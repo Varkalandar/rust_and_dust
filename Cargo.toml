@@ -1,0 +1,21 @@
+[package]
+name = "fractal_lands"
+version = "0.1.0"
+edition = "2024"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies.image]
+version = "0.25"
+default-features = false
+features = ["png", "jpeg"]
+
+[dependencies]
+rodio = "0.18"
+freetype-rs = "0.34.0"
+vecmath = "1.0"
+rand = "0.9"
+glium = "0.36"
+glutin = "0.32"
+geo = "0.29"
+
