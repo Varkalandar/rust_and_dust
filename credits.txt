@@ -1,0 +1,6 @@
+Fonts
+-----
+
+Fira Sans by Mozilla Foundation (SIL Open Font License)
+https://mozilla.org/
+
