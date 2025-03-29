@@ -7,7 +7,7 @@ Fight monsters, collect rust and dust, erm, gold! Items! Yes ... and stay alive.
 
 ### Install Rust
 
-You need to have Rust installed on your computer to build Rust and Dust Collector from source. Please see https://www.rust-lang.org/tools/install for further instructions. Once Rust is installed, you can compile and start fractal lands this way:
+You need to have Rust installed on your computer to build Rust and Dust Collector from source. Please see https://www.rust-lang.org/tools/install for further instructions. Once Rust is installed, you can compile and start Rust and Dust Collector this way:
 
     git clone https://github.com/Varkalandar/rust_and_dust.git
     cd rust_and_dust
