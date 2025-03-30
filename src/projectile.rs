@@ -15,7 +15,7 @@ pub struct ProjectileBuilder {
 
 
 pub struct ProjectileConfig {
-    speed: f64, // movement speed
+    speed: f32, // movement speed
     base_tile_id: usize,
     directions: usize,
     phases: usize,
@@ -35,7 +35,7 @@ impl ProjectileBuilder {
         }
     }
 
-    pub fn configure_projectile(&self, key: &str, visual: &mut Visual, velocity: &mut Vector2<f64>, speaker: &mut SoundPlayer) {
+    pub fn configure_projectile(&self, key: &str, visual: &mut Visual, velocity: &mut Vector2<f32>, speaker: &mut SoundPlayer) {
         let pd = self.projectile_data.get(&key.to_string()).unwrap();
 
         speaker.play_sound(pd.sound, pd.volume);
@@ -65,7 +65,7 @@ fn read_projectile_config() -> HashMap <String, ProjectileConfig> {
 
         projectiles.insert(name, 
             ProjectileConfig {
-                speed: parts.next().unwrap().parse::<f64>().unwrap(),
+                speed: parts.next().unwrap().parse::<f32>().unwrap(),
                 base_tile_id: parts.next().unwrap().parse::<usize>().unwrap(),
                 directions: parts.next().unwrap().parse::<usize>().unwrap(),
                 phases: parts.next().unwrap().parse::<usize>().unwrap(),

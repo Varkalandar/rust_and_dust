@@ -20,8 +20,9 @@ pub struct Item {
     pub inventory_w: i32,
     pub inventory_h: i32,
     pub inventory_scale: f32,
-    pub slot: Slot,
     pub map_tile_id: usize,
+    pub map_scale: f32,
+    pub slot: Slot,
     pub stack_size: u32,         // some items can be stacked and must have a stack count
     pub max_stack_size: u32,
 }
@@ -117,6 +118,7 @@ impl ItemFactory {
             inventory_w: proto.inventory_w,
             inventory_h: proto.inventory_h,
             inventory_scale: proto.inventory_scale,
+            map_scale: proto.map_scale,
             slot: proto.slot,
         
             map_tile_id: proto.map_tile_id,
@@ -148,6 +150,7 @@ fn read_proto_items() -> HashMap<String, Item> {
                 inventory_w: parts.next().unwrap().parse::<i32>().unwrap(),
                 inventory_h: parts.next().unwrap().parse::<i32>().unwrap(),
                 inventory_scale: parts.next().unwrap().parse::<f32>().unwrap(),
+                map_scale: parts.next().unwrap().parse::<f32>().unwrap(),
                 slot: calc_slot(parts.next().unwrap().parse::<i32>().unwrap()),
                 stack_size: 1,
                 max_stack_size: parts.next().unwrap().parse::<u32>().unwrap(),
@@ -178,6 +181,7 @@ fn read_plugins() -> Vec<Item> {
             inventory_w: parts.next().unwrap().parse::<i32>().unwrap(),
             inventory_h: parts.next().unwrap().parse::<i32>().unwrap(),
             inventory_scale: parts.next().unwrap().parse::<f32>().unwrap(),
+            map_scale: parts.next().unwrap().parse::<f32>().unwrap(),
             slot: Slot::Bag,
             stack_size: 1,
             max_stack_size: 1,

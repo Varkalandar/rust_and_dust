@@ -58,30 +58,30 @@ pub struct ButtonArgs {
 #[derive(Debug, Clone)]
 pub struct ButtonEvent {
     pub args: ButtonArgs,
-    pub mx: f64,
-    pub my: f64,
+    pub mx: f32,
+    pub my: f32,
 }
 
 impl ButtonEvent {
     fn translate(&self, x: i32, y: i32) -> ButtonEvent {
         ButtonEvent {
             args: self.args.clone(),
-            mx: self.mx + x as f64,
-            my: self.my + y as f64,
+            mx: self.mx + x as f32,
+            my: self.my + y as f32,
         }
     }
 }
 
 
 pub struct MouseState {
-    pub position: Vector2<f64>,
-    drag_start: Vector2<f64>,
+    pub position: Vector2<f32>,
+    drag_start: Vector2<f32>,
     pub left_pressed: bool,    
 }
 
 
 impl MouseState {
-    pub fn record_drag_start(&mut self) -> Vector2<f64> {
+    pub fn record_drag_start(&mut self) -> Vector2<f32> {
         self.drag_start = self.position;
         self.drag_start
     }
@@ -127,7 +127,7 @@ pub trait UiController {
 
     }
 
-    fn update(&mut self, _appdata: &mut Self::Appdata, _dt: f64) {
+    fn update(&mut self, _appdata: &mut Self::Appdata, _dt: f32) {
 
     }
 }
@@ -211,8 +211,8 @@ impl UI {
     }
 
     
-    pub fn window_center(&self) -> Vector2<f64> {
-        [(self.context.window_size[0] / 2) as f64, (self.context.window_size[1] / 2) as f64]
+    pub fn window_center(&self) -> Vector2<f32> {
+        [(self.context.window_size[0] / 2) as f32, (self.context.window_size[1] / 2) as f32]
     }
 
 
@@ -278,7 +278,7 @@ impl UI {
 
     
     pub fn make_scrollpane(&self, x: i32, y: i32, w: i32, h: i32, 
-                           child: UiComponent, scroll_step_x: i32, scroll_step_y: i32) -> UiComponent {
+                           child: UiComponent, scroll_step_x: f32, scroll_step_y: f32) -> UiComponent {
         let scrollpane = UiScrollpane {
             area: UiArea {
                 x, 
@@ -289,8 +289,8 @@ impl UI {
             child,
             offset_x: 0,
             offset_y: 0,
-            scroll_step_x: scroll_step_x as f64,
-            scroll_step_y: scroll_step_y as f64,
+            scroll_step_x,
+            scroll_step_y,
         };
         
         UiComponent {
@@ -380,7 +380,7 @@ impl UI {
 
 
     pub fn handle_mouse_move_event(&mut self, event: &MouseMoveEvent) -> Option<&dyn UiHead> {
-        self.context.mouse_state.position = [event.mx as f64, event.my as f64];
+        self.context.mouse_state.position = [event.mx as f32, event.my as f32];
         self.root.head.handle_mouse_move_event(event, &self.context.mouse_state)
     }
 
@@ -391,16 +391,16 @@ impl UI {
 }
 
 pub struct MouseMoveEvent {
-    pub mx: f64,
-    pub my: f64,
+    pub mx: f32,
+    pub my: f32,
 }
 
 
 pub struct ScrollEvent {
-    pub dx: f64,
-    pub dy: f64,
-    pub mx: f64,
-    pub my: f64,
+    pub dx: f32,
+    pub dy: f32,
+    pub mx: f32,
+    pub my: f32,
 }
 
 
@@ -701,8 +701,8 @@ pub struct UiScrollpane
     child: UiComponent,
     offset_x: i32,
     offset_y: i32,
-    scroll_step_x: f64,
-    scroll_step_y: f64
+    scroll_step_x: f32,
+    scroll_step_y: f32
 }
 
 

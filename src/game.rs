@@ -117,7 +117,7 @@ impl UiController for Game {
     }
 
 
-    fn update(&mut self, world: &mut Self::Appdata, dt: f64) {
+    fn update(&mut self, world: &mut Self::Appdata, dt: f32) {
         let map = &mut world.map;
         let inv = &mut world.player_inventory;
         let rng = &mut world.rng;
@@ -157,7 +157,7 @@ impl Game {
 }
 
 
-pub fn fire_projectile(shooter_position: Vector2<f64>, fire_at: Vector2<f64>, 
+pub fn fire_projectile(shooter_position: Vector2<f32>, fire_at: Vector2<f32>, 
                        projectile_type: MobType, factory: &mut MapObjectFactory) -> MapObject {
     println!("New projectile fired at {:?}", fire_at);
 

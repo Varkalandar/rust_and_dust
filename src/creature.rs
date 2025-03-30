@@ -10,7 +10,7 @@ pub struct CreatureFactory {
 struct CreaturePrototype {
     pub base_tile_id: usize,
     pub frames: usize,
-    pub speed: f64,
+    pub speed: f32,
     pub min_hp: i32,
     pub max_hp: i32,
 }
@@ -19,7 +19,7 @@ struct CreaturePrototype {
 pub struct Creature {
     pub base_tile_id: usize,
     pub frames: usize,
-    pub base_speed: f64,
+    pub base_speed: f32,
     pub hit_points: i32,
 }
 
@@ -62,7 +62,7 @@ fn read_creature_prototypes() -> HashMap <String, CreaturePrototype> {
             CreaturePrototype {
                 base_tile_id: parts.next().unwrap().parse::<usize>().unwrap(),
                 frames: parts.next().unwrap().parse::<usize>().unwrap(),
-                speed: parts.next().unwrap().parse::<f64>().unwrap(),
+                speed: parts.next().unwrap().parse::<f32>().unwrap(),
                 min_hp: parts.next().unwrap().parse::<i32>().unwrap(),
                 max_hp: parts.next().unwrap().parse::<i32>().unwrap(),
             });

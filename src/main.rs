@@ -222,7 +222,7 @@ impl App {
         let difference = now.duration_since(self.update_time);
 
         if difference.is_ok() {
-            let secs = difference.unwrap().as_secs_f64();
+            let secs = difference.unwrap().as_secs_f32();
 
             // try to limit to 100 updates per second
             if secs < 0.01 {
@@ -332,7 +332,7 @@ impl App {
                     world: &GameWorld, tex_white: &Texture2d, layer_id: usize) {
 
         let (display_width, display_height) = display.get_framebuffer_dimensions();
-        let window_center = [display_width as f64 * 0.5, display_height as f64 * 0.5];
+        let window_center = [display_width as f32 * 0.5, display_height as f32 * 0.5];
 
         let pos_frac = &world.map.get_player_position();
         let player_position = &[pos_frac[0].floor(), pos_frac[1].floor()];
@@ -398,8 +398,8 @@ impl App {
                     tex_white,
                     tpos[0],
                     tpos[1], 
-                    (tile.size[0] * mob.visual.scale / 16.0) as f32, 
-                    (tile.size[1] * mob.visual.scale / 16.0) as f32, 
+                    (tile.size[0] as f32 * mob.visual.scale / 16.0), 
+                    (tile.size[1] as f32 * mob.visual.scale / 16.0), 
                     &[0.15, 0.2, 0.1, 1.0]);
             }
 
@@ -457,7 +457,7 @@ impl App {
     }
 
     
-    fn move_player(&mut self, window_center: Vector2<f64>) {
+    fn move_player(&mut self, window_center: Vector2<f32>) {
         
         let screen_direction = vec2_sub(self.ui.context.mouse_state.position, window_center);
         
@@ -506,7 +506,7 @@ impl App {
             }        
         }
 
-        let window_center: Vector2<f64> = self.ui.window_center(); 
+        let window_center: Vector2<f32> = self.ui.window_center(); 
         let controller = &mut self.controllers.current();
         let world = &mut self.world;
         let ui = &mut self.ui;
@@ -567,10 +567,10 @@ pub fn parse_rgba(color_str: &str) -> [f32; 4] {
 }
 
 
-pub fn screen_to_world_pos(ui: &UI, player_pos: &Vector2<f64>, screen_pos: &Vector2<f64>) -> Vector2<f64>
+pub fn screen_to_world_pos(ui: &UI, player_pos: &Vector2<f32>, screen_pos: &Vector2<f32>) -> Vector2<f32>
 {
-    let rel_mouse_x = screen_pos[0] - (ui.context.window_size[0]/2) as f64;
-    let rel_mouse_y = (screen_pos[1] - (ui.context.window_size[1]/2) as f64) * 2.0;
+    let rel_mouse_x = screen_pos[0] - (ui.context.window_size[0] / 2) as f32;
+    let rel_mouse_y = (screen_pos[1] - (ui.context.window_size[1] / 2) as f32) * 2.0;
 
     // transform to world coordinates
     // it is relatrive to player position
@@ -580,7 +580,7 @@ pub fn screen_to_world_pos(ui: &UI, player_pos: &Vector2<f64>, screen_pos: &Vect
 }
 
 
-pub fn calc_tile_position(position: &Vector2<f64>, foot: Vector2<f64>, scale: f64, player_position: &Vector2<f64>, window_center: &Vector2<f64>) -> [f32; 2] {
+pub fn calc_tile_position(position: &Vector2<f32>, foot: Vector2<f32>, scale: f32, player_position: &Vector2<f32>, window_center: &Vector2<f32>) -> [f32; 2] {
         
     let mut pos_x = position[0] - player_position[0];
     let mut pos_y = (position[1] - player_position[1]) * 0.5;  
@@ -590,12 +590,12 @@ pub fn calc_tile_position(position: &Vector2<f64>, foot: Vector2<f64>, scale: f6
     pos_x += -foot[0] * scale;
     pos_y += -foot[1] * scale;
     
-    [pos_x as f32, pos_y as f32]
+    [pos_x, pos_y]
 }
 
 
-fn quadratic_fade(x: f64) -> f32 {
-    (1.0 - (x*x)) as f32
+fn quadratic_fade(x: f32) -> f32 {
+    (1.0 - (x*x))
 }
 
 
@@ -663,8 +663,8 @@ impl ApplicationHandler for App {
                 // println!("mouse position = {:?}", position);
 
                 let event = MouseMoveEvent {
-                    mx: position.x,
-                    my: position.y,
+                    mx: position.x as f32,
+                    my: position.y as f32,
                 };
                 self.handle_mouse_move_event(&event);
             },
@@ -675,8 +675,8 @@ impl ApplicationHandler for App {
                 match delta {
                     MouseScrollDelta::LineDelta(dx, dy) => {
                         let event = ScrollEvent {
-                            dx: dx as f64,
-                            dy: dy as f64,
+                            dx: dx as f32,
+                            dy: dy as f32,
                             mx: self.ui.context.mouse_state.position[0],
                             my: self.ui.context.mouse_state.position[1],
                         };

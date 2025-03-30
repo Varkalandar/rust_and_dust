@@ -145,21 +145,21 @@ impl Map {
     }
 
 
-    pub fn get_player_position(&self) -> Vector2<f64> {
+    pub fn get_player_position(&self) -> Vector2<f32> {
 
         let mob: &MapObject = self.layers[MAP_OBJECT_LAYER].get(&self.player_id).unwrap();
         return mob.position;
     }
 
 
-    pub fn set_player_position(&mut self, position: Vector2<f64>) {
+    pub fn set_player_position(&mut self, position: Vector2<f32>) {
 
         let mob: &mut MapObject = self.layers[MAP_OBJECT_LAYER].get_mut(&self.player_id).unwrap();
         mob.position = position;
     }
 
 
-    pub fn find_nearest_object(layer: &HashMap<u64, MapObject>, position: &Vector2<f64>, search_radius: f64, ignore_uid: u64) -> Option<u64> {
+    pub fn find_nearest_object(layer: &HashMap<u64, MapObject>, position: &Vector2<f32>, search_radius: f32, ignore_uid: u64) -> Option<u64> {
         let mut distance = search_radius * search_radius;
         let mut best_id = 0;
 
@@ -187,7 +187,7 @@ impl Map {
     }
 
 
-    pub fn update(&mut self, dt: f64, 
+    pub fn update(&mut self, dt: f32, 
                   inventory: &mut Inventory, rng: &mut StdRng, speaker: &mut SoundPlayer) {
 
         let mut kill_list = Vec::new();
@@ -231,7 +231,7 @@ impl Map {
 
                 if len > 0 {
                     let chance = particles.spawn_chance * dt;
-                    if rng.random::<f64>() < chance {
+                    if rng.random::<f32>() < chance {
                         let spark = particles.spawn_ids[rng.random_range(0..len)];
                         
                         particles.add_particle(0.0, -400.0, 0.0, 0.0, 0.0, 0.0, 
@@ -302,7 +302,7 @@ impl Map {
         }
     }
 
-    fn check_pickup(layer: &mut HashMap<u64, MapObject>, position: &Vector2<f64>,
+    fn check_pickup(layer: &mut HashMap<u64, MapObject>, position: &Vector2<f32>,
         inventory: &mut Inventory, player_id: u64) {
         let option = Map::find_nearest_object(layer, position, 100.0, player_id);
         match option {
@@ -395,9 +395,9 @@ impl Map {
                 speaker.play(Sound::FireballHit, 0.5);
 
                 for _i in 0..10 {
-                    let xv = rng.random::<f64>() * 2.0 - 1.0;
-                    let yv = rng.random::<f64>() * 2.0 - 1.0;
-                    let zv = rng.random::<f64>();
+                    let xv = rng.random::<f32>() * 2.0 - 1.0;
+                    let yv = rng.random::<f32>() * 2.0 - 1.0;
+                    let zv = rng.random::<f32>();
 
                     let color = [0.8 + rng.random::<f32>() * 0.4, 0.5 + rng.random::<f32>() * 0.4, 0.1 + rng.random::<f32>() * 0.4];
                     let tile = sparks[rng.random_range(0..sparks.len())];
@@ -490,10 +490,10 @@ impl Map {
         let tile_id = parts[1].parse::<usize>().unwrap();
         let directions = parts[2].parse::<usize>().unwrap();
 
-        let x = parts[3].parse::<f64>().unwrap();
-        let y = parts[4].parse::<f64>().unwrap();
-        let height = parts[5].parse::<f64>().unwrap();
-        let scale = parts[6].parse::<f64>().unwrap();
+        let x = parts[3].parse::<f32>().unwrap();
+        let y = parts[4].parse::<f32>().unwrap();
+        let height = parts[5].parse::<f32>().unwrap();
+        let scale = parts[6].parse::<f32>().unwrap();
 
         // parts[7] is an RGBA tuple
         let color = parse_rgba(parts[7]);
@@ -513,9 +513,9 @@ impl Map {
     fn load_transition(&mut self, line: &str) {
         let mut parts = line.split(",");
 
-        let x = parts.next().unwrap().parse::<f64>().unwrap();
-        let y = parts.next().unwrap().parse::<f64>().unwrap();
-        let r = parts.next().unwrap().parse::<f64>().unwrap();
+        let x = parts.next().unwrap().parse::<f32>().unwrap();
+        let y = parts.next().unwrap().parse::<f32>().unwrap();
+        let r = parts.next().unwrap().parse::<f32>().unwrap();
         let map_id = parts.next().unwrap().parse::<i32>().unwrap();
 
         self.transitions.push(MapTransition {
@@ -609,7 +609,7 @@ impl Map {
     }
 
     
-    pub fn move_selected_object(&mut self, dx: f64, dy: f64) {        
+    pub fn move_selected_object(&mut self, dx: f32, dy: f32) {        
         if self.has_selection {
             let object = self.layers[self.selected_layer].get_mut(&self.selected_item).unwrap();
             object.position[0] += dx;
@@ -628,7 +628,7 @@ impl Map {
     }
 
 
-    pub fn make_creatures(&mut self, id: &str, min_count: i32, max_count: i32, center: Vector2<f64>, spacing: f64, scale: f64, rng: &mut StdRng) -> Vec<MapObject> {
+    pub fn make_creatures(&mut self, id: &str, min_count: i32, max_count: i32, center: Vector2<f32>, spacing: f32, scale: f32, rng: &mut StdRng) -> Vec<MapObject> {
 
         let count = rng.random_range(min_count ..= max_count) as usize;
 
@@ -642,8 +642,8 @@ impl Map {
             // don't place mobs in the same spot if possible
             // 10 tries will be made to find a clear spot
             loop {
-                let x = center[0] + spacing * (rng.random::<f64>() * 10.0 - 5.0);
-                let y = center[1] + spacing * (rng.random::<f64>() * 10.0 - 5.0);
+                let x = center[0] + spacing * (rng.random::<f32>() * 10.0 - 5.0);
+                let y = center[1] + spacing * (rng.random::<f32>() * 10.0 - 5.0);
     
                 let mut ok = true;
                 for mob in &list {
@@ -662,7 +662,7 @@ impl Map {
                     let mut mob = self.factory.create_mob(creature.base_tile_id, CREATURE_TILESET, [x, y], 32.0, scale);
                     mob.mob_type = MobType::Creature;
                     mob.creature = Some(creature);
-                    mob.animation_timer = rng.random::<f64>(); // otherwise all start with the very same frame
+                    mob.animation_timer = rng.random::<f32>(); // otherwise all start with the very same frame
                     list.push(mob);
 
                     break; 
@@ -678,7 +678,7 @@ impl Map {
     }
 
     
-    pub fn make_creature_group(&mut self, id: &str, min_count: i32, max_count: i32, center: Vector2<f64>, spacing: f64, rng: &mut StdRng) -> MobGroup {
+    pub fn make_creature_group(&mut self, id: &str, min_count: i32, max_count: i32, center: Vector2<f32>, spacing: f32, rng: &mut StdRng) -> MobGroup {
         
         let mut mobs = self.make_creatures(id, min_count, max_count, center, spacing, 0.5, rng);
         let mut list = Vec::new();
@@ -698,7 +698,7 @@ impl Map {
 }
 
 
-fn emit_drive_particles(mob: &mut MapObject, dt: f64, rng: &mut StdRng) {
+fn emit_drive_particles(mob: &mut MapObject, dt: f32, rng: &mut StdRng) {
 
     let direction = vec2_scale(mob.velocity, -1.0);
     let rad = 0.25;
@@ -706,23 +706,23 @@ fn emit_drive_particles(mob: &mut MapObject, dt: f64, rng: &mut StdRng) {
     let chance_per_second = 20.0;
     let chance = chance_per_second * dt;
 
-    if rng.random::<f64>() < chance {
-        let xp = direction[0] * rad + direction[1] * (rng.random::<f64>() * 2.0 - 1.0) * 0.15;
-        let yp = direction[1] * rad + direction[0] * (rng.random::<f64>() * 2.0 - 1.0) * 0.15;
+    if rng.random::<f32>() < chance {
+        let xp = direction[0] * rad + direction[1] * (rng.random::<f32>() * 2.0 - 1.0) * 0.15;
+        let yp = direction[1] * rad + direction[0] * (rng.random::<f32>() * 2.0 - 1.0) * 0.15;
 
-        let xv = direction[0] + rng.random::<f64>() * 2.0 - 1.0;
-        let yv = direction[1] + rng.random::<f64>() * 2.0 - 1.0;
-        let zv = (rng.random::<f64>() *2.0 - 1.0) * 0.15;
+        let xv = direction[0] + rng.random::<f32>() * 2.0 - 1.0;
+        let yv = direction[1] + rng.random::<f32>() * 2.0 - 1.0;
+        let zv = (rng.random::<f32>() *2.0 - 1.0) * 0.15;
         let speed = 1.0;
 
-        let spark = 1993 + (rng.random::<f64>() * 5.0) as usize;
+        let spark = 1993 + (rng.random::<f32>() * 5.0) as usize;
 
         mob.visual.particles.add_particle(xp, yp, 25.0, xv * speed, yv * speed, zv * speed, 1.0, spark, [0.5, 0.8, 1.0]);
     }
 }
 
 
-pub fn move_mob(mob: &mut MapObject, destination: Vector2<f64>, base_speed: f64) {
+pub fn move_mob(mob: &mut MapObject, destination: Vector2<f32>, base_speed: f32) {
 
     let direction = vec2_sub(destination, mob.position);
 
@@ -732,7 +732,7 @@ pub fn move_mob(mob: &mut MapObject, destination: Vector2<f64>, base_speed: f64)
     let time = distance / base_speed; // pixel per second
 
     mob.move_time_left = time;
-    mob.velocity = vec2_scale(direction, 1.0/time);
+    mob.velocity = vec2_scale(direction, 1.0 / time);
 
     let d = mob.visual.orient(direction);
     mob.visual.current_image_id = mob.visual.base_image_id + d;
@@ -774,19 +774,19 @@ pub struct MapObject {
     pub item: Option<Item>,
 
     // world coordinates of this object. Note that screen coordinates are different
-    pub position: Vector2<f64>,
-    pub velocity: Vector2<f64>,
-    pub move_time_left: f64,
+    pub position: Vector2<f32>,
+    pub velocity: Vector2<f32>,
+    pub move_time_left: f32,
 
     pub move_end_action: MoveEndAction,
     pub update_action: UpdateAction,
-    pub animation_timer: f64,
+    pub animation_timer: f32,
 }
 
 
 impl MapObject {
     
-    pub fn move_dt(&mut self, dt: f64) {
+    pub fn move_dt(&mut self, dt: f32) {
         if self.move_time_left > 0.0 {
             let distance = vec2_scale(self.velocity, dt);
             self.position = vec2_add(self.position, distance);
@@ -803,7 +803,7 @@ pub struct MapObjectFactory {
 
 impl MapObjectFactory {
 
-    pub fn create_mob(&mut self, tile_id: usize, tileset_id: usize, position: Vector2<f64>, height: f64, scale: f64) -> MapObject {
+    pub fn create_mob(&mut self, tile_id: usize, tileset_id: usize, position: Vector2<f32>, height: f32, scale: f32) -> MapObject {
 
         let visual = Visual {
             base_image_id: tile_id,
@@ -865,8 +865,8 @@ pub struct Visual {
     pub directions: usize,
     pub phases: usize, // animation phases per direction 
     pub tileset_id: usize,
-    pub height: f64,
-    pub scale: f64,
+    pub height: f32,
+    pub scale: f32,
     pub color: [f32; 4],
     pub glow: [f32; 4], // ground illumination color
     pub blend: BlendMode,
@@ -875,8 +875,9 @@ pub struct Visual {
 
 
 impl Visual {
-    pub fn orient(&self, direction: Vector2<f64>) -> usize {
-        let directions = self.directions;
+    pub fn orient(&self, direction: Vector2<f32>) -> usize {
+        let directions = self.directions as f32;
+        let pi = PI as f32;
         let mut result = 0;
 
         if direction[0] != 0.0 && direction[1] != 0.0 {
@@ -884,16 +885,16 @@ impl Visual {
             let mut r = direction[1].atan2(direction[0]);
             
             // round to a segment
-            r = r + PI + PI * 2.0 / directions as f64;
+            r = r + pi + pi * 2.0 / directions;
         
             // calculate tile offsets from 0 to directions-1
 
-            let f = (r * directions as f64)  / (PI * 2.0) - 0.5;
+            let f = (r * directions)  / (pi * 2.0) - 0.5;
 
-            result = directions/2 + f.floor() as usize;
+            result = self.directions/2 + f.floor() as usize;
 
-            if result >= directions {
-                result = result - directions;
+            if result >= self.directions {
+                result = result - self.directions;
             }
 
             // println!("dx={} dy={} r={} directions={}", direction[0], direction[1], result, directions);
@@ -907,7 +908,7 @@ impl Visual {
     }
 
 
-    pub fn orient_in_direction(&mut self, direction: Vector2<f64>) {
+    pub fn orient_in_direction(&mut self, direction: Vector2<f32>) {
         let offset = self.orient(direction);
         self.current_image_id = self.base_image_id + offset;
 
@@ -929,9 +930,11 @@ pub enum MobType {
 pub struct MapTransition {
 
     // entrance location
-    from: Vector2<f64>,
+    from: Vector2<f32>,
+    
     // catchment area
-    rad: f64,
+    rad: f32,
+
     // destination map
     to: i32,
 }

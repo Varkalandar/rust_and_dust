@@ -22,7 +22,7 @@ pub struct Room {
 
 
 pub struct Dungeon {
-    pub start_position: [f64; 2],
+    pub start_position: [f32; 2],
 
     pub rooms: Vec<Room>,
     pub corridors: Vec<HashMap<i32, [i32; 2]>>,
@@ -187,10 +187,8 @@ fn rooms_and_corridors<R: Rng + ?Sized>(map: &mut Map, factory: &mut ItemFactory
         }
     }
 
-    let spos = map_pos(rooms[0].x2 - 1, rooms[0].y1 + 1, 0, 1.0);
-
     Dungeon {
-        start_position: [spos[0] as f64, spos[1] as f64],
+        start_position: map_pos(rooms[0].x2 - 1, rooms[0].y1 + 1, 0, 1.0),
         rooms, 
         corridors,
     }
@@ -533,7 +531,7 @@ fn place_floor_tile(map: &mut Map, x: i32, y: i32, id: usize, color: [f32; 4]) {
     let scale = 1.0;
     let pos = map_pos(x, y, 0, scale);
 
-    let mob_id = create_mob(map, id, layer, [pos[0] as f64, pos[1] as f64], height, scale);
+    let mob_id = create_mob(map, id, layer, pos, height, scale);
 
     let mob = map.layers[layer].get_mut(&mob_id).unwrap();
 
@@ -547,7 +545,7 @@ fn place_wall_tile(map: &mut Map, x: i32, y: i32, z_off: i32, id: usize, color: 
     let scale = 1.0;
     let pos = map_pos(x, y, z_off, scale);
 
-    let mob_id = create_mob(map, id, layer, [pos[0] as f64, pos[1] as f64], height, scale);
+    let mob_id = create_mob(map, id, layer, pos, height, scale);
     let mob = map.layers[layer].get_mut(&mob_id).unwrap();
 
     mob.visual.color = color;
@@ -561,7 +559,7 @@ fn place_coins(map: &mut Map, factory: &mut ItemFactory,
     let scale = 1.0;
     let pos = map_pos(x, y, 0, scale);
 
-    let mob_id = create_mob(map, 0, layer, [pos[0] as f64, pos[1] as f64], height, scale);
+    let mob_id = create_mob(map, 0, layer, pos, height, scale);
 
     let mob = map.layers[layer].get_mut(&mob_id).unwrap();
 
@@ -571,13 +569,14 @@ fn place_coins(map: &mut Map, factory: &mut ItemFactory,
     mob.visual.tileset_id = 6;
     mob.visual.base_image_id = item.map_tile_id;  
     mob.visual.current_image_id = item.map_tile_id + Item::calc_image_offset_for_stack_size(count);
+    mob.visual.scale = item.map_scale;
     mob.item = Some(item);
     mob_id
 }
 
 
-fn create_mob(map: &mut Map, tile_id: usize, layer: usize, position: Vector2<f64>, height: f64, scale: f32) -> u64 {
-    let mob = map.factory.create_mob(tile_id, layer, position, height, scale as f64);
+fn create_mob(map: &mut Map, tile_id: usize, layer: usize, position: Vector2<f32>, height: f32, scale: f32) -> u64 {
+    let mob = map.factory.create_mob(tile_id, layer, position, height, scale);
     let mob_id = mob.uid;
     map.layers[layer].insert(mob_id, mob);
 

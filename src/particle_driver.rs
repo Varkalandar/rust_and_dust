@@ -3,14 +3,14 @@ const PMAX: usize = 1024;
 pub struct Particle 
 {
     pub active: bool,
-    pub lifetime: f64,
-    pub age: f64,
-    pub xpos: f64,
-    pub ypos: f64,
-    pub zpos: f64,
-    pub xvel: f64,
-    pub yvel: f64,
-    pub zvel: f64,
+    pub lifetime: f32,
+    pub age: f32,
+    pub xpos: f32,
+    pub ypos: f32,
+    pub zpos: f32,
+    pub xvel: f32,
+    pub yvel: f32,
+    pub zvel: f32,
     pub tex_id: usize,
     pub color: [f32; 3],
 }    
@@ -41,7 +41,7 @@ pub struct ParticleDriver {
     pub spawn_ids: Vec<usize>,
 
     // chance to spawn a new partile per second
-    pub spawn_chance: f64,
+    pub spawn_chance: f32,
 
     pub spawn_tile_set: usize, 
 }
@@ -62,7 +62,7 @@ impl ParticleDriver {
     }
     
 
-    pub fn add_particle(&mut self, x: f64, y: f64, z: f64, xv: f64, yv: f64, zv: f64, lifetime: f64, tex_id: usize, color: [f32; 3]) -> bool {
+    pub fn add_particle(&mut self, x: f32, y: f32, z: f32, xv: f32, yv: f32, zv: f32, lifetime: f32, tex_id: usize, color: [f32; 3]) -> bool {
 
         for i in self.start_search_mark .. PMAX {
             if self.particles[i].active == false {
@@ -95,7 +95,7 @@ impl ParticleDriver {
     }
 
     
-    pub fn drive(&mut self, dt: f64)  {
+    pub fn drive(&mut self, dt: f32)  {
 
         let mut last_active_particle = -1;
         

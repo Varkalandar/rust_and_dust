@@ -9,8 +9,8 @@ use crate::load_texture;
 
 pub struct Tile {
     pub id: usize,
-    pub size: Vector2<f64>,
-    pub foot: Vector2<f64>,
+    pub size: Vector2<f32>,
+    pub foot: Vector2<f32>,
     pub tex: Texture2d,
     pub name: String,
 }
@@ -105,12 +105,12 @@ fn load_tile(display: &Display<WindowSurface>, path_str: &str, lines: &Vec<&str>
     let id = lines[start + 2].parse::<usize>().unwrap();
 
     let mut size = lines[start + 3].split(" ");
-    let width = size.next().unwrap().parse::<f64>().unwrap();
-    let height = size.next().unwrap().parse::<f64>().unwrap();
+    let width = size.next().unwrap().parse::<f32>().unwrap();
+    let height = size.next().unwrap().parse::<f32>().unwrap();
 
     let mut foot = lines[start + 5].split(" ");
-    let foot_x = foot.next().unwrap().parse::<f64>().unwrap();
-    let foot_y = foot.next().unwrap().parse::<f64>().unwrap();
+    let foot_x = foot.next().unwrap().parse::<f32>().unwrap();
+    let foot_y = foot.next().unwrap().parse::<f32>().unwrap();
 
     let name = lines[start + 11];
 

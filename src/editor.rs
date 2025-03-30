@@ -305,7 +305,7 @@ impl UiController for MapEditor {
             let player_position = &world.map.get_player_position();
 
             let mp = &ui.context.mouse_state.position;
-            let window_center: Vector2<f64> = ui.window_center(); 
+            let window_center: Vector2<f32> = ui.window_center(); 
 
             let pos = screen_to_world_pos(&ui, player_position, mp);
             let tpos = calc_tile_position(&pos, tile.foot, 1.0, player_position, &window_center);            
@@ -361,7 +361,7 @@ impl UiController for MapEditor {
     }
 
 
-    fn update(&mut self, world: &mut Self::Appdata, dt: f64) {
+    fn update(&mut self, world: &mut Self::Appdata, dt: f32) {
         let map = &mut world.map;
         let inv = &mut world.player_inventory;
         let rng = &mut world.rng;
@@ -454,13 +454,13 @@ impl MapEditor {
             }
         }
 
-        let scrolly = ui.make_scrollpane((ww - w)/2, (wh - h)/2, w, h, cont, 64, 64);
+        let scrolly = ui.make_scrollpane((ww - w)/2, (wh - h)/2, w, h, cont, 64.0, 64.0);
         scrolly
     }
 }
 
 
-fn place_particle_generator(world: &mut GameWorld, pos: Vector2<f64>) {
+fn place_particle_generator(world: &mut GameWorld, pos: Vector2<f32>) {
     let id = 212;
     let map = &mut world.map;
     let layer = MAP_OBJECT_LAYER;

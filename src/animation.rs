@@ -4,7 +4,7 @@ use crate::ANIMATION_TILESET;
 use crate::gl_support::BlendMode;
 
 pub trait Animated {
-    fn update(&self, _dt: f64, _mob: &mut MapObject) {
+    fn update(&self, _dt: f32, _mob: &mut MapObject) {
 
     }
 }
@@ -19,11 +19,11 @@ impl Animated for NoAnimation {
 
 
 pub struct SpinAnimation {
-    speed: f64,
+    speed: f32,
 }
 
 impl SpinAnimation {
-    pub fn new(speed: f64) -> SpinAnimation {
+    pub fn new(speed: f32) -> SpinAnimation {
         SpinAnimation {
             speed,
         }
@@ -31,7 +31,7 @@ impl SpinAnimation {
 }
 
 impl Animated for SpinAnimation {
-    fn update(&self, dt: f64, mob: &mut MapObject) {
+    fn update(&self, dt: f32, mob: &mut MapObject) {
         mob.animation_timer += dt;
 
         let frame = (mob.animation_timer * self.speed) as usize;
@@ -41,12 +41,12 @@ impl Animated for SpinAnimation {
 
 
 pub struct RemovalAnimation {
-    time_limit: f64,
-    timer_start: f64, 
+    time_limit: f32,
+    timer_start: f32, 
 }
 
 impl RemovalAnimation {
-    pub fn new(timer_start: f64, time_limit: f64) -> RemovalAnimation {
+    pub fn new(timer_start: f32, time_limit: f32) -> RemovalAnimation {
         RemovalAnimation {
             time_limit,
             timer_start,
@@ -55,7 +55,7 @@ impl RemovalAnimation {
 }
 
 impl Animated for RemovalAnimation {
-    fn update(&self, dt: f64, mob: &mut MapObject) {
+    fn update(&self, dt: f32, mob: &mut MapObject) {
         mob.animation_timer += dt;
 
         let countdown = mob.animation_timer - self.timer_start;

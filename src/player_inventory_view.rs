@@ -32,8 +32,8 @@ pub struct PlayerInventoryView {
 
     hover_item: Option<usize>,
     dragged_item: Option<usize>,
-    drag_x: f64,
-    drag_y: f64,
+    drag_x: f32,
+    drag_y: f32,
 
     font: Rc<UiFont>,
 }
