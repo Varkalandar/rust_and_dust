@@ -330,21 +330,28 @@ impl Map {
 
 
     pub fn check_player_transition(&mut self, rng: &mut StdRng) -> bool {
-        let player = self.layers[MAP_OBJECT_LAYER].get(&self.player_id).unwrap();
-        let pos = player.position;
-        let mut best_map = -1;
+        let player_pos = self.layers[MAP_OBJECT_LAYER].get(&self.player_id).unwrap().position;
+        let mut best_index = None;
         
-        for transit in &self.transitions {
-            let v = vec2_sub(pos, transit.from);
+        for i in 0 .. self.transitions.len() {
+            let transit = &self.transitions[i];
+            let v = vec2_sub(player_pos, transit.from);
             let d = vec2_square_len(v);
             if d < transit.rad * transit.rad {
-                best_map = transit.to;
+                best_index = Some(i);
             }
         }
 
-        if best_map >= 0 {
-            self.load("warmup.map");
-            self.populate("warmup.csv", rng);
+        // println!("Checked {} transitions, best is {:?}", self.transitions.len(), best_index);
+
+        if best_index.is_some() {
+            let dest_pos = self.transitions[best_index.unwrap()].to_location;
+
+            self.load("town.map");
+            self.populate("town.csv", rng);
+
+            let player = self.layers[MAP_OBJECT_LAYER].get_mut(&self.player_id).unwrap();
+            player.position = dest_pos;
 
             return true;
         }
@@ -463,8 +470,10 @@ impl Map {
         self.transitions.clear();
 
         let mut path = PathBuf::new();
-        path.push("maps");
+        path.push("resources/maps/");
         path.push(filename);
+
+        println!("Loading map {}", path.display());
 
         let content = std::fs::read_to_string(path.as_path()).unwrap();
         let mut lines = content.lines();
@@ -540,11 +549,21 @@ impl Map {
         let y = parts.next().unwrap().parse::<f32>().unwrap();
         let r = parts.next().unwrap().parse::<f32>().unwrap();
         let map_id = parts.next().unwrap().parse::<i32>().unwrap();
+        let dest_x = parts.next().unwrap().parse::<f32>().unwrap();
+        let dest_y = parts.next().unwrap().parse::<f32>().unwrap();
+
+        self.add_transition([x, y], r, map_id, [dest_x, dest_y]);
+    }
+
+
+    pub fn add_transition(&mut self, from: [f32; 2], catchment: f32, 
+                          to_map: i32, to_location: [f32; 2]) {
 
         self.transitions.push(MapTransition {
-            from: [x, y],
-            rad: r,
-            to: map_id,
+            from,
+            rad: catchment,
+            to_map,
+            to_location,
         });
     }
 
@@ -622,7 +641,9 @@ impl Map {
                 transit.from[0].to_string() + "," +
                 &transit.from[1].to_string() + "," +
                 &transit.rad.to_string() + "," +
-                &transit.to.to_string() + "\n";
+                &transit.to_map.to_string() + "," +
+                &transit.to_location[0].to_string() + "," +
+                &transit.to_location[1].to_string() + "\n";
             writer.write(line.as_bytes())?;
         }
 
@@ -959,5 +980,7 @@ pub struct MapTransition {
     rad: f32,
 
     // destination map
-    to: i32,
+    to_map: i32,
+
+    to_location: Vector2<f32>,
 }

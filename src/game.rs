@@ -15,7 +15,8 @@ use crate::map::MapObjectFactory;
 use crate::map::MobType;
 use crate::MAP_OBJECT_LAYER;
 use crate::PROJECTILE_TILESET;
-
+use crate::gl_support::load_texture;
+use crate::MAP_RESOURCE_PATH;
 
 pub struct Game {
     piv: PlayerInventoryView,
@@ -117,7 +118,7 @@ impl UiController for Game {
     }
 
 
-    fn update(&mut self, world: &mut Self::Appdata, dt: f32) {
+    fn update(&mut self, world: &mut Self::Appdata, dt: f32) -> bool {
         let map = &mut world.map;
         let inv = &mut world.player_inventory;
         let rng = &mut world.rng;
@@ -126,15 +127,7 @@ impl UiController for Game {
 
         let reload = map.check_player_transition(rng);
 
-        if reload {
-/*
-            let map_texture = Texture::from_path(Path::new(&(MAP_RESOURCE_PATH.to_string() + &map.map_image_name)), &TextureSettings::new()).unwrap();
-            let map_backdrop = Texture::from_path(Path::new(&(MAP_RESOURCE_PATH.to_string() + &map.backdrop_image_name)), &TextureSettings::new()).unwrap();
- 
-            world.map_texture = map_texture;
-            world.map_backdrop = map_backdrop;
-*/
-        }
+        reload
     }
 }
 

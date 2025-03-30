@@ -361,13 +361,15 @@ impl UiController for MapEditor {
     }
 
 
-    fn update(&mut self, world: &mut Self::Appdata, dt: f32) {
+    fn update(&mut self, world: &mut Self::Appdata, dt: f32) -> bool {
         let map = &mut world.map;
         let inv = &mut world.player_inventory;
         let rng = &mut world.rng;
         let speaker = &mut world.speaker;
 
         map.update(dt, inv, rng, speaker);
+
+        false
     }
 }
 

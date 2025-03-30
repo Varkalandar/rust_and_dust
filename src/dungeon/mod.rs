@@ -9,6 +9,7 @@ use geo::Polygon;
 use crate::MAP_GROUND_LAYER;
 use crate::MAP_OBJECT_LAYER;
 use crate::Map;
+use crate::map::MapTransition;
 use crate::ItemFactory;
 use crate::item::Item;
 
@@ -201,6 +202,10 @@ fn furnish_dungeon<R: Rng + ?Sized>(dungeon: &Dungeon,
     // place entrance stairs
     place_wall_tile(map, dungeon.rooms[0].x2, dungeon.rooms[0].y1, 
                     0, 248, [1.0, 1.0, 1.0, 1.0]);
+
+    map.transitions.clear();
+    map.add_transition(map_pos(dungeon.rooms[0].x2, dungeon.rooms[0].y1, 0, 1.0), 100.0, 
+                      0, [1000.0, 1000.0]);                
 
     for i in 1 .. dungeon.rooms.len() {
         place_coins(map, factory, 

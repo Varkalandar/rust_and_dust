@@ -127,8 +127,8 @@ pub trait UiController {
 
     }
 
-    fn update(&mut self, _appdata: &mut Self::Appdata, _dt: f32) {
-
+    fn update(&mut self, _appdata: &mut Self::Appdata, _dt: f32) -> bool {
+        false
     }
 }
 

@@ -84,8 +84,8 @@ pub struct GameWorld {
     rng: rand::rngs::StdRng,
 
     black_texture: Texture2d,
-    map_texture: Texture2d,
-    map_backdrop: Texture2d,
+    map_texture: Option<Texture2d>,
+    map_backdrop: Option<Texture2d>,
 }
 
 
@@ -128,8 +128,10 @@ impl App {
         let map_backdrop_file = "backdrop_red_blue.png";
 
         let black_texture = load_texture(&display, &(MAP_RESOURCE_PATH.to_string() + "map_black.png"));
-        let map_texture = load_texture(&display, &(MAP_RESOURCE_PATH.to_string() + map_image_file));
-        let map_backdrop = load_texture(&display, &(MAP_RESOURCE_PATH.to_string() + map_backdrop_file));
+        // let map_texture = Some(load_texture(&display, &(MAP_RESOURCE_PATH.to_string() + map_image_file)));
+        // let map_backdrop = Some(load_texture(&display, &(MAP_RESOURCE_PATH.to_string() + map_backdrop_file)));
+        let map_texture = None;
+        let map_backdrop = None;
 
         let ground_tiles = TileSet::load(&display, "resources/gfx/grounds", "map_objects.tica");
         let decoration_tiles = TileSet::load(&display, "resources/gfx/objects", "map_objects.tica");
@@ -234,7 +236,14 @@ impl App {
 
             // println!("seconds: {}", secs);
 
-            self.controllers.current().update(world, secs);
+            let reload = self.controllers.current().update(world, secs);
+
+            if reload {
+                let map_texture = load_texture(&self.ui.display, &(MAP_RESOURCE_PATH.to_string() + &world.map.map_image_name));
+                let map_backdrop = load_texture(&self.ui.display, &(MAP_RESOURCE_PATH.to_string() + &world.map.backdrop_image_name));
+                world.map_texture = Some(map_texture);
+                world.map_backdrop = Some(map_backdrop);
+            }
         }
 
         true
@@ -267,18 +276,27 @@ impl App {
         target.clear_color(0.0, 1.0, 1.0, 1.0);
         target.clear_depth(1.0);
 
-        
-        draw_texture(&self.ui.display, &mut target, &self.ui.program, BlendMode::Blend, &self.world.black_texture, 
-                     0.0, 0.0, 1000.0, 1000.0, &[0.8, 0.8, 0.8, 1.0]);
-        
+        match &self.world.map_backdrop {
+            None => {
+                draw_texture(&self.ui.display, &mut target, &self.ui.program, BlendMode::Blend, &self.world.black_texture, 
+                    0.0, 0.0, 1000.0, 1000.0, &[0.8, 0.8, 0.8, 1.0]);
+            },
+            Some(map_backdrop) => {
+                draw_texture(&self.ui.display, &mut target, &self.ui.program, BlendMode::Blend, 
+                    map_backdrop, 
+                    back_off_x, back_off_y, 2.0, 2.0, &[0.8, 0.8, 0.8, 1.0]);
+            }            
+        }
 
-        /*
-        draw_texture(&self.ui.display, &mut target, &self.ui.program, BlendMode::Blend, &self.world.map_backdrop, 
-                     back_off_x, back_off_y, 2.0, 2.0, &[0.8, 0.8, 0.8, 1.0]);
-
-        draw_texture(&self.ui.display, &mut target, &self.ui.program, BlendMode::Blend, &self.world.map_texture, 
-                     offset_x, offset_y, 2.0, 2.0, &[0.8, 0.8, 0.8, 1.0]);
-        */
+        match &self.world.map_texture {
+            None => {
+            },
+            Some(map_texture) => {
+                draw_texture(&self.ui.display, &mut target, &self.ui.program, BlendMode::Blend, 
+                    map_texture, 
+                    offset_x, offset_y, 2.0, 2.0, &[0.8, 0.8, 0.8, 1.0]);
+            }
+        }
 
         let tex_white = &self.ui.context.tex_white;
 
