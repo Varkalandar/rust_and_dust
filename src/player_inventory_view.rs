@@ -30,8 +30,8 @@ pub struct PlayerInventoryView {
     slot_offsets: HashMap<Slot, [i32; 2]>,
     slot_sizes: HashMap<Slot, [i32; 2]>,
 
-    hover_item: Option<usize>,
-    dragged_item: Option<usize>,
+    hover_item: Option<u64>,
+    dragged_item: Option<u64>,
     drag_x: f32,
     drag_y: f32,
 
@@ -159,7 +159,7 @@ impl PlayerInventoryView {
     }
 
 
-    fn find_item_at(&self, inventory: &Inventory, mx: i32, my: i32) -> Option<usize> {
+    fn find_item_at(&self, inventory: &Inventory, mx: i32, my: i32) -> Option<u64> {
         let area = &self.area;
 
         for entry in &inventory.entries {
@@ -363,6 +363,10 @@ impl PlayerInventoryView {
     
                         return true;
                     }
+                    else if mx < 0 { // dropped to the map floor?
+                        self.dragged_item = None;
+                        self.drop_item(world, id);
+                    }
                     else {
                         println!("No suitable drop location {}, {}", mx, my);
                     }
@@ -371,6 +375,24 @@ impl PlayerInventoryView {
         }
 
         false
+    }
+
+
+    pub fn drop_item(&mut self, world: &mut GameWorld, id: u64) {
+
+        let inventory = &mut world.player_inventory;
+        let item_opt = inventory.remove_item(id);
+
+        match item_opt {
+            None => {},
+            Some(item) => {
+                let position = world.map.get_player_position();
+
+                println!("Dropping an {} to map floor at {}, {}", item.name(), position[0], position[1]);
+        
+                world.map.place_item(item, position);
+            }
+        }
     }
 
 

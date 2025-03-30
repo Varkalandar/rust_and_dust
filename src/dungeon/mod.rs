@@ -93,7 +93,7 @@ fn rooms_and_corridors<R: Rng + ?Sized>(map: &mut Map, factory: &mut ItemFactory
             entrances[room + 6] = x1;
             entrances[room + 7] = y;
 
-            build_room(map, factory, rng, x1, y1, x2, y2, &entrances[room .. room + 8]);
+            build_room(map, rng, x1, y1, x2, y2, &entrances[room .. room + 8]);
 
             rooms.push(Room {
                 x1, x2, y1, y2,
@@ -223,7 +223,7 @@ fn furnish_dungeon<R: Rng + ?Sized>(dungeon: &Dungeon,
 }
 
 
-fn build_room<R: Rng + ?Sized>(map: &mut Map, factory: &mut ItemFactory, rng: &mut R, 
+fn build_room<R: Rng + ?Sized>(map: &mut Map, rng: &mut R, 
                                sx: i32, sy: i32, dx: i32, dy: i32,
                                entrances: &[i32]) {
 
@@ -554,24 +554,10 @@ fn place_wall_tile(map: &mut Map, x: i32, y: i32, z_off: i32, id: usize, color: 
 
 fn place_coins(map: &mut Map, factory: &mut ItemFactory,
                x: i32, y: i32, id: &str, count: u32) -> u64 {
-    let layer = MAP_OBJECT_LAYER;
-    let height = 0.0;
-    let scale = 1.0;
-    let pos = map_pos(x, y, 0, scale);
-
-    let mob_id = create_mob(map, 0, layer, pos, height, scale);
-
-    let mob = map.layers[layer].get_mut(&mob_id).unwrap();
-
     let mut item = factory.create(id);
     item.stack_size = count;
 
-    mob.visual.tileset_id = 6;
-    mob.visual.base_image_id = item.map_tile_id;  
-    mob.visual.current_image_id = item.map_tile_id + Item::calc_image_offset_for_stack_size(count);
-    mob.visual.scale = item.map_scale;
-    mob.item = Some(item);
-    mob_id
+    map.place_item(item, map_pos(x, y, 0, 1.0))
 }
 
 

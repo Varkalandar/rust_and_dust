@@ -9,7 +9,7 @@ use crate::read_lines;
 pub struct Item {
     
     // the ID must be unique in a game
-    pub id: usize,
+    pub id: u64,
 
     pub key: String,              // for prototype lookup
     pub singular: String,         // name for stack size == 1
@@ -77,7 +77,7 @@ impl Item {
 
 pub struct ItemFactory
 {
-    next_id: usize,
+    next_id: u64,
 
     proto_items: HashMap<String, Item>,
 }

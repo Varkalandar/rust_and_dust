@@ -16,7 +16,7 @@ pub enum Slot {
 
 #[derive(Debug)]
 pub struct Entry {
-    pub item_id: usize,
+    pub item_id: u64,
     pub slot: Slot,
     pub location_x: i32,
     pub location_y: i32,    
@@ -26,7 +26,7 @@ pub struct Entry {
 pub struct Inventory {
 
     // Keeps all the items (owns all the items)
-    pub bag: HashMap <usize, Item>,
+    pub bag: HashMap <u64, Item>,
 
     // describes details about each of the owned items
     pub entries: Vec<Entry>,
@@ -62,6 +62,18 @@ impl Inventory {
 
         self.bag.insert(item.id, item);
         self.entries.push(entry);
+    }
+
+
+    pub fn remove_item(&mut self, id: u64) -> Option<Item> {
+        let item_opt = self.bag.remove(&id);
+
+        if item_opt.is_some() {
+            let idx = self.find_entry_for_id(id).unwrap();
+            self.entries.remove(idx);
+        }
+
+        item_opt
     }
 
 
@@ -104,7 +116,7 @@ impl Inventory {
     }
 
     
-    pub fn find_entry_for_id(&self, item_id: usize) -> Option<usize> {
+    pub fn find_entry_for_id(&self, item_id: u64) -> Option<usize> {
         for idx in 0..self.entries.len() {
             let entry = &self.entries[idx];
             if entry.item_id == item_id {

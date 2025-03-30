@@ -398,8 +398,8 @@ impl App {
                     tex_white,
                     tpos[0],
                     tpos[1], 
-                    (tile.size[0] as f32 * mob.visual.scale / 16.0), 
-                    (tile.size[1] as f32 * mob.visual.scale / 16.0), 
+                    tile.size[0] as f32 * mob.visual.scale / 16.0, 
+                    tile.size[1] as f32 * mob.visual.scale / 16.0, 
                     &[0.15, 0.2, 0.1, 1.0]);
             }
 
@@ -595,7 +595,7 @@ pub fn calc_tile_position(position: &Vector2<f32>, foot: Vector2<f32>, scale: f3
 
 
 fn quadratic_fade(x: f32) -> f32 {
-    (1.0 - (x*x))
+    1.0 - (x*x)
 }
 
 

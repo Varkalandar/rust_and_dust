@@ -420,6 +420,29 @@ impl Map {
     }
 
 
+    pub fn place_item(&mut self, item: Item, position: Vector2<f32>) -> u64{
+
+        // first we need a map object to anchor the item
+        let layer = MAP_OBJECT_LAYER;
+        let scale = 1.0;
+        let height = 0.0;
+        let mut mob = self.factory.create_mob(item.map_tile_id, layer, position, height, scale);
+        let mob_id = mob.uid;
+
+        // now add the item to the map object
+        mob.visual.tileset_id = 6;
+        mob.visual.base_image_id = item.map_tile_id;  
+        mob.visual.current_image_id = item.map_tile_id + 
+                                      Item::calc_image_offset_for_stack_size(item.stack_size);
+        mob.visual.scale = item.map_scale;
+        mob.item = Some(item);
+
+        self.layers[layer].insert(mob_id, mob);
+
+        mob_id
+    }
+    
+
     pub fn populate(&mut self, _filename: &str, rng: &mut StdRng) {
 
         let position = [1216.0, 1448.0];
@@ -744,7 +767,7 @@ fn blend_to_key(blend: &BlendMode) -> String {
         match blend {
             BlendMode::Blend => {"n"}, 
             BlendMode::Add => {"a"},
-            _ => {panic!("Unsupported blend mode")},
+            // _ => {panic!("Unsupported blend mode")},
         };
 
     key.to_string()
