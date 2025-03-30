@@ -1,0 +1,10 @@
+v10
+begin map header
+Town Map
+map_soft_grass.png
+backdrop_red_blue.png
+end map header
+begin map objects
+end map objects
+begin map transitions
+end map transitions
