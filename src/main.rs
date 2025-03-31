@@ -154,54 +154,62 @@ impl App {
             ];        
 
         let mut factory = ItemFactory::new();
+        let mut player_inventory = Inventory::new();
         let rng = rand::rngs::StdRng::seed_from_u64(12345678901);
+
         let mut map = Map::new("Demo Map", map_image_file, map_backdrop_file);
-        // map.load("start.map");
+        // map.load("town.map");
 
         // Testing dungeon generation
         let dungeon = generate_dungeon(&mut map, &mut factory);
         map.set_player_position(dungeon.start_position);
+        
+
+        let mut world = GameWorld {
+            map,
+            layer_tileset,
+            player_inventory,
+            speaker: SoundPlayer::new(),
+
+            rng,
+
+            black_texture,
+            map_texture,
+            map_backdrop,
+        };
+
+        Self::load_map_textures(&mut world, &display);
+        
+        
+
 
         let ui = UI::new(window, display, program, window_size);
         
         let editor = MapEditor::new();
 
         let inventory_bg = load_texture(&ui.display, "resources/gfx/ui/inventory_bg.png");
-        let game = Game::new(inventory_bg, &ui, &layer_tileset[6]);
+        let game = Game::new(inventory_bg, &ui, &world.layer_tileset[6]);
 
-        let mut inv = Inventory::new();
 
         // Some inventory contents for testing
 
         let demo_item = factory.create("wooden_wand");
-        inv.put_item(demo_item, Slot::Bag);
+        world.player_inventory.put_item(demo_item, Slot::Bag);
 
-        let laser = factory.create("engraved_wand");
-        inv.put_item(laser, Slot::RWing);
+        let wand = factory.create("engraved_wand");
+        world.player_inventory.put_item(wand, Slot::RWing);
 
         let mut coins = factory.create("copper_coin");
         coins.stack_size = 1000;
-        inv.put_item(coins, Slot::Bag);
+        world.player_inventory.put_item(coins, Slot::Bag);
 
         let mut scroll = factory.create("fireball_scroll");
         scroll.color = [1.0, 0.8, 0.6, 1.0];
-        inv.put_item(scroll, Slot::Bag);
+        world.player_inventory.put_item(scroll, Slot::Bag);
 
         App {        
             ui,
-
-            world: GameWorld {
-                map,
-                layer_tileset,
-                player_inventory: inv,
-                speaker: SoundPlayer::new(),
-
-                rng,
-
-                black_texture,
-                map_texture,
-                map_backdrop,
-            },
+            world,
 
             controllers: GameControllers {
                 editor,
@@ -243,14 +251,26 @@ impl App {
             let reload = self.controllers.current().update(world, secs);
 
             if reload {
-                let map_texture = load_texture(&self.ui.display, &(MAP_RESOURCE_PATH.to_string() + &world.map.map_image_name));
-                let map_backdrop = load_texture(&self.ui.display, &(MAP_RESOURCE_PATH.to_string() + &world.map.backdrop_image_name));
-                world.map_texture = Some(map_texture);
-                world.map_backdrop = Some(map_backdrop);
+                Self::load_map_textures(world, &self.ui.display);
             }
         }
 
         true
+    }
+
+
+    fn load_map_textures(world: &mut GameWorld, display: &Display<WindowSurface>,) {
+
+        if world.map.map_image_name.len() == 0 && world.map.backdrop_image_name.len() == 0 {
+            world.map_texture = None;
+            world.map_backdrop = None;
+        }
+        else {
+            let map_texture = load_texture(display, &(MAP_RESOURCE_PATH.to_string() + &world.map.map_image_name));
+            let map_backdrop = load_texture(display, &(MAP_RESOURCE_PATH.to_string() + &world.map.backdrop_image_name));
+            world.map_texture = Some(map_texture);
+            world.map_backdrop = Some(map_backdrop);
+        }
     }
 
 
@@ -283,12 +303,12 @@ impl App {
         match &self.world.map_backdrop {
             None => {
                 draw_texture(&self.ui.display, &mut target, &self.ui.program, BlendMode::Blend, &self.world.black_texture, 
-                    0.0, 0.0, 1000.0, 1000.0, &[0.8, 0.8, 0.8, 1.0]);
+                    0.0, 0.0, 1000.0, 1000.0, &[1.0, 1.0, 1.0, 1.0]);
             },
             Some(map_backdrop) => {
                 draw_texture(&self.ui.display, &mut target, &self.ui.program, BlendMode::Blend, 
                     map_backdrop, 
-                    back_off_x, back_off_y, 2.0, 2.0, &[0.8, 0.8, 0.8, 1.0]);
+                    back_off_x, back_off_y, 2.0, 2.0, &[0.6, 0.6, 0.6, 1.0]);
             }            
         }
 
@@ -298,7 +318,7 @@ impl App {
             Some(map_texture) => {
                 draw_texture(&self.ui.display, &mut target, &self.ui.program, BlendMode::Blend, 
                     map_texture, 
-                    offset_x, offset_y, 2.0, 2.0, &[0.8, 0.8, 0.8, 1.0]);
+                    offset_x, offset_y, 2.0, 2.0, &[0.6, 0.6, 0.6, 1.0]);
             }
         }
 

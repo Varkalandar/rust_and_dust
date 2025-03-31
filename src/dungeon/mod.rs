@@ -32,26 +32,10 @@ pub struct Dungeon {
 
 pub fn generate_dungeon(map: &mut Map, factory: &mut ItemFactory) -> Dungeon {
 
-/*
-    let layer = MAP_GROUND_LAYER;
-    let height = 0.0;
-    let id = 50;
-    let mut pos = [1000.0, 1000.0];
-
-    // let height = world.layer_tileset[layer].tiles_by_id.get(&id).unwrap().foot[1];
-    
-    create_mob(map, id, layer, pos, height, 1.0);
-
-    pos[0] += 108.0;
-    pos[1] += 108.0;
-
-    create_mob(map, id, layer, pos, height, 1.0);
-*/
+    map.map_image_name = "".to_string();
+    map.backdrop_image_name = "".to_string();
 
     let mut rng = rand::rng();
-
-    // place_floor_tile(map, -5 + 5, 5 + 5);
-    // build_winded_corridor(map, &mut rng, 0, 0, 10, 10);
 
     let dungeon = rooms_and_corridors(map, factory, &mut rng);
 

@@ -570,7 +570,7 @@ impl Map {
 
     pub fn save(&self, filename: &str) -> Result<()> {
         let mut path = PathBuf::new();
-        path.push("maps");
+        path.push("resources/maps");
         path.push(filename);
 
         let f = File::create(path.as_path())?;

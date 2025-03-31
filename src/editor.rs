@@ -170,7 +170,7 @@ impl UiController for MapEditor {
                     }
 
                     if event.args.button == Button::Keyboard(Key::Character("s".into())) {
-                        world.map.save("test.map").unwrap();
+                        world.map.save("town.map").unwrap();
                     }        
                 },
                 Some(comp) => {
