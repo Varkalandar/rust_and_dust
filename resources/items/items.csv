@@ -1,5 +1,6 @@
-Key,Singular,Plural,Inventory tile id,Map tile id,Inventory width,Inventory height,Inventory scale,Map Scale,Slot,Max Stack Size,Structure,Agility,Armor,Computation,Speed,Physical Dam,Spell Dam,Radiation Dam
-wooden_wand,Wooden Wand,,86,85,1,3,0.9,0.2,4,1,0,0,0,0,0,0-0,5-9,0-0
-engraved_wand,Engraved Wand,,88,87,1,3,0.9,0.2,4,1,0,0,0,0,0,0-0,10-14,0-0
-engine,BF Engine,,22,1,1,3,1,1,6,1,10,10,0,0,120,0-0,0-0,0-0
-copper_coin,Copper Coin,Copper Coins,44,43,1,1,1,1,0,2000,0,0,0,0,0,0-0,0-0,0-0
+Key,Singular,Plural,Inventory tile id,Map tile id,Inventory width,Inventory height,Inventory scale,Map Scale,Slot,Max Stack Size,Health,Agility,Defense,Intelligence,Speed,Physical Dam,Spell Dam,Activation
+wooden_wand,Wooden Wand,,86,85,1,3,0.9,0.2,4,1,0,0,0,0,0,0-0,5-9,
+engraved_wand,Engraved Wand,,88,87,1,3,0.9,0.2,4,1,0,0,0,0,0,0-0,10-14,
+engine,BF Engine,,22,1,1,3,1,1,6,1,10,10,0,0,120,0-0,0-0,
+copper_coin,Copper Coin,Copper Coins,44,43,1,1,1,1,0,2000,0,0,0,0,0,0-0,0-0,
+fireball_scroll,Scroll of Enchant Fireball,Scroll of Enchant Fireball,11,11,2,1,1.2,0.2,0,10,0,0,0,0,0,0-0,0-0,enchant_fireball

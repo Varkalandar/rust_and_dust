@@ -175,15 +175,15 @@ plh_22i
 Tile Description
 v.5
 11
-19 17
+307 187
 0 0
-0 0
+153 111
 End Of Header
 Item
 v.1
 data
 2
-small_blaster_m
+scroll_halo_inv
 
 1
 0
@@ -191,15 +191,15 @@ small_blaster_m
 Tile Description
 v.5
 12
-90 277
+216 118
 0 0
-0 0
+127 70
 End Of Header
 Item
 v.1
 data
 2
-small_blaster_i
+scroll_inv
 
 1
 0

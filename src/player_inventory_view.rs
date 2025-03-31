@@ -107,9 +107,10 @@ impl PlayerInventoryView {
         }
 
         let mut line = y - line_count * line_space;
+        let mut bottom_margin = if line_count > 1 {8} else {4};
 
-        ui.fill_box(target, x, line, 200, (line_count * line_space) + 8, &[0.1, 0.1, 0.1, 0.9]);
-        ui.draw_box(target, x, line, 200, (line_count * line_space) + 8, &[0.6, 0.6, 0.6, 1.0]);
+        ui.fill_box(target, x, line, 200, (line_count * line_space) + bottom_margin, &[0.1, 0.1, 0.1, 0.9]);
+        ui.draw_box(target, x, line, 200, (line_count * line_space) + bottom_margin, &[0.6, 0.6, 0.6, 1.0]);
         
         // ui.draw_hline(target, x, line, 200, &[0.6, 0.6, 0.6, 1.0]);
 
@@ -189,8 +190,9 @@ impl PlayerInventoryView {
                  stack_size: u32, 
                  entry_x: f32, entry_y: f32, 
                  slot_w: f32, slot_h: f32,
-                 item_inventory_w: f32 , item_inventory_h: f32,
-                 inventory_scale: f32) {
+                 item_inventory_w: f32, item_inventory_h: f32,
+                 inventory_scale: f32,
+                 color: &[f32; 4]) {
 
         // item stacks have several images.
         let mut image_id = id;
@@ -219,7 +221,7 @@ impl PlayerInventoryView {
 
         draw_texture(&display, target, program, BlendMode::Blend, 
                      &tile.tex, 
-                     entry_x + origin_x, entry_y + origin_y, scale, scale, &[1.0, 1.0, 1.0, 1.0]);
+                     entry_x + origin_x, entry_y + origin_y, scale, scale, color);
     }
 
 
@@ -268,7 +270,7 @@ impl PlayerInventoryView {
                     item.inventory_tile_id, item.stack_size,
                     entry_x, entry_y, w, h, 
                     (item.inventory_w * 32) as f32, (item.inventory_h * 32) as f32,
-                    item.inventory_scale);
+                    item.inventory_scale, &item.color);
             }
         }
        
@@ -300,7 +302,7 @@ impl PlayerInventoryView {
                     (self.drag_x - 16.0) as f32, (self.drag_y - 16.0) as f32, 
                     (item.inventory_w * 32) as f32, (item.inventory_h * 32) as f32, 
                     (item.inventory_w * 32) as f32, (item.inventory_h * 32) as f32,
-                    item.inventory_scale);
+                    item.inventory_scale, &item.color);
             }
         }
     }

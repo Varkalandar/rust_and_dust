@@ -185,16 +185,16 @@
       <Description>
         <version>4</version>
         <id>11</id>
-        <width>19</width>
-        <height>17</height>
+        <width>307</width>
+        <height>187</height>
         <offsetX>0</offsetX>
         <offsetY>0</offsetY>
-        <footX>0</footX>
-        <footY>0</footY>
+        <footX>153</footX>
+        <footY>111</footY>
       </Description>
       <Metadata>
         <int>0</int>
-        <string>small_blaster_m</string>
+        <string>scroll_halo_inv</string>
         <string></string>
       </Metadata>
     </Tile>
@@ -202,16 +202,16 @@
       <Description>
         <version>4</version>
         <id>12</id>
-        <width>90</width>
-        <height>277</height>
+        <width>216</width>
+        <height>118</height>
         <offsetX>0</offsetX>
         <offsetY>0</offsetY>
-        <footX>0</footX>
-        <footY>0</footY>
+        <footX>127</footX>
+        <footY>70</footY>
       </Description>
       <Metadata>
         <int>0</int>
-        <string>small_blaster_i</string>
+        <string>scroll_inv</string>
         <string></string>
       </Metadata>
     </Tile>

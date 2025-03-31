@@ -22,6 +22,7 @@ pub struct Item {
     pub inventory_scale: f32,
     pub map_tile_id: usize,
     pub map_scale: f32,
+    pub color: [f32; 4],
     pub slot: Slot,
     pub stack_size: u32,         // some items can be stacked and must have a stack count
     pub max_stack_size: u32,
@@ -119,6 +120,7 @@ impl ItemFactory {
             inventory_h: proto.inventory_h,
             inventory_scale: proto.inventory_scale,
             map_scale: proto.map_scale,
+            color: proto.color,
             slot: proto.slot,
         
             map_tile_id: proto.map_tile_id,
@@ -151,6 +153,7 @@ fn read_proto_items() -> HashMap<String, Item> {
                 inventory_h: parts.next().unwrap().parse::<i32>().unwrap(),
                 inventory_scale: parts.next().unwrap().parse::<f32>().unwrap(),
                 map_scale: parts.next().unwrap().parse::<f32>().unwrap(),
+                color: [1.0, 1.0, 1.0, 1.0],
                 slot: calc_slot(parts.next().unwrap().parse::<i32>().unwrap()),
                 stack_size: 1,
                 max_stack_size: parts.next().unwrap().parse::<u32>().unwrap(),
@@ -182,6 +185,7 @@ fn read_plugins() -> Vec<Item> {
             inventory_h: parts.next().unwrap().parse::<i32>().unwrap(),
             inventory_scale: parts.next().unwrap().parse::<f32>().unwrap(),
             map_scale: parts.next().unwrap().parse::<f32>().unwrap(),
+            color: [1.0, 1.0, 1.0, 1.0],
             slot: Slot::Bag,
             stack_size: 1,
             max_stack_size: 1,
@@ -217,7 +221,6 @@ fn parse_mods(parts: &mut Split<&str>) -> Vec<Mod> {
     result.push(parse_mod(parts.next(), Attribute::Speed));
     result.push(parse_mod(parts.next(), Attribute::PhysicalDamage));
     result.push(parse_mod(parts.next(), Attribute::SpellDamage));
-    result.push(parse_mod(parts.next(), Attribute::RadiationDamage));
 
     result
 }

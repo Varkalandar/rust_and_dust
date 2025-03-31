@@ -183,6 +183,10 @@ impl App {
         coins.stack_size = 1000;
         inv.put_item(coins, Slot::Bag);
 
+        let mut scroll = factory.create("fireball_scroll");
+        scroll.color = [1.0, 0.8, 0.6, 1.0];
+        inv.put_item(scroll, Slot::Bag);
+
         App {        
             ui,
 
@@ -633,7 +637,9 @@ impl ApplicationHandler for App {
 
             if visible.is_some() && visible.unwrap() {
                 self.ui.window.focus_window();
-                self.need_focus = false;
+                if self.ui.window.has_focus() {
+                    self.need_focus = false;
+                } 
             }
         }
 
