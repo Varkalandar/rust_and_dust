@@ -117,7 +117,7 @@ fn create_glyphs(display: &Display<WindowSurface>, face: &freetype::Face, glyphs
 
     for glyph_nr in 0..0xFFFF {
         let idx_result = face.get_char_index(glyph_nr);
-        if idx_result.is_ok() { 
+        if idx_result.is_some() { 
             num_glyphs += 1;
         }
     }
@@ -135,9 +135,8 @@ fn create_glyphs(display: &Display<WindowSurface>, face: &freetype::Face, glyphs
     for glyph_nr in 0..0xFFFF {
 
         let idx_result = face.get_char_index(glyph_nr);
-        if idx_result.is_ok() {
-            let ch = idx_result.unwrap();
-            let idx = ch.get();
+        if idx_result.is_some() {
+            let idx = idx_result.unwrap();
             face.load_glyph(idx, freetype::face::LoadFlag::RENDER).unwrap();
     
             let gs = face.glyph();

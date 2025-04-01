@@ -154,7 +154,7 @@ impl App {
             ];        
 
         let mut factory = ItemFactory::new();
-        let mut player_inventory = Inventory::new();
+        let player_inventory = Inventory::new();
         let rng = rand::rngs::StdRng::seed_from_u64(12345678901);
 
         let mut map = Map::new("Demo Map", map_image_file, map_backdrop_file);

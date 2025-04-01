@@ -107,7 +107,7 @@ impl PlayerInventoryView {
         }
 
         let mut line = y - line_count * line_space;
-        let mut bottom_margin = if line_count > 1 {8} else {4};
+        let bottom_margin = if line_count > 1 {8} else {4};
 
         ui.fill_box(target, x, line, 200, (line_count * line_space) + bottom_margin, &[0.1, 0.1, 0.1, 0.9]);
         ui.draw_box(target, x, line, 200, (line_count * line_space) + bottom_margin, &[0.6, 0.6, 0.6, 1.0]);
