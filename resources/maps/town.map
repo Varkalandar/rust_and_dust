@@ -24,5 +24,5 @@ begin map objects
 2,24,8,707.7786,980.9589,126,0.29999977,0.1764706 0.1764706 0.14117648 1,a
 end map objects
 begin map transitions
-724,1069,100,1,0,0
+724,1069,100,501,0,0
 end map transitions

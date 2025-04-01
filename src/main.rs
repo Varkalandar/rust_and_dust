@@ -151,17 +151,17 @@ impl App {
             projectile_tiles,
             item_tiles,
             animation_tiles,
-            ];        
+        ];        
 
-        let mut factory = ItemFactory::new();
+        let item_factory = ItemFactory::new();
         let player_inventory = Inventory::new();
         let rng = rand::rngs::StdRng::seed_from_u64(12345678901);
 
-        let mut map = Map::new("Demo Map", map_image_file, map_backdrop_file);
+        let mut map = Map::new("Demo Map", map_image_file, map_backdrop_file, item_factory);
         // map.load("town.map");
 
         // Testing dungeon generation
-        let dungeon = generate_dungeon(&mut map, &mut factory);
+        let dungeon = generate_dungeon(&mut map);
         map.set_player_position(dungeon.start_position);
         
 
@@ -179,8 +179,6 @@ impl App {
         };
 
         Self::load_map_textures(&mut world, &display);
-        
-        
 
 
         let ui = UI::new(window, display, program, window_size);
@@ -193,17 +191,17 @@ impl App {
 
         // Some inventory contents for testing
 
-        let demo_item = factory.create("wooden_wand");
+        let demo_item = world.map.item_factory.create("wooden_wand");
         world.player_inventory.put_item(demo_item, Slot::Bag);
 
-        let wand = factory.create("engraved_wand");
+        let wand = world.map.item_factory.create("engraved_wand");
         world.player_inventory.put_item(wand, Slot::RWing);
 
-        let mut coins = factory.create("copper_coin");
+        let mut coins = world.map.item_factory.create("copper_coin");
         coins.stack_size = 1000;
         world.player_inventory.put_item(coins, Slot::Bag);
 
-        let mut scroll = factory.create("fireball_scroll");
+        let mut scroll = world.map.item_factory.create("fireball_scroll");
         scroll.color = [1.0, 0.8, 0.6, 1.0];
         world.player_inventory.put_item(scroll, Slot::Bag);
 

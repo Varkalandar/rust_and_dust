@@ -27,6 +27,8 @@ use crate::CREATURE_TILESET;
 use crate::parse_rgba;
 use crate::gl_support::BlendMode;
 use crate::Slot;
+use crate::generate_dungeon;
+use crate::ItemFactory;
 
 
 pub const MAP_GROUND_LAYER:usize = 0;
@@ -59,6 +61,7 @@ pub struct Map {
     pub backdrop_image_name: String,
 
     pub factory: MapObjectFactory,
+    pub item_factory: ItemFactory,
     pub creature_factory: CreatureFactory,
     pub projectile_builder: ProjectileBuilder,
     pub player_id: u64, 
@@ -66,7 +69,9 @@ pub struct Map {
 
 
 impl Map {
-    pub fn new(name: &str, map_image_name: &str, backdrop_image_name: &str) -> Map {
+    pub fn new(name: &str, 
+               map_image_name: &str, backdrop_image_name: &str,
+               item_factory: ItemFactory) -> Map {
         let mut layers = [HashMap::new(), HashMap::new(), HashMap::new(), HashMap::new(), HashMap::new(), HashMap::new(), HashMap::new(),];
 /*        
         let player_visual = Visual {
@@ -138,6 +143,7 @@ impl Map {
             backdrop_image_name: backdrop_image_name.to_string(),
         
             factory,
+            item_factory,
             creature_factory,
             projectile_builder,
             player_id,
@@ -345,13 +351,20 @@ impl Map {
         // println!("Checked {} transitions, best is {:?}", self.transitions.len(), best_index);
 
         if best_index.is_some() {
-            let dest_pos = self.transitions[best_index.unwrap()].to_location;
+            let index = best_index.unwrap();
+            let to_map = self.transitions[index].to_map;
+            let to_location = self.transitions[index].to_location;
 
-            self.load("town.map");
-            self.populate("town.csv", rng);
-
-            let player = self.layers[MAP_OBJECT_LAYER].get_mut(&self.player_id).unwrap();
-            player.position = dest_pos;
+            if to_map == 501 {
+                let dungeon = generate_dungeon(self);
+                self.set_player_position(dungeon.start_position);                
+            }
+            else {
+                self.load("town.map");
+                self.populate("town.csv", rng);
+    
+                self.set_player_position(to_location);
+            }
 
             return true;
         }

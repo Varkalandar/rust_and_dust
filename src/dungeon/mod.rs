@@ -30,21 +30,21 @@ pub struct Dungeon {
 }
 
 
-pub fn generate_dungeon(map: &mut Map, factory: &mut ItemFactory) -> Dungeon {
+pub fn generate_dungeon(map: &mut Map) -> Dungeon {
 
     map.map_image_name = "".to_string();
     map.backdrop_image_name = "".to_string();
 
     let mut rng = rand::rng();
 
-    let dungeon = rooms_and_corridors(map, factory, &mut rng);
+    let dungeon = rooms_and_corridors(map, &mut rng);
 
-    furnish_dungeon(&dungeon, map, factory, &mut rng);
+    furnish_dungeon(&dungeon, map, &mut rng);
     dungeon
 }
 
 
-fn rooms_and_corridors<R: Rng + ?Sized>(map: &mut Map, factory: &mut ItemFactory, rng: &mut R) -> Dungeon {
+fn rooms_and_corridors<R: Rng + ?Sized>(map: &mut Map, rng: &mut R) -> Dungeon {
 
     let mut corridors: Vec<HashMap<i32, [i32; 2]>> = Vec::new();
     let mut rooms: Vec<Room> = Vec::new();
@@ -180,8 +180,7 @@ fn rooms_and_corridors<R: Rng + ?Sized>(map: &mut Map, factory: &mut ItemFactory
 }
 
 
-fn furnish_dungeon<R: Rng + ?Sized>(dungeon: &Dungeon, 
-                                    map: &mut Map, factory: &mut ItemFactory, rng: &mut R) {
+fn furnish_dungeon<R: Rng + ?Sized>(dungeon: &Dungeon, map: &mut Map, rng: &mut R) {
 
     // place entrance stairs
     place_wall_tile(map, dungeon.rooms[0].x2, dungeon.rooms[0].y1, 
@@ -192,7 +191,7 @@ fn furnish_dungeon<R: Rng + ?Sized>(dungeon: &Dungeon,
                       0, [1000.0, 1000.0]);                
 
     for i in 1 .. dungeon.rooms.len() {
-        place_coins(map, factory, 
+        place_coins(map,
                     rng.random_range(dungeon.rooms[i].x1 .. dungeon.rooms[i].x2), 
                     rng.random_range(dungeon.rooms[i].y1 .. dungeon.rooms[i].y2), 
                     "copper_coin", rng.random_range(1 .. 6));
@@ -541,9 +540,9 @@ fn place_wall_tile(map: &mut Map, x: i32, y: i32, z_off: i32, id: usize, color: 
 }
 
 
-fn place_coins(map: &mut Map, factory: &mut ItemFactory,
+fn place_coins(map: &mut Map,
                x: i32, y: i32, id: &str, count: u32) -> u64 {
-    let mut item = factory.create(id);
+    let mut item = map.item_factory.create(id);
     item.stack_size = count;
 
     map.place_item(item, map_pos(x, y, 0, 1.0))
