@@ -14,6 +14,7 @@ use rand::Rng;
 use rand::rngs::StdRng;
 
 use crate::item::Item;
+use crate::ItemFactory;
 use crate::creature::Creature;
 use crate::creature::CreatureFactory;
 use crate::projectile::ProjectileBuilder;
@@ -28,7 +29,7 @@ use crate::parse_rgba;
 use crate::gl_support::BlendMode;
 use crate::Slot;
 use crate::generate_dungeon;
-use crate::ItemFactory;
+use crate::map_pos;
 
 
 pub const MAP_GROUND_LAYER:usize = 0;
@@ -148,6 +149,16 @@ impl Map {
             projectile_builder,
             player_id,
         }
+    }
+
+
+    pub fn clear(&mut self) {
+    
+        for layer in &mut self.layers {
+            layer.clear();
+        }
+
+        self.transitions.clear();
     }
 
 
@@ -356,12 +367,26 @@ impl Map {
             let to_location = self.transitions[index].to_location;
 
             if to_map == 501 {
+                // preserve player
+                let mut player = self.layers[MAP_OBJECT_LAYER].remove(&self.player_id).unwrap();
+
+                self.clear();
                 let dungeon = generate_dungeon(self);
-                self.set_player_position(dungeon.start_position);                
+        
+                // stop player movement
+                player.move_time_left = 0.0;
+                self.layers[MAP_OBJECT_LAYER].insert(self.player_id, player);
+        
+                self.set_player_position(dungeon.start_position);
+
+                let x = (dungeon.rooms[5].x1 + dungeon.rooms[5].x2) / 2;
+                let y = (dungeon.rooms[5].y1 + dungeon.rooms[5].y2) / 2;
+
+                self.populate("dungeon.csv", rng, map_pos(x, y, 0));
             }
             else {
                 self.load("town.map");
-                self.populate("town.csv", rng);
+                // self.populate("town.csv", rng);
     
                 self.set_player_position(to_location);
             }
@@ -463,9 +488,7 @@ impl Map {
     }
     
 
-    pub fn populate(&mut self, _filename: &str, rng: &mut StdRng) {
-
-        let position = [1216.0, 1448.0];
+    pub fn populate(&mut self, _filename: &str, rng: &mut StdRng, position: Vector2<f32>) {
 
         let group = self.make_creature_group("Targetting Drone", 5, 9, position, 40.0, rng);
         self.mob_groups.push(group);
@@ -477,10 +500,7 @@ impl Map {
         // preserve player
         let mut player = self.layers[MAP_OBJECT_LAYER].remove(&self.player_id).unwrap();
 
-        for layer in &mut self.layers {
-            layer.clear();
-        }
-        self.transitions.clear();
+        self.clear();
 
         let mut path = PathBuf::new();
         path.push("resources/maps/");
@@ -737,6 +757,8 @@ impl Map {
     
     pub fn make_creature_group(&mut self, id: &str, min_count: i32, max_count: i32, center: Vector2<f32>, spacing: f32, rng: &mut StdRng) -> MobGroup {
         
+        println!("Placing creatures at {}, {}", center[0], center[1]);
+
         let mut mobs = self.make_creatures(id, min_count, max_count, center, spacing, 0.5, rng);
         let mut list = Vec::new();
 
@@ -879,7 +901,7 @@ impl MapObjectFactory {
         let uid = self.next_id;
         self.next_id += 1;
 
-        println!("MapObjectFactory: next id will be {}", self.next_id);
+        // println!("MapObjectFactory: next id will be {}", self.next_id);
 
         MapObject {
             mob_type: MobType::MapObject,

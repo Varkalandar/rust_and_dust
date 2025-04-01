@@ -173,7 +173,7 @@ fn rooms_and_corridors<R: Rng + ?Sized>(map: &mut Map, rng: &mut R) -> Dungeon {
     }
 
     Dungeon {
-        start_position: map_pos(rooms[0].x2 - 1, rooms[0].y1 + 1, 0, 1.0),
+        start_position: map_pos(rooms[0].x2 - 1, rooms[0].y1 + 1, 0),
         rooms, 
         corridors,
     }
@@ -187,9 +187,9 @@ fn furnish_dungeon<R: Rng + ?Sized>(dungeon: &Dungeon, map: &mut Map, rng: &mut 
                     0, 248, [1.0, 1.0, 1.0, 1.0]);
 
     map.transitions.clear();
-    map.add_transition(map_pos(dungeon.rooms[0].x2, dungeon.rooms[0].y1, 0, 1.0), 100.0, 
-                      0, [1000.0, 1000.0]);                
-
+    map.add_transition(map_pos(dungeon.rooms[0].x2, dungeon.rooms[0].y1, 0), 100.0, 
+                      0, [833.0, 1164.0]);                
+                      
     for i in 1 .. dungeon.rooms.len() {
         place_coins(map,
                     rng.random_range(dungeon.rooms[i].x1 .. dungeon.rooms[i].x2), 
@@ -199,10 +199,10 @@ fn furnish_dungeon<R: Rng + ?Sized>(dungeon: &Dungeon, map: &mut Map, rng: &mut 
 
     for room in &dungeon.rooms {
     
-        let p1 = map_pos(room.x1, room.y1, 0, 1.0);
-        let p2 = map_pos(room.x2, room.y1, 0, 1.0);
-        let p3 = map_pos(room.x2, room.y2, 0, 1.0);
-        let p4 = map_pos(room.x1, room.y2, 0, 1.0);
+        let p1 = map_pos(room.x1, room.y1, 0);
+        let p2 = map_pos(room.x2, room.y1, 0);
+        let p3 = map_pos(room.x2, room.y2, 0);
+        let p4 = map_pos(room.x1, room.y2, 0);
     
         let area = Polygon::new(LineString::from(vec![(p1[0], p1[1]), (p2[0], p2[1]), (p3[0], p3[1]), (p4[0], p4[1])]), vec![]);
 
@@ -517,7 +517,7 @@ fn place_floor_tile(map: &mut Map, x: i32, y: i32, id: usize, color: [f32; 4]) {
     let layer = MAP_GROUND_LAYER;
     let height = 0.0;
     let scale = 1.0;
-    let pos = map_pos(x, y, 0, scale);
+    let pos = map_pos(x, y, 0);
 
     let mob_id = create_mob(map, id, layer, pos, height, scale);
 
@@ -531,7 +531,7 @@ fn place_wall_tile(map: &mut Map, x: i32, y: i32, z_off: i32, id: usize, color: 
     let layer = MAP_OBJECT_LAYER;
     let height = 0.0;
     let scale = 1.0;
-    let pos = map_pos(x, y, z_off, scale);
+    let pos = map_pos(x, y, z_off);
 
     let mob_id = create_mob(map, id, layer, pos, height, scale);
     let mob = map.layers[layer].get_mut(&mob_id).unwrap();
@@ -545,7 +545,7 @@ fn place_coins(map: &mut Map,
     let mut item = map.item_factory.create(id);
     item.stack_size = count;
 
-    map.place_item(item, map_pos(x, y, 0, 1.0))
+    map.place_item(item, map_pos(x, y, 0))
 }
 
 
@@ -558,12 +558,12 @@ fn create_mob(map: &mut Map, tile_id: usize, layer: usize, position: Vector2<f32
 }
 
 
-fn map_pos(x: i32, y: i32, z_off: i32, scale: f32) -> [f32; 2] {
+pub fn map_pos(x: i32, y: i32, z_off: i32) -> [f32; 2] {
 
     let fx = ((y + x) * 108) as f32; 
     let fy = ((y - x) * 108 + z_off) as f32;
 
     // println!("{}, {} -> {}, {}", x, y, fx, fy);
 
-    [fx * scale, fy * scale]
+    [fx, fy]
 }
