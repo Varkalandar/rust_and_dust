@@ -460,8 +460,11 @@ fn build_tunnel_from_coordinates(map: &mut Map, floors: &HashMap<i32, [i32; 2]>)
         if !east && !(end_piece && west) {
             place_wall_tile(map, x, y, 110, 514, wall_color);  
         }
+
+        store_walkable_area(x, y, x, y, &mut map.walkable);
     }
 }
+
 
 fn build_corridor_from_coordinates(map: &mut Map, floors: &HashMap<i32, [i32; 2]>)
 {

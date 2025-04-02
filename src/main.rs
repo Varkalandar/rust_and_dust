@@ -536,19 +536,28 @@ impl App {
         
         let distance = vec2_len(direction);
 
-        let player = self.world.map.layers[MAP_OBJECT_LAYER].get_mut(&self.world.map.player_id).unwrap();
-        let attributes = player.creature.as_ref().unwrap();
-        let time = distance / attributes.base_speed; // pixel per second
+        let dest;
+        let time;
 
-        player.move_time_left = time;
-        player.velocity = vec2_scale(direction, 1.0/time);
+        {
+            let player = self.world.map.layers[MAP_OBJECT_LAYER].get(&self.world.map.player_id).unwrap();
+            let attributes = player.creature.as_ref().unwrap();
+            
+            time = distance / attributes.base_speed; // pixel per second
+            dest = vec2_add(player.position, direction);
+        }
 
-        let dest = vec2_add(player.position, direction);
+        if self.world.map.is_walkable(dest) {
+            let player = self.world.map.layers[MAP_OBJECT_LAYER].get_mut(&self.world.map.player_id).unwrap();
 
-        let d = player.visual.orient(direction);
-        player.visual.current_image_id = player.visual.base_image_id + d;
-
-        println!("  moving {} pixels over {} seconds, destination is {:?}", distance, time, dest);        
+            player.move_time_left = time;
+            player.velocity = vec2_scale(direction, 1.0/time);
+    
+            let d = player.visual.orient(direction);
+            player.visual.current_image_id = player.visual.base_image_id + d;
+    
+            println!("  moving {} pixels over {} seconds, destination is {:?}", distance, time, dest);        
+        }
     }
 
 

@@ -1,6 +1,9 @@
 use vecmath::{Vector2, vec2_sub, vec2_add, vec2_scale, vec2_len, vec2_square_len};
+use geo::Coord;
 use geo::Polygon;
 use geo::LineString;
+use geo::Contains;
+use geo::coord;
 
 use std::f64::consts::PI;
 use std::io::prelude::*;
@@ -159,6 +162,9 @@ impl Map {
         }
 
         self.transitions.clear();
+
+        self.walkable.clear();
+        self.blocked.clear();
     }
 
 
@@ -201,6 +207,24 @@ impl Map {
         }
 
         result
+    }
+
+
+    pub fn is_walkable(&self, position: [f32; 2]) -> bool {
+        let p = coord! { x: position[0], y: position[1] };
+        
+        let mut ok = false;
+        
+        for polygon in &self.walkable {
+            if polygon.contains(&p) {
+                ok = true;
+                break;
+            }
+        }
+
+        println!("Location {}, {} is walkable={}", position[0], position[1], ok);
+
+        ok
     }
 
 
@@ -545,6 +569,20 @@ impl Map {
         // stop player movement
         player.move_time_left = 0.0;
         self.layers[MAP_OBJECT_LAYER].insert(self.player_id, player);
+
+        // store walkable area
+        let p1 = [1250.0, 100.0];
+        let p2 = [2500.0, 1250.0];
+        let p3 = [1250.0, 2500.0];
+        let p4 = [-50.0, 1250.0];
+
+        let area = Polygon::new(LineString::from(vec![(p1[0], p1[1] + 108.0), 
+                                                    (p2[0], p2[1] + 108.0), 
+                                                    (p3[0], p3[1] + 108.0), 
+                                                    (p4[0], p4[1] + 108.0)]),
+                                                    vec![]);
+
+        self.walkable.push(area);
     }
 
 
