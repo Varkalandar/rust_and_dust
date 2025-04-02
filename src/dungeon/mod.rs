@@ -196,18 +196,6 @@ fn furnish_dungeon<R: Rng + ?Sized>(dungeon: &Dungeon, map: &mut Map, rng: &mut 
                     rng.random_range(dungeon.rooms[i].y1 .. dungeon.rooms[i].y2), 
                     "copper_coin", rng.random_range(1 .. 6));
     }
-
-    for room in &dungeon.rooms {
-    
-        let p1 = map_pos(room.x1, room.y1, 0);
-        let p2 = map_pos(room.x2, room.y1, 0);
-        let p3 = map_pos(room.x2, room.y2, 0);
-        let p4 = map_pos(room.x1, room.y2, 0);
-    
-        let area = Polygon::new(LineString::from(vec![(p1[0], p1[1]), (p2[0], p2[1]), (p3[0], p3[1]), (p4[0], p4[1])]), vec![]);
-
-        map.walkable.push(area);
-    }
 }
 
 
@@ -278,6 +266,26 @@ fn build_room<R: Rng + ?Sized>(map: &mut Map, rng: &mut R,
 
     // right room corner
     place_wall_tile(map, dx+1, dy, 98, 501, wall_color);
+
+    store_walkable_area(sx, sy, dx, dy, &mut map.walkable);
+}
+
+
+fn store_walkable_area(sx: i32, sy: i32, dx: i32, dy: i32, 
+                       walkable: &mut Vec<Polygon<f32>>) {
+    // store walkable area
+    let p1 = map_pos(sx, sy - 1, 0);
+    let p2 = map_pos(dx + 1, sy - 1, 0);
+    let p3 = map_pos(dx + 1, dy, 0);
+    let p4 = map_pos(sx, dy, 0);
+
+    let area = Polygon::new(LineString::from(vec![(p1[0], p1[1] + 108.0), 
+                                                  (p2[0], p2[1] + 108.0), 
+                                                  (p3[0], p3[1] + 108.0), 
+                                                  (p4[0], p4[1] + 108.0)]),
+                                                vec![]);
+
+    walkable.push(area);
 }
 
 
@@ -510,8 +518,11 @@ fn build_corridor_from_coordinates(map: &mut Map, floors: &HashMap<i32, [i32; 2]
         if !east && !(end_piece && west) {
             place_wall_tile(map, x, y, 94, 509, wall_color);  
         }
+
+        store_walkable_area(x, y, x, y, &mut map.walkable);
     }
 }
+
 
 fn place_floor_tile(map: &mut Map, x: i32, y: i32, id: usize, color: [f32; 4]) {
     let layer = MAP_GROUND_LAYER;

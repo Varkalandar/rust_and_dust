@@ -22,6 +22,10 @@ use glium::VertexBuffer;
 use glium::Surface;
 
 use vecmath::{vec2_add, vec2_len, vec2_scale, vec2_sub, Vector2};
+use geo::Polygon;
+use geo::CoordsIter;
+use geo::LineString;
+
 use rand::SeedableRng;
 
 use std::time::SystemTime;
@@ -276,7 +280,8 @@ impl App {
 
         let t0 = SystemTime::now();
 
-        let buffer = build_dynamic_quad_buffer(&self.ui.display);
+        // let buffer = build_dynamic_quad_buffer(&self.ui.display);
+        let buffer = &self.ui.context.vertex_buffer;
         let world = &self.world;
 
         let width = self.ui.context.window_size[0] as f32;
@@ -332,14 +337,8 @@ impl App {
         // draw clouds
         Self::render_layer(&self.ui.display, &mut target, &self.ui.program, &buffer, world, tex_white, MAP_CLOUD_LAYER);
         
-        /*
-        draw_polygon(&self.ui.display, &mut target, &self.ui.program,
-            BlendMode::Blend,
-            tex_white,
-            &self.world.map.walkable[0],
-            &[1.0, 1.0, 1.0, 1.0]);
-        */
-
+        // Debug: show walkable areas
+        //self.show_walkable_areas(&self.ui.display, &mut target, &self.ui.program, tex_white, &world.map);
 
         {
             let world = &mut self.world;
@@ -494,6 +493,36 @@ impl App {
                 }
             });
         }    
+    }
+
+
+    #[allow(dead_code)]
+    fn show_walkable_areas(&self, 
+                           display: &Display<WindowSurface>, target: &mut Frame, program: &Program,
+                           tex_white: &Texture2d, 
+                           map: &Map) 
+    {
+        let (display_width, display_height) = display.get_framebuffer_dimensions();
+        let window_center = [display_width as f32 * 0.5, display_height as f32 * 0.5];
+
+        let player_position = map.get_player_position();
+
+
+        for polygon in &map.walkable {
+            let mut points = Vec::new();
+            for coord in polygon.exterior_coords_iter() {
+                let tpos = calc_tile_position(&[coord.x, coord.y], [0.0, 0.0], 1.0, &player_position, &window_center);
+                points.push((tpos[0], tpos[1]));
+            }
+
+            let area = Polygon::new(LineString::from(points), vec![]);
+
+            draw_polygon(display, target, program,
+                BlendMode::Blend,
+                tex_white,
+                &area,
+                &[1.0, 1.0, 1.0, 1.0]);
+        }
     }
 
     
