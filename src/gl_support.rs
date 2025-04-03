@@ -164,17 +164,20 @@ pub fn draw_texture<T: SurfaceTypeTrait + ResizeableSurface>(display: &Display<T
     draw_shape(display, target, program, blend, &shape, texture, color, None);
 }
 
-pub fn draw_texture_clip<T: SurfaceTypeTrait + ResizeableSurface>(display: &Display<T>,
-    target: &mut Frame,   
-    program: &Program,  
-    blend: BlendMode,
-    texture: &Texture2d,
-    xp: f32,
-    yp: f32, 
-    sx: f32, 
-    sy: f32,
-    color: &[f32; 4],
-    scissors: &Option<UiArea>) {
+
+pub fn draw_texture_clip_wb(target: &mut Frame,   
+                            program: &Program,
+                            buffer: &VertexBuffer<Vertex>,
+                            blend: BlendMode,
+                            display_width: u32,
+                            display_height: u32,
+                            texture: &Texture2d,
+                            xp: f32,
+                            yp: f32, 
+                            sx: f32, 
+                            sy: f32,
+                            color: &[f32; 4],
+                            scissors: &Option<UiArea>) {
 
     let fw = texture.width() as f32 * sx;
     let fh = texture.height() as f32 * sy;
@@ -200,7 +203,8 @@ pub fn draw_texture_clip<T: SurfaceTypeTrait + ResizeableSurface>(display: &Disp
             None => None,
         };
 
-    draw_shape(display, target, program, blend, &shape, texture, color, clip);
+    draw_shape_wb(target, program, buffer, blend, 
+                  display_width, display_height, &shape, texture, color, clip);
 }
 
 /*

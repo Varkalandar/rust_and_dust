@@ -21,12 +21,12 @@ pub use font::UiFont;
 use crate::BlendMode;
 use crate::gl_support::draw_texture;
 use crate::gl_support::texture_from_data;
-use crate::gl_support::draw_texture_clip;
+use crate::gl_support::draw_texture_wb;
 use crate::gl_support::draw_tex_area_wb;
+use crate::gl_support::draw_texture_clip_wb;
 use crate::gl_support::build_dynamic_quad_buffer;
 use crate::gl_support::Vertex;
 use crate::gl_support::RectF32;
-
 
 
 #[derive(PartialEq, Clone, Debug)]
@@ -601,8 +601,9 @@ impl UiHead for UiButton {
 
         let area = self.area();
         
-        draw_texture_clip(display, target, program,
+        draw_texture_clip_wb(target, program, &context.vertex_buffer,
             BlendMode::Blend,
+            context.window_size[0], context.window_size[1],
             &context.tex_white,
             (area.x + x) as f32,
             (area.y + y) as f32, 
@@ -642,8 +643,9 @@ impl UiHead for UiIcon
         let xp = (x + area.x) as f32;
         let yp = (y + area.y) as f32;
 
-        draw_texture_clip(display, target, program,
+        draw_texture_clip_wb(target, program, &context.vertex_buffer,
             BlendMode::Blend,
+            context.window_size[0], context.window_size[1],
             &context.tex_white,
             xp,
             yp, 
@@ -660,8 +662,9 @@ impl UiHead for UiIcon
         let image_x = xp + (area.w as f32 - tw) / 2.0;
         let image_y = y_base - th;
 
-        draw_texture_clip(display, target, program,
+        draw_texture_clip_wb(target, program, &context.vertex_buffer,
             BlendMode::Blend,
+            context.window_size[0], context.window_size[1],
             &self.tile.tex,
             image_x,
             image_y, 
@@ -719,8 +722,9 @@ impl UiHead for UiScrollpane
         let xp = x + area.x;
         let yp = y + area.y;
 
-        draw_texture(display, target, program,
+        draw_texture_wb(target, program, &context.vertex_buffer,
             BlendMode::Blend,
+            context.window_size[0], context.window_size[1],
             &context.tex_white,
             xp as f32,
             yp as f32, 
@@ -919,8 +923,9 @@ impl UiHead for UiColorchoice
 
 
         // white "reset" area
-        draw_texture_clip(display, target, program,
+        draw_texture_clip_wb(target, program, &context.vertex_buffer,
             BlendMode::Blend,
+            context.window_size[0], context.window_size[1],
             &context.tex_white,
             (xp + area.w - bw + 4) as f32,
             yp as f32, 
@@ -930,8 +935,9 @@ impl UiHead for UiColorchoice
             &context.scissors);    
 
         // lightness
-        draw_texture_clip(display, target, program,
+        draw_texture_clip_wb(target, program, &context.vertex_buffer,
             BlendMode::Blend,
+            context.window_size[0], context.window_size[1],
             &self.light,
             xp as f32,
             yp as f32, 
@@ -941,8 +947,9 @@ impl UiHead for UiColorchoice
             &context.scissors);
             
         // transparency
-        draw_texture_clip(display, target, program,
+        draw_texture_clip_wb(target, program, &context.vertex_buffer,
             BlendMode::Blend,
+            context.window_size[0], context.window_size[1],
             &self.trans,
             (xp + area.w - bw + 4) as f32,
             (yp + bw) as f32, 
@@ -952,8 +959,9 @@ impl UiHead for UiColorchoice
             &context.scissors);
 
         // color
-        draw_texture_clip(display, target, program,
+        draw_texture_clip_wb(target, program, &context.vertex_buffer,
             BlendMode::Blend,
+            context.window_size[0], context.window_size[1],
             &self.tex,
             xp as f32,
             (yp + bw) as f32, 
