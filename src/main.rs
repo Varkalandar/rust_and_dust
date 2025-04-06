@@ -216,7 +216,7 @@ impl App {
             controllers: GameControllers {
                 editor,
                 game,
-                edit: true,
+                edit: false,
             },
 
             update_time: SystemTime::now(),
