@@ -206,7 +206,7 @@ fn furnish_dungeon<R: Rng + ?Sized>(dungeon: &Dungeon, map: &mut Map, rng: &mut 
 
     map.transitions.clear();
     map.add_transition(map_pos(dungeon.rooms[0].x2, dungeon.rooms[0].y1, 0), 100.0, 
-                      0, [833.0, 1164.0]);                
+                      0, [720.0, 1802.0]);                
                       
     for i in 1 .. dungeon.rooms.len() {
         place_coins(map,

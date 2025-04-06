@@ -287,16 +287,16 @@
       <Description>
         <version>4</version>
         <id>17</id>
-        <width>284</width>
-        <height>227</height>
+        <width>426</width>
+        <height>435</height>
         <offsetX>0</offsetX>
         <offsetY>0</offsetY>
-        <footX>141</footX>
-        <footY>213</footY>
+        <footX>209</footX>
+        <footY>409</footY>
       </Description>
       <Metadata>
         <int>0</int>
-        <string>hjm_tree_200317_1a</string>
+        <string>green_beech</string>
         <string></string>
       </Metadata>
     </Tile>
@@ -304,16 +304,16 @@
       <Description>
         <version>4</version>
         <id>18</id>
-        <width>262</width>
-        <height>220</height>
+        <width>505</width>
+        <height>479</height>
         <offsetX>0</offsetX>
         <offsetY>0</offsetY>
-        <footX>130</footX>
-        <footY>210</footY>
+        <footX>258</footX>
+        <footY>460</footY>
       </Description>
       <Metadata>
         <int>0</int>
-        <string>hjm_tree_200317_1b</string>
+        <string>green_maple</string>
         <string></string>
       </Metadata>
     </Tile>
@@ -355,16 +355,16 @@
       <Description>
         <version>4</version>
         <id>21</id>
-        <width>304</width>
-        <height>220</height>
+        <width>432</width>
+        <height>452</height>
         <offsetX>0</offsetX>
         <offsetY>0</offsetY>
-        <footX>150</footX>
-        <footY>218</footY>
+        <footX>227</footX>
+        <footY>404</footY>
       </Description>
       <Metadata>
         <int>0</int>
-        <string>hjm_tree_200317_3a</string>
+        <string>copper_beech</string>
         <string></string>
       </Metadata>
     </Tile>
@@ -491,16 +491,16 @@
       <Description>
         <version>4</version>
         <id>29</id>
-        <width>269</width>
-        <height>215</height>
+        <width>486</width>
+        <height>476</height>
         <offsetX>0</offsetX>
         <offsetY>0</offsetY>
-        <footX>138</footX>
-        <footY>213</footY>
+        <footX>257</footX>
+        <footY>450</footY>
       </Description>
       <Metadata>
         <int>0</int>
-        <string>hjm_tree_200317_7a</string>
+        <string>green_oak</string>
         <string></string>
       </Metadata>
     </Tile>
@@ -508,16 +508,16 @@
       <Description>
         <version>4</version>
         <id>30</id>
-        <width>271</width>
-        <height>277</height>
+        <width>386</width>
+        <height>430</height>
         <offsetX>0</offsetX>
         <offsetY>0</offsetY>
-        <footX>81</footX>
-        <footY>274</footY>
+        <footX>203</footX>
+        <footY>412</footY>
       </Description>
       <Metadata>
         <int>0</int>
-        <string>hjm_tree_200317_7b</string>
+        <string>green_birch</string>
         <string></string>
       </Metadata>
     </Tile>
@@ -11915,16 +11915,16 @@
       <Description>
         <version>4</version>
         <id>689</id>
-        <width>1</width>
-        <height>1</height>
+        <width>430</width>
+        <height>468</height>
         <offsetX>0</offsetX>
         <offsetY>0</offsetY>
-        <footX>0</footX>
-        <footY>0</footY>
+        <footX>104</footX>
+        <footY>426</footY>
       </Description>
       <Metadata>
         <int>0</int>
-        <string></string>
+        <string>mushroom_house</string>
         <string></string>
       </Metadata>
     </Tile>
@@ -11932,16 +11932,16 @@
       <Description>
         <version>4</version>
         <id>690</id>
-        <width>1</width>
-        <height>1</height>
+        <width>458</width>
+        <height>436</height>
         <offsetX>0</offsetX>
         <offsetY>0</offsetY>
-        <footX>0</footX>
-        <footY>0</footY>
+        <footX>253</footX>
+        <footY>407</footY>
       </Description>
       <Metadata>
         <int>0</int>
-        <string></string>
+        <string>snail_shop</string>
         <string></string>
       </Metadata>
     </Tile>
@@ -11949,16 +11949,16 @@
       <Description>
         <version>4</version>
         <id>691</id>
-        <width>1</width>
-        <height>1</height>
+        <width>381</width>
+        <height>438</height>
         <offsetX>0</offsetX>
         <offsetY>0</offsetY>
-        <footX>0</footX>
-        <footY>0</footY>
+        <footX>104</footX>
+        <footY>382</footY>
       </Description>
       <Metadata>
         <int>0</int>
-        <string></string>
+        <string>tavern</string>
         <string></string>
       </Metadata>
     </Tile>
