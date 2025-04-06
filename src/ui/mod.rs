@@ -238,7 +238,8 @@ impl UI {
     }
     
 
-    pub fn make_button(&self, x: i32, y: i32, w: i32, h: i32, label: &str, _id: usize) -> UiComponent {
+    pub fn make_button(&self, x: i32, y: i32, w: i32, h: i32, label: &str, _id: usize) -> UiComponent 
+    {
         let button = UiButton {
             area: UiArea {
                 x, 
@@ -278,7 +279,8 @@ impl UI {
 
     
     pub fn make_scrollpane(&self, x: i32, y: i32, w: i32, h: i32, 
-                           child: UiComponent, scroll_step_x: f32, scroll_step_y: f32) -> UiComponent {
+                           child: UiComponent, scroll_step_x: f32, scroll_step_y: f32) -> UiComponent 
+    {
         let scrollpane = UiScrollpane {
             area: UiArea {
                 x, 
@@ -299,7 +301,8 @@ impl UI {
     }
 
 
-    pub fn make_color_choice(&self, x: i32, y: i32, w: i32, h: i32, id: usize, color: [f32;4]) -> UiComponent {
+    pub fn make_color_choice(&self, x: i32, y: i32, w: i32, h: i32, id: usize, color: [f32;4]) -> UiComponent 
+    {
         let colorchoice = UiColorchoice::new(&self.display, x, y, w, h, id, color); 
 
         UiComponent {
@@ -308,14 +311,16 @@ impl UI {
     }
 
 
-    pub fn draw(&mut self, target: &mut Frame) {
+    pub fn draw(&mut self, target: &mut Frame) 
+    {
         let context = &mut self.context;
         let head = &self.root.head;
         head.draw(&self.display, target, &self.program, context, 0, 0);
     }
 
 
-    pub fn draw_hline(&self, target: &mut Frame, x: i32, y: i32, width: i32, color: &[f32; 4]) {
+    pub fn draw_hline(&self, target: &mut Frame, x: i32, y: i32, width: i32, color: &[f32; 4]) 
+    {
         let context = &self.context;
 
         draw_tex_area_wb(target, &self.program, &context.vertex_buffer,
@@ -328,8 +333,8 @@ impl UI {
     }
 
 
-    pub fn draw_box(&self, target: &mut Frame, x: i32, y: i32, width: i32, height: i32, color: &[f32; 4]) {
-        let context = &self.context;
+    pub fn draw_box(&self, target: &mut Frame, x: i32, y: i32, width: i32, height: i32, color: &[f32; 4]) 
+    {
         self.draw_hline(target, x, y, width, color);
         self.draw_hline(target, x, y + height - 1, width, color);
 
@@ -339,7 +344,8 @@ impl UI {
     }
     
 
-    pub fn fill_box(&self, target: &mut Frame, x: i32, y: i32, width: i32, height: i32, color: &[f32; 4]) {
+    pub fn fill_box(&self, target: &mut Frame, x: i32, y: i32, width: i32, height: i32, color: &[f32; 4]) 
+    {
         let context = &self.context;
 
         draw_tex_area_wb(target, &self.program, &context.vertex_buffer,
@@ -352,7 +358,8 @@ impl UI {
     }
 
 
-    pub fn handle_button_event(&mut self, event: &ButtonEvent) -> Option<&dyn UiHead> {
+    pub fn handle_button_event(&mut self, event: &ButtonEvent) -> Option<&dyn UiHead> 
+    {
         if event.args.state == ButtonState::Press {
             if event.args.button == Button::Keyboard(Key::Named(NamedKey::Shift)) {
                 println!("Shift pressed");
@@ -911,7 +918,7 @@ impl UiHead for UiColorchoice
         self.area.y = y;
     }
 
-    fn draw(&self, display: &Display<WindowSurface>, target: &mut Frame, program: &Program, 
+    fn draw(&self, _display: &Display<WindowSurface>, target: &mut Frame, program: &Program, 
             context: &mut UiContext, x: i32, y: i32) {
         let area = &self.area;
         let xp = x + area.x;

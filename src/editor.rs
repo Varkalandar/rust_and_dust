@@ -1,4 +1,5 @@
 use vecmath::Vector2;
+use vecmath::vec2_sub;
 
 use glium::winit::keyboard::Key;
 use glium::winit::keyboard::NamedKey;
@@ -13,6 +14,7 @@ use crate::gl_support::BlendMode;
 use crate::gl_support::draw_texture;
 use crate::calc_tile_position;
 use crate::screen_to_world_pos;
+use crate::move_player;
 
 
 pub struct MapEditor {
@@ -46,6 +48,13 @@ impl UiController for MapEditor {
 
                         if id == 0 {
                             let ok = self.select_nearest_item(ui, world);
+
+                            if !ok {
+                                // walk there
+                                let screen_direction = vec2_sub(ui.context.mouse_state.position, ui.window_center());
+                                move_player(&mut world.map, screen_direction);                
+                            }
+
                             return ok;
                         }
                         else {

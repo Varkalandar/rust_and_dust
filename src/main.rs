@@ -526,39 +526,6 @@ impl App {
     }
 
     
-    fn move_player(&mut self, window_center: Vector2<f32>) {
-        
-        let screen_direction = vec2_sub(self.ui.context.mouse_state.position, window_center);
-        
-        // world coordinates have y components double as large
-        // as screen coordinates
-        let direction = [screen_direction[0], screen_direction[1] * 2.0];
-        
-        let distance = vec2_len(direction);
-
-        let dest;
-        let time;
-
-        {
-            let player = self.world.map.layers[MAP_OBJECT_LAYER].get(&self.world.map.player_id).unwrap();
-            let attributes = player.creature.as_ref().unwrap();
-            
-            time = distance / attributes.base_speed; // pixel per second
-            dest = vec2_add(player.position, direction);
-        }
-
-        if self.world.map.is_walkable(dest) {
-            let player = self.world.map.layers[MAP_OBJECT_LAYER].get_mut(&self.world.map.player_id).unwrap();
-
-            player.move_time_left = time;
-            player.velocity = vec2_scale(direction, 1.0/time);
-    
-            let d = player.visual.orient(direction);
-            player.visual.current_image_id = player.visual.base_image_id + d;
-    
-            println!("  moving {} pixels over {} seconds, destination is {:?}", distance, time, dest);        
-        }
-    }
 
 
     pub fn handle_button_event(&mut self, event: &ButtonEvent) {
@@ -584,18 +551,11 @@ impl App {
             }        
         }
 
-        let window_center: Vector2<f32> = self.ui.window_center(); 
         let controller = &mut self.controllers.current();
         let world = &mut self.world;
         let ui = &mut self.ui;
 
-        let consumed = controller.handle_button_event(ui, &event, world);
-
-        if event.args.state == ButtonState::Release && !consumed {
-            if event.args.button == Button::Mouse(MouseButton::Left) {
-                self.move_player(window_center);            
-            }
-        }
+        let _consumed = controller.handle_button_event(ui, &event, world);
     }
 
 
@@ -616,6 +576,39 @@ impl App {
         let ui = &mut self.ui;
 
         controller.handle_scroll_event(ui, &event, world);
+    }
+}
+
+
+fn move_player(map: &mut Map, screen_direction: Vector2<f32>) 
+{
+    // world coordinates have y components double as large
+    // as screen coordinates
+    let direction = [screen_direction[0], screen_direction[1] * 2.0];
+    
+    let distance = vec2_len(direction);
+
+    let dest;
+    let time;
+
+    {
+        let player = map.layers[MAP_OBJECT_LAYER].get(&map.player_id).unwrap();
+        let attributes = player.creature.as_ref().unwrap();
+        
+        time = distance / attributes.base_speed; // pixel per second
+        dest = vec2_add(player.position, direction);
+    }
+
+    if map.is_walkable(dest) {
+        let player = map.layers[MAP_OBJECT_LAYER].get_mut(&map.player_id).unwrap();
+
+        player.move_time_left = time;
+        player.velocity = vec2_scale(direction, 1.0/time);
+
+        let d = player.visual.orient(direction);
+        player.visual.current_image_id = player.visual.base_image_id + d;
+
+        println!("  moving {} pixels over {} seconds, destination is {:?}", distance, time, dest);        
     }
 }
 

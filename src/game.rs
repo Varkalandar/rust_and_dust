@@ -6,9 +6,11 @@ use glium::Frame;
 
 use crate::ui::{UI, UiController, MouseButton, Button, ButtonState, ButtonEvent, MouseMoveEvent, ScrollEvent};
 use crate::GameWorld;
+use crate::move_player;
 use crate::screen_to_world_pos;
 use crate::player_inventory_view::PlayerInventoryView;
 use crate::TileSet;
+use crate::Map;
 use crate::map::MoveEndAction;
 use crate::map::MapObject;
 use crate::map::MapObjectFactory;
@@ -17,6 +19,8 @@ use crate::MAP_OBJECT_LAYER;
 use crate::PROJECTILE_TILESET;
 use crate::gl_support::load_texture;
 use crate::MAP_RESOURCE_PATH;
+use crate::SoundPlayer;
+
 
 pub struct Game {
     piv: PlayerInventoryView,
@@ -41,24 +45,35 @@ impl UiController for Game {
 
             match comp {
                 None => {
+                    // the click hit no UI element, so we look into handling it.
 
                     let pos = screen_to_world_pos(&ui, &world.map.get_player_position(), &ui.context.mouse_state.position);
                     
                     if event.args.button == Button::Mouse(MouseButton::Left) {
                         ui.root.head.clear();
+
+                        let target_opt = Map::find_nearest_object(&world.map.layers[MAP_OBJECT_LAYER], &pos, 100.0, world.map.player_id);
+                        match target_opt {
+                            None => {},
+                            Some(target_uid) => {
+                                let target = world.map.layers[MAP_OBJECT_LAYER].get(&target_uid).unwrap();
+
+                                if target.creature.is_some() {
+                                    let target_pos = target.position;
+                                    fire_projectile(&mut world.map, "Fireball", target_pos, &mut world.speaker);
+                                    return true;
+                                }
+                            }
+                        }
+
+                        {
+                            let screen_direction = vec2_sub(ui.context.mouse_state.position, ui.window_center());
+                            move_player(&mut world.map, screen_direction);                
+                        }
                     }
 
                     if event.args.button == Button::Mouse(MouseButton::Right) {
-
-                        let map = &mut world.map;
-                        let id = map.player_id;
-                        let player = map.layers[MAP_OBJECT_LAYER].get_mut(&id).unwrap();
-                        let factory = &mut map.factory;
-                        // let direction = vec2_sub(pos, player.position);
-
-                        let mut projectile = fire_projectile(player.position, pos, MobType::PlayerProjectile, factory);
-                        map.projectile_builder.configure_projectile("Fireball", &mut projectile.visual, &mut projectile.velocity, &mut world.speaker);
-                        map.layers[MAP_OBJECT_LAYER].insert(projectile.uid, projectile);
+                        fire_projectile(&mut world.map, "Fireball", pos, &mut world.speaker);
                     }
 
                     if event.args.button == Button::Keyboard(Key::Character("i".into())) {
@@ -66,6 +81,7 @@ impl UiController for Game {
                     }        
                 },
                 Some(_comp) => {
+                    // the click hit some UI element, so we ignore it.
                 }
             }
         
@@ -150,8 +166,25 @@ impl Game {
 }
 
 
-pub fn fire_projectile(shooter_position: Vector2<f32>, fire_at: Vector2<f32>, 
-                       projectile_type: MobType, factory: &mut MapObjectFactory) -> MapObject {
+pub fn fire_projectile(map: &mut Map, kind: &str, fire_at: Vector2<f32>, speaker: &mut SoundPlayer) -> u64 
+{
+    let id = map.player_id;
+    let player = map.layers[MAP_OBJECT_LAYER].get_mut(&id).unwrap();
+    let factory = &mut map.factory;
+
+    let mut projectile = launch_projectile(player.position, fire_at, MobType::PlayerProjectile, factory);
+    map.projectile_builder.configure_projectile(kind, &mut projectile.visual, &mut projectile.velocity, speaker);
+
+    let uid = projectile.uid;
+    map.layers[MAP_OBJECT_LAYER].insert(uid, projectile);
+
+    uid
+}
+
+
+pub fn launch_projectile(shooter_position: Vector2<f32>, fire_at: Vector2<f32>, 
+                       projectile_type: MobType, factory: &mut MapObjectFactory) -> MapObject 
+{
     println!("New projectile fired at {:?}", fire_at);
 
     let np = vec2_sub(fire_at, shooter_position);

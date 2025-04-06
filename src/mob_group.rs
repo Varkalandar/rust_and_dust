@@ -8,7 +8,7 @@ use crate::map::MapObject;
 use crate::map::MapObjectFactory;
 use crate::map::MobType;
 use crate::map::move_mob;
-use crate::game::fire_projectile;
+use crate::game::launch_projectile;
 use crate::projectile::ProjectileBuilder;
 use crate::SoundPlayer;
 
@@ -82,7 +82,7 @@ impl MobGroup {
                             let reach = 500.0 * 500.0;
                             if len < reach {
 
-                                let mut projectile = fire_projectile(mob.position, player_position, MobType::CreatureProjectile, factory);
+                                let mut projectile = launch_projectile(mob.position, player_position, MobType::CreatureProjectile, factory);
                                 projectile_builder.configure_projectile("Iron shot", &mut projectile.visual, &mut projectile.velocity, speaker);
                                 mobs.insert(projectile.uid, projectile);
 
