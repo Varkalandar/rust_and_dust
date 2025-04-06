@@ -195,8 +195,8 @@ impl App {
 
         // Some inventory contents for testing
 
-        let demo_item = world.map.item_factory.create("wooden_wand");
-        world.player_inventory.put_item(demo_item, Slot::Bag);
+        let wand = world.map.item_factory.create("wooden_wand");
+        world.player_inventory.put_item(wand, Slot::Bag);
 
         let wand = world.map.item_factory.create("engraved_wand");
         world.player_inventory.put_item(wand, Slot::RWing);
@@ -206,7 +206,9 @@ impl App {
         world.player_inventory.put_item(coins, Slot::Bag);
 
         let mut scroll = world.map.item_factory.create("fireball_scroll");
-        scroll.color = [1.0, 0.8, 0.6, 1.0];
+        world.player_inventory.put_item(scroll, Slot::Bag);
+
+        let mut scroll = world.map.item_factory.create("identify_scroll");
         world.player_inventory.put_item(scroll, Slot::Bag);
 
         App {        

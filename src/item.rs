@@ -4,6 +4,7 @@ use std::collections::HashMap;
 
 use crate::inventory::Slot;
 use crate::read_lines;
+use crate::parse_rgba;
 
 #[derive(Debug)]
 pub struct Item {
@@ -153,7 +154,7 @@ fn read_proto_items() -> HashMap<String, Item> {
                 inventory_h: parts.next().unwrap().parse::<i32>().unwrap(),
                 inventory_scale: parts.next().unwrap().parse::<f32>().unwrap(),
                 map_scale: parts.next().unwrap().parse::<f32>().unwrap(),
-                color: [1.0, 1.0, 1.0, 1.0],
+                color: parse_rgba(parts.next().unwrap()),
                 slot: calc_slot(parts.next().unwrap().parse::<i32>().unwrap()),
                 stack_size: 1,
                 max_stack_size: parts.next().unwrap().parse::<u32>().unwrap(),
