@@ -1,10 +1,14 @@
 use std::collections::HashMap;
+use std::collections::HashSet;
 use std::cmp;
 
 use vecmath::Vector2;
 use rand::prelude::*;
 use geo::LineString;
 use geo::Polygon;
+use geo::CoordsIter;
+use geo::Contains;
+use geo::BooleanOps;
 
 use crate::MAP_GROUND_LAYER;
 use crate::MAP_OBJECT_LAYER;
@@ -171,6 +175,20 @@ fn rooms_and_corridors<R: Rng + ?Sized>(map: &mut Map, rng: &mut R) -> Dungeon {
             corridors.push(floors);
         }
     }
+
+    // This is expensive, would be even with only one call to merge_polygons,
+    // but we need the walkable lists often for basically all movement related checks
+    // so we have to minimize the number of entries even at this high cost (cause it happens only
+    // oncve per dungeon, but "walkable" lookup happens many times per path calculation)
+    loop {
+        let old_count = map.walkable.len();
+        map.walkable = merge_polygons(&map.walkable);
+
+        if map.walkable.len() >= old_count {
+            break;
+        }
+    }
+
 
     Dungeon {
         start_position: map_pos(rooms[0].x2 - 1, rooms[0].y1 + 1, 0),
@@ -563,7 +581,8 @@ fn place_coins(map: &mut Map,
 }
 
 
-fn create_mob(map: &mut Map, tile_id: usize, layer: usize, position: Vector2<f32>, height: f32, scale: f32) -> u64 {
+fn create_mob(map: &mut Map, tile_id: usize, layer: usize, position: Vector2<f32>, height: f32, scale: f32) -> u64 
+{
     let mob = map.factory.create_mob(tile_id, layer, position, height, scale);
     let mob_id = mob.uid;
     map.layers[layer].insert(mob_id, mob);
@@ -572,12 +591,76 @@ fn create_mob(map: &mut Map, tile_id: usize, layer: usize, position: Vector2<f32
 }
 
 
-pub fn map_pos(x: i32, y: i32, z_off: i32) -> [f32; 2] {
-
+pub fn map_pos(x: i32, y: i32, z_off: i32) -> [f32; 2] 
+{
     let fx = ((y + x) * 108) as f32; 
     let fy = ((y - x) * 108 + z_off) as f32;
 
     // println!("{}, {} -> {}, {}", x, y, fx, fy);
 
     [fx, fy]
+}
+
+
+/**
+ * Careful, this is an expensive operation with O(n²) complexity
+ */
+fn merge_polygons(polygons: &Vec<Polygon<f32>>) -> Vec<Polygon<f32>>
+{
+    let mut result = Vec::new();
+    let mut already_merged = HashSet::new();
+
+    for left in 0 .. polygons.len() {
+        let mut merged = false;
+
+        for right in left + 1 .. polygons.len() {
+
+            if !merged && !already_merged.contains(&right) {
+                let mut matching_points = Vec::new();
+
+                for c_left in polygons[left].exterior_coords_iter() {
+                    for c_right in polygons[right].exterior_coords_iter() {
+                    
+                        let xd = c_left.x - c_right.x;
+                        let yd = c_left.y - c_right.y;
+                        let d2 = xd * xd + yd * yd;
+    
+                        if d2 < 1.0 && !matching_points.contains(&c_left) {
+                            matching_points.push(c_left);
+                        }
+                    }
+                }
+    
+                if matching_points.len() > 1 {
+                    // we can merge these two squares
+    
+                    // println!("Merge option: poly {} and {} have {} common coordinates", left, right, matching_points.len());
+/*                
+                    for c in matching_points {
+                        println!("  c: {:?}", c);
+                    }
+*/                
+                    let union = polygons[left].union(&polygons[right]);
+                    // println!("->  union: {:?} {:?}", union, union.0);
+    
+                    result.push(union.0[0].clone());
+    
+                    already_merged.insert(right);
+                    // println!("square count = {}", result.len());
+
+                    merged = true;
+                    break;
+                }
+            }            
+        }
+
+        if !merged && !already_merged.contains(&left) {
+            result.push(polygons[left].clone());
+            // println!("square count = {}", result.len());
+        }
+    }
+
+    println!("Merged {} square areas into {}", polygons.len(), result.len());
+
+    result
 }

@@ -338,7 +338,7 @@ impl App {
         Self::render_layer(&self.ui.display, &mut target, &self.ui.program, &buffer, world, tex_white, MAP_CLOUD_LAYER);
         
         // Debug: show walkable areas
-        //self.show_walkable_areas(&self.ui.display, &mut target, &self.ui.program, tex_white, &world.map);
+        // self.show_walkable_areas(&self.ui.display, &mut target, &self.ui.program, tex_white, &world.map);
 
         {
             let world = &mut self.world;
