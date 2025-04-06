@@ -118,6 +118,8 @@ impl Map {
         player.visual = player_visual;
         player.update_action = UpdateAction::EmitDriveParticles;
         player.creature = Some(creature_factory.create("Player"));
+        player.move_end_action = MoveEndAction::PickItemsUp;
+
         layers[MAP_OBJECT_LAYER].insert(player.uid, player);
 
 
@@ -818,17 +820,19 @@ impl Map {
 fn emit_drive_particles(mob: &mut MapObject, dt: f32, rng: &mut StdRng) {
 
     let direction = vec2_scale(mob.velocity, -1.0);
-    let rad = 0.25;
+    let rad = 0.05;
 
     let chance_per_second = 20.0;
     let chance = chance_per_second * dt;
 
     if rng.random::<f32>() < chance {
-        let xp = direction[0] * rad + direction[1] * (rng.random::<f32>() * 2.0 - 1.0) * 0.15;
-        let yp = direction[1] * rad + direction[0] * (rng.random::<f32>() * 2.0 - 1.0) * 0.15;
+                
+        let xp = direction[0] * rad + direction[1] * (rng.random::<f32>() * 2.0 - 1.0) * 0.05;
+        let yp = direction[1] * rad + direction[0] * (rng.random::<f32>() * 2.0 - 1.0) * 0.05;                
 
         let xv = direction[0] + rng.random::<f32>() * 2.0 - 1.0;
         let yv = direction[1] + rng.random::<f32>() * 2.0 - 1.0;
+        
         let zv = (rng.random::<f32>() *2.0 - 1.0) * 0.15;
         let speed = 1.0;
 
