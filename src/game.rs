@@ -43,6 +43,14 @@ impl UiController for Game {
 
         if event.args.state == ButtonState::Release {
 
+            if event.args.button == Button::Keyboard(Key::Character("i".into())) {
+                self.show_inventory = !self.show_inventory;
+            }        
+
+            if self.show_inventory {
+                return self.piv.handle_button_event(event, &ui.context.mouse_state, world);
+            }
+
             match comp {
                 None => {
                     // the click hit no UI element, so we look into handling it.
@@ -76,9 +84,6 @@ impl UiController for Game {
                         fire_projectile(&mut world.map, "Fireball", pos, &mut world.speaker);
                     }
 
-                    if event.args.button == Button::Keyboard(Key::Character("i".into())) {
-                        self.show_inventory = !self.show_inventory;
-                    }        
                 },
                 Some(_comp) => {
                     // the click hit some UI element, so we ignore it.
@@ -87,9 +92,6 @@ impl UiController for Game {
         
         }
 
-        if self.show_inventory {
-            return self.piv.handle_button_event(event, &ui.context.mouse_state, world);
-        }
 
         false
     }

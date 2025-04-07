@@ -368,6 +368,8 @@ impl PlayerInventoryView {
                     else if mx < 0 { // dropped to the map floor?
                         self.dragged_item = None;
                         self.drop_item(world, id);
+
+                        return true;
                     }
                     else {
                         println!("No suitable drop location {}, {}", mx, my);
