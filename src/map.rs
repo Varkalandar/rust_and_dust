@@ -313,7 +313,7 @@ impl Map {
         // player might have picked something up
         if pickup_position.is_some() {
             Self::check_pickup(&mut self.layers[MAP_OBJECT_LAYER], &pickup_position.unwrap(), 
-                               inventory, self.player_id);
+                               inventory, self.player_id, speaker);
         }
 
         for (_key, mob) in &self.layers[MAP_OBJECT_LAYER] {
@@ -366,7 +366,8 @@ impl Map {
 
 
     fn check_pickup(layer: &mut HashMap<u64, MapObject>, position: &Vector2<f32>,
-                    inventory: &mut Inventory, player_id: u64) 
+                    inventory: &mut Inventory, player_id: u64,
+                    speaker: &mut SoundPlayer) 
     {
         let option = Map::find_nearest_object(layer, position, 100.0, player_id);
         match option {
@@ -380,6 +381,7 @@ impl Map {
                         println!("Found a map object: {}, item option is {:?}", mob.uid, mob.item);
 
                         if mob.item.is_some() {
+                            speaker.play(Sound::Click, 0.5);
                             let mob = layer.remove(&key);
                             let item = mob.unwrap().item;
                             inventory.put_item(item.unwrap(), Slot::Bag);
