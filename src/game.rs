@@ -17,10 +17,13 @@ use crate::map::MoveEndAction;
 use crate::map::MapObject;
 use crate::map::MapObjectFactory;
 use crate::map::MobType;
+use crate::map::TransitionDestination;
 use crate::MAP_OBJECT_LAYER;
 use crate::PROJECTILE_TILESET;
 use crate::SoundPlayer;
 use crate::sound::Sound;
+use crate::generate_dungeon;
+use crate::map_pos;
 
 
 pub struct Game 
@@ -149,9 +152,50 @@ impl UiController for Game
 
         drop_loot(map, killed_mob_list, rng, speaker);
 
-        let reload = map.check_player_transition(rng);
+        let transition_opt = map.check_player_transition(rng);
 
-        reload
+        if transition_opt.is_some() {
+            let index = transition_opt.unwrap();
+            let transition = &world.map.transitions[index];
+            
+            match transition.destination {
+                TransitionDestination::Map { to_map, to_location } => {
+
+                    if to_map == 501 {
+                        // preserve player
+                        let mut player = world.map.layers[MAP_OBJECT_LAYER].remove(&world.map.player_id).unwrap();
+        
+                        world.map.clear();
+                        let dungeon = generate_dungeon(&mut world.map);
+                
+                        // stop player movement
+                        player.move_time_left = 0.0;
+                        world.map.layers[MAP_OBJECT_LAYER].insert(world.map.player_id, player);
+                
+                        world.map.set_player_position(dungeon.start_position);
+        
+                        let x = (dungeon.rooms[5].x1 + dungeon.rooms[5].x2) / 2;
+                        let y = (dungeon.rooms[5].y1 + dungeon.rooms[5].y2) / 2;
+        
+                        world.map.populate("dungeon.csv", rng, map_pos(x, y, 0));
+                    }
+                    else {
+                        world.map.load("town.map");
+                        // self.populate("town.csv", rng);
+            
+                        world.map.set_player_position(to_location);
+                    }
+
+                    return true;        
+                },
+                TransitionDestination::Shop { kind: _ } => {
+                    // todo
+                    return false;
+                }
+            }
+        }
+
+        return false;
     }
 }
 

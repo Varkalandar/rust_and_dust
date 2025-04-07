@@ -395,7 +395,7 @@ impl Map {
     }
 
 
-    pub fn check_player_transition(&mut self, rng: &mut StdRng) -> bool {
+    pub fn check_player_transition(&mut self, rng: &mut StdRng) -> Option<usize> {
         let player_pos = self.layers[MAP_OBJECT_LAYER].get(&self.player_id).unwrap().position;
         let mut best_index = None;
         
@@ -410,40 +410,7 @@ impl Map {
 
         // println!("Checked {} transitions, best is {:?}", self.transitions.len(), best_index);
 
-        if best_index.is_some() {
-            let index = best_index.unwrap();
-            let to_map = self.transitions[index].to_map;
-            let to_location = self.transitions[index].to_location;
-
-            if to_map == 501 {
-                // preserve player
-                let mut player = self.layers[MAP_OBJECT_LAYER].remove(&self.player_id).unwrap();
-
-                self.clear();
-                let dungeon = generate_dungeon(self);
-        
-                // stop player movement
-                player.move_time_left = 0.0;
-                self.layers[MAP_OBJECT_LAYER].insert(self.player_id, player);
-        
-                self.set_player_position(dungeon.start_position);
-
-                let x = (dungeon.rooms[5].x1 + dungeon.rooms[5].x2) / 2;
-                let y = (dungeon.rooms[5].y1 + dungeon.rooms[5].y2) / 2;
-
-                self.populate("dungeon.csv", rng, map_pos(x, y, 0));
-            }
-            else {
-                self.load("town.map");
-                // self.populate("town.csv", rng);
-    
-                self.set_player_position(to_location);
-            }
-
-            return true;
-        }
-
-        false
+        best_index
     }
 
 
@@ -638,28 +605,42 @@ impl Map {
     }
 
 
-    fn load_transition(&mut self, line: &str) {
+    fn load_transition(&mut self, line: &str) 
+    {
         let mut parts = line.split(",");
 
         let x = parts.next().unwrap().parse::<f32>().unwrap();
         let y = parts.next().unwrap().parse::<f32>().unwrap();
         let r = parts.next().unwrap().parse::<f32>().unwrap();
-        let map_id = parts.next().unwrap().parse::<i32>().unwrap();
-        let dest_x = parts.next().unwrap().parse::<f32>().unwrap();
-        let dest_y = parts.next().unwrap().parse::<f32>().unwrap();
+        
+        let dest_str = parts.next().unwrap();
+        let c = dest_str.chars().next().unwrap();
+        let destination;
 
-        self.add_transition([x, y], r, map_id, [dest_x, dest_y]);
+        if c.is_ascii_digit() {
+            let map_id = dest_str.parse::<i32>().unwrap();
+            let dest_x = parts.next().unwrap().parse::<f32>().unwrap();
+            let dest_y = parts.next().unwrap().parse::<f32>().unwrap();
+            let to_location = [dest_x, dest_y];
+
+            destination = TransitionDestination::Map {to_map: map_id, to_location};
+        }
+        else {
+            let kind = "general_store".to_string();
+            destination = TransitionDestination::Shop {kind};
+        }
+
+        self.add_transition([x, y], r, destination);
     }
 
 
     pub fn add_transition(&mut self, from: [f32; 2], catchment: f32, 
-                          to_map: i32, to_location: [f32; 2]) {
+                          destination: TransitionDestination) {
 
         self.transitions.push(MapTransition {
             from,
             rad: catchment,
-            to_map,
-            to_location,
+            destination,
         });
     }
 
@@ -733,13 +714,26 @@ impl Map {
         writer.write("begin map transitions\n".as_bytes())?;
 
         for transit in &self.transitions {
+
+            let destination =
+                match &transit.destination  {
+                    TransitionDestination::Map { to_map, to_location } => {
+                        to_map.to_string() + "," +
+                        &to_location[0].to_string() + "," +
+                        &to_location[1].to_string()
+                    },
+                    TransitionDestination::Shop { kind } => {
+                        kind.to_string()
+                    }
+                };
+
+
             let line = 
                 transit.from[0].to_string() + "," +
                 &transit.from[1].to_string() + "," +
                 &transit.rad.to_string() + "," +
-                &transit.to_map.to_string() + "," +
-                &transit.to_location[0].to_string() + "," +
-                &transit.to_location[1].to_string() + "\n";
+                &destination + "\n";
+
             writer.write(line.as_bytes())?;
         }
 
@@ -1062,7 +1056,8 @@ impl Visual {
 
 
 #[derive(PartialEq, Clone, Copy)]
-pub enum MobType {
+pub enum MobType 
+{
     MapObject,
     Player,
     Creature,
@@ -1070,8 +1065,21 @@ pub enum MobType {
     CreatureProjectile,
 }
 
+pub enum TransitionDestination 
+{
+    Map {
+        // destination map
+        to_map: i32,
 
-pub struct MapTransition {
+        to_location: Vector2<f32>,
+    },
+    Shop {
+        kind: String,
+    }, 
+}
+
+pub struct MapTransition 
+{
 
     // entrance location
     from: Vector2<f32>,
@@ -1079,8 +1087,5 @@ pub struct MapTransition {
     // catchment area
     rad: f32,
 
-    // destination map
-    to_map: i32,
-
-    to_location: Vector2<f32>,
+    pub destination: TransitionDestination,
 }

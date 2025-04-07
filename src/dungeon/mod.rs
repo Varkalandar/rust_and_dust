@@ -14,6 +14,7 @@ use crate::MAP_GROUND_LAYER;
 use crate::MAP_OBJECT_LAYER;
 use crate::Map;
 use crate::map::MapTransition;
+use crate::map::TransitionDestination;
 use crate::ItemFactory;
 use crate::item::Item;
 
@@ -204,9 +205,10 @@ fn furnish_dungeon<R: Rng + ?Sized>(dungeon: &Dungeon, map: &mut Map, rng: &mut 
     place_wall_tile(map, dungeon.rooms[0].x2, dungeon.rooms[0].y1, 
                     0, 248, [1.0, 1.0, 1.0, 1.0]);
 
+    let destination = TransitionDestination::Map {to_map: 0, to_location: [720.0, 1802.0]};
+
     map.transitions.clear();
-    map.add_transition(map_pos(dungeon.rooms[0].x2, dungeon.rooms[0].y1, 0), 100.0, 
-                      0, [720.0, 1802.0]);                
+    map.add_transition(map_pos(dungeon.rooms[0].x2, dungeon.rooms[0].y1, 0), 100.0, destination);
                       
     for i in 1 .. dungeon.rooms.len() {
         place_coins(map,
