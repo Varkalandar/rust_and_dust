@@ -348,8 +348,17 @@ impl Map {
         let mut killed_mob_list = Vec::with_capacity(kill_list.len()); 
 
         for id in kill_list {
-            killed_mob_list.push(self.layers[MAP_OBJECT_LAYER].remove(&id).unwrap());
             self.animations.remove(&id);
+            let creature_opt = self.layers[MAP_OBJECT_LAYER].remove(&id);
+
+            match creature_opt {
+                None => {},
+                Some(creature) => {
+                    if creature.creature.is_some() {
+                        killed_mob_list.push(creature);
+                    }    
+                }
+            }
         }
 
         killed_mob_list
