@@ -4,6 +4,8 @@ use glium::Texture2d;
 use glium::winit::keyboard::Key;
 use glium::Frame;
 
+use rand::Rng;
+
 use crate::ui::{UI, UiController, MouseButton, Button, ButtonState, ButtonEvent, MouseMoveEvent, ScrollEvent};
 use crate::GameWorld;
 use crate::move_player;
@@ -17,18 +19,19 @@ use crate::map::MapObjectFactory;
 use crate::map::MobType;
 use crate::MAP_OBJECT_LAYER;
 use crate::PROJECTILE_TILESET;
-use crate::gl_support::load_texture;
-use crate::MAP_RESOURCE_PATH;
 use crate::SoundPlayer;
+use crate::sound::Sound;
 
 
-pub struct Game {
+pub struct Game 
+{
     piv: PlayerInventoryView,
     show_inventory: bool,
 }
 
 
-impl UiController for Game {
+impl UiController for Game 
+{
     type Appdata = GameWorld;
 
     /**
@@ -141,7 +144,10 @@ impl UiController for Game {
         let inv = &mut world.player_inventory;
         let rng = &mut world.rng;
         let speaker = &mut world.speaker;
-        map.update(dt, inv, rng, speaker);
+        
+        let killed_mob_list = map.update(dt, inv, rng, speaker);
+
+        drop_loot(map, killed_mob_list, rng, speaker);
 
         let reload = map.check_player_transition(rng);
 
@@ -201,3 +207,16 @@ pub fn launch_projectile(shooter_position: Vector2<f32>, fire_at: Vector2<f32>,
 
     projectile
 } 
+
+
+fn drop_loot<R: Rng + ?Sized>(map: &mut Map, killed_mob_list: Vec<MapObject>, 
+                              rng: &mut R, speaker: &mut SoundPlayer) 
+{
+    // todo: monster or area levels
+    for mob in killed_mob_list {
+        let item = map.item_factory.create_random(rng, 1);
+
+        map.place_item(item, mob.position);
+        speaker.play(Sound::Click, 0.2);
+    }
+}

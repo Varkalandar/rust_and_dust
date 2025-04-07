@@ -67,7 +67,6 @@ use gl_support::load_texture;
 use gl_support::build_program;
 use gl_support::draw_texture;
 use gl_support::draw_texture_wb;
-use gl_support::build_dynamic_quad_buffer;
 use gl_support::draw_polygon;
 
 const MAP_RESOURCE_PATH: &str = "resources/gfx/map/";
@@ -159,7 +158,7 @@ impl App {
 
         let item_factory = ItemFactory::new();
         let player_inventory = Inventory::new();
-        let rng = rand::rngs::StdRng::seed_from_u64(12345678901);
+        let mut rng = rand::rngs::StdRng::seed_from_u64(12345678901);
 
         let mut map = Map::new("Demo Map", map_image_file, map_backdrop_file, item_factory);
         // map.load("town.map");
@@ -167,7 +166,11 @@ impl App {
         // Testing dungeon generation
         let dungeon = generate_dungeon(&mut map);
         map.set_player_position(dungeon.start_position);
-        
+        let x = (dungeon.rooms[5].x1 + dungeon.rooms[5].x2) / 2;
+        let y = (dungeon.rooms[5].y1 + dungeon.rooms[5].y2) / 2;
+
+        map.populate("dungeon.csv", &mut rng, map_pos(x, y, 0));
+
 
         let mut world = GameWorld {
             map,
@@ -205,10 +208,10 @@ impl App {
         coins.stack_size = 1000;
         world.player_inventory.put_item(coins, Slot::Bag);
 
-        let mut scroll = world.map.item_factory.create("fireball_scroll");
+        let scroll = world.map.item_factory.create("fireball_scroll");
         world.player_inventory.put_item(scroll, Slot::Bag);
 
-        let mut scroll = world.map.item_factory.create("identify_scroll");
+        let scroll = world.map.item_factory.create("identify_scroll");
         world.player_inventory.put_item(scroll, Slot::Bag);
 
         App {        
@@ -370,8 +373,8 @@ impl App {
 
     fn render_layer(display: &Display<WindowSurface>, target: &mut Frame, program: &Program,
                     buffer: &VertexBuffer<Vertex>,
-                    world: &GameWorld, tex_white: &Texture2d, layer_id: usize) {
-
+                    world: &GameWorld, tex_white: &Texture2d, layer_id: usize) 
+    {
         let (display_width, display_height) = display.get_framebuffer_dimensions();
         let window_center = [display_width as f32 * 0.5, display_height as f32 * 0.5];
 
@@ -412,7 +415,16 @@ impl App {
             // println!("Accessing mob {} with tile {} from tileset {}", mob.uid, mob.visual.current_image_id, tileset_id);
 
             let set = &world.layer_tileset[tileset_id];                    
-            let tile = set.tiles_by_id.get(&mob.visual.current_image_id).unwrap();
+            let tile_opt = set.tiles_by_id.get(&mob.visual.current_image_id);
+            let tile;
+            
+            if tile_opt.is_some() {
+                tile = tile_opt.unwrap();
+            }
+            else {
+                println!("Error! Tile {} not found in tile set {}", mob.visual.current_image_id, tileset_id);
+                return;
+            }
 
             let tpos = calc_tile_position(&mob.position, tile.foot, mob.visual.scale, player_position, &window_center);
 

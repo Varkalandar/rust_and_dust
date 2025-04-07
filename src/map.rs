@@ -230,9 +230,15 @@ impl Map {
     }
 
 
+    /**
+     * Move all map objects, handle projectile hits, clean up data structures.
+     
+     * @return A list of all MapObjects which had been killed or destroyed during this update
+     */
     pub fn update(&mut self, dt: f32, 
-                  inventory: &mut Inventory, rng: &mut StdRng, speaker: &mut SoundPlayer) {
-
+                  inventory: &mut Inventory, rng: &mut StdRng, speaker: &mut SoundPlayer) 
+        -> Vec<MapObject>
+    {
         let mut kill_list = Vec::new();
         let mut phit_list = Vec::new();
 
@@ -339,14 +345,20 @@ impl Map {
             }
         }
 
+        let mut killed_mob_list = Vec::with_capacity(kill_list.len()); 
+
         for id in kill_list {
-            self.layers[MAP_OBJECT_LAYER].remove(&id);
+            killed_mob_list.push(self.layers[MAP_OBJECT_LAYER].remove(&id).unwrap());
             self.animations.remove(&id);
         }
+
+        killed_mob_list
     }
 
+
     fn check_pickup(layer: &mut HashMap<u64, MapObject>, position: &Vector2<f32>,
-        inventory: &mut Inventory, player_id: u64) {
+                    inventory: &mut Inventory, player_id: u64) 
+    {
         let option = Map::find_nearest_object(layer, position, 100.0, player_id);
         match option {
             None => {},

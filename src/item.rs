@@ -1,14 +1,15 @@
-use std::fmt::Formatter;
 use core::str::Split;
+use std::fmt::Formatter;
 use std::collections::HashMap;
+use rand::Rng;
 
 use crate::inventory::Slot;
 use crate::read_lines;
 use crate::parse_rgba;
 
 #[derive(Debug)]
-pub struct Item {
-    
+pub struct Item 
+{   
     // the ID must be unique in a game
     pub id: u64,
 
@@ -30,9 +31,10 @@ pub struct Item {
 }
 
 
-impl Item {
-
-    pub fn name(&self) -> String {
+impl Item 
+{
+    pub fn name(&self) -> String 
+    {
         if self.stack_size == 1 {
             return self.singular.to_string();
         }
@@ -44,8 +46,10 @@ impl Item {
 
         return self.singular.to_string();
     }
+
     
-    pub fn get_attribute_total_mod(&self, attribute: Attribute) -> f32 {
+    pub fn get_attribute_total_mod(&self, attribute: Attribute) -> f32 
+    {
         let mut sum: f32 = 0.0;
 
         for m in &self.mods {
@@ -57,7 +61,9 @@ impl Item {
         sum
     }
     
-    pub fn calc_image_offset_for_stack_size(stack_size: u32) -> usize {
+
+    pub fn calc_image_offset_for_stack_size(stack_size: u32) -> usize 
+    {
         match stack_size {
             0 => 0,    
             1 => 0,    
@@ -71,7 +77,8 @@ impl Item {
         }
     }
 
-    pub fn print_debug(&self) {
+    pub fn print_debug(&self) 
+    {
         println!("{}", self.name());
     }
 }
@@ -86,8 +93,8 @@ pub struct ItemFactory
 
 
 impl ItemFactory {
-    pub fn new() -> ItemFactory {
-
+    pub fn new() -> ItemFactory 
+    {
         let mut proto_items = read_proto_items();
         let plugins = read_plugins();
 
@@ -103,7 +110,8 @@ impl ItemFactory {
     }
 
 
-    pub fn create(&mut self, key: &str) -> Item {
+    pub fn create(&mut self, key: &str) -> Item 
+    {
         let id = self.next_id;
         self.next_id += 1;
         
@@ -129,11 +137,26 @@ impl ItemFactory {
             max_stack_size: proto.max_stack_size,
         }
     }
+
+    pub fn create_random<R: Rng + ?Sized>(&mut self, rng: &mut R, area_level: i32) -> Item
+    {
+        let mut matches = Vec::with_capacity(self.proto_items.len());
+
+        // todo: filter by level
+        for proto in &self.proto_items {
+            matches.push(proto.1.key.clone());
+        }
+
+        // pick a random one
+        let index = rng.random_range(0 .. matches.len());
+
+        self.create(&matches[index])
+    }
 }
 
 
-fn read_proto_items() -> HashMap<String, Item> {
-
+fn read_proto_items() -> HashMap<String, Item> 
+{
     let lines = read_lines("resources/items/items.csv");
     let mut proto_items: HashMap<String, Item> = HashMap::new();
 

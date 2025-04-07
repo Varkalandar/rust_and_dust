@@ -82,7 +82,7 @@ impl Inventory {
         // look for free space
         for grid_y in 0..8 
         {
-            for grid_x in 0..32 
+            for grid_x in 0..14 
             {
                 let mut free = true;
 
