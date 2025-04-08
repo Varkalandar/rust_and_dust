@@ -54,4 +54,6 @@ end map objects
 begin map transitions
 626,1730,100,501,0,0
 1496,1016,100,stash
+1066,780,100,magic_shop
+1640,1684,100,general_store
 end map transitions
