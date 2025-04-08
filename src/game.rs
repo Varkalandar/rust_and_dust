@@ -10,7 +10,7 @@ use crate::ui::{UI, UiController, MouseButton, Button, ButtonState, ButtonEvent,
 use crate::GameWorld;
 use crate::move_player;
 use crate::screen_to_world_pos;
-use crate::player_inventory_view::PlayerInventoryView;
+use crate::inventory_view::InventoryView;
 use crate::TileSet;
 use crate::Map;
 use crate::map::MoveEndAction;
@@ -28,8 +28,11 @@ use crate::map_pos;
 
 pub struct Game 
 {
-    piv: PlayerInventoryView,
-    show_inventory: bool,
+    piv: InventoryView,
+    shop_view: InventoryView,
+
+    show_player_inventory: bool,
+    show_shop_inventory: bool,
 }
 
 
@@ -50,16 +53,28 @@ impl UiController for Game
         if event.args.state == ButtonState::Release {
 
             if event.args.button == Button::Keyboard(Key::Character("i".into())) {
-                self.show_inventory = !self.show_inventory;
+                self.show_player_inventory = !self.show_player_inventory;
             }        
 
-            if self.show_inventory {
-                return self.piv.handle_button_event(event, &ui.context.mouse_state, world);
-            }
 
             match comp {
                 None => {
                     // the click hit no UI element, so we look into handling it.
+
+                    let mut consumed = false;
+
+                    // first check our self-controlled user interfaces
+                    if self.show_shop_inventory {
+                        consumed = self.shop_view.handle_button_event(event, &ui.context.mouse_state, world);
+                    }
+        
+                    if !consumed && self.show_player_inventory {
+                        consumed = self.piv.handle_button_event(event, &ui.context.mouse_state, world);
+                    }
+
+                    if consumed {return true;}
+
+                    // then check the game itself
 
                     let pos = screen_to_world_pos(&ui, &world.map.get_player_position(), &ui.context.mouse_state.position);
                     
@@ -81,6 +96,13 @@ impl UiController for Game
                         }
 
                         {
+                            // close shop and inventory views if the player moves from shop
+                            if self.show_shop_inventory {
+                                self.show_shop_inventory = false;
+                                self.show_player_inventory = false;
+                            }
+
+                            // now move
                             let screen_direction = vec2_sub(ui.context.mouse_state.position, ui.window_center());
                             move_player(&mut world.map, screen_direction);                
                         }
@@ -89,25 +111,27 @@ impl UiController for Game
                     if event.args.button == Button::Mouse(MouseButton::Right) {
                         fire_projectile(&mut world.map, "Fireball", pos, &mut world.speaker);
                     }
-
                 },
                 Some(_comp) => {
                     // the click hit some UI element, so we ignore it.
                 }
             }
-        
         }
-
 
         false
     }
 
 
-    fn handle_mouse_move_event(&mut self, ui: &mut UI, event: &MouseMoveEvent, world: &mut Self::Appdata) -> bool {
+    fn handle_mouse_move_event(&mut self, ui: &mut UI, event: &MouseMoveEvent, world: &mut Self::Appdata) -> bool 
+    {
         let _comp = ui.handle_mouse_move_event(event);
 
-        if self.show_inventory {
+        if self.show_player_inventory {
             self.piv.handle_mouse_move_event(event, &ui.context.mouse_state, &mut world.player_inventory);
+        }
+
+        if self.show_shop_inventory {
+            self.shop_view.handle_mouse_move_event(event, &ui.context.mouse_state, &mut world.player_inventory);
         }
 
         false
@@ -117,42 +141,44 @@ impl UiController for Game
     /**
      * @return true if this controller could handle the event, false to pass the event to other controllers
      */
-    fn handle_scroll_event(&mut self, ui: &mut UI, event: &ScrollEvent, _world: &mut Self::Appdata) -> bool {
-
+    fn handle_scroll_event(&mut self, ui: &mut UI, event: &ScrollEvent, _world: &mut Self::Appdata) -> bool 
+    {
         let _comp = ui.handle_scroll_event(event);
 
         false
     }
 
 
-    fn draw(&mut self, target: &mut Frame,
-            ui: &mut UI, world: &mut Self::Appdata) {
-
+    fn draw(&mut self, target: &mut Frame, ui: &mut UI, world: &mut Self::Appdata) 
+    {
         ui.draw(target);
  
-        if self.show_inventory {
+        if self.show_player_inventory {
             self.piv.draw(ui, target, 0, 10, &world.player_inventory)
+        }
+
+        if self.show_shop_inventory {
+            self.shop_view.draw(ui, target, 0, 10, &world.player_inventory)
         }
     }
 
 
-    fn draw_overlay(&mut self, target: &mut Frame,
-                    ui: &mut UI, _world: &mut Self::Appdata) {
+    fn draw_overlay(&mut self, target: &mut Frame, ui: &mut UI, _world: &mut Self::Appdata) 
+    {
         ui.context.font_14.draw(&ui.display, target, &ui.program, 10, 20, "Game testing mode", &[1.0, 1.0, 1.0, 1.0]);
     }
 
 
-    fn update(&mut self, world: &mut Self::Appdata, dt: f32) -> bool {
+    fn update(&mut self, world: &mut Self::Appdata, dt: f32) -> bool 
+    {
         let map = &mut world.map;
         let inv = &mut world.player_inventory;
         let rng = &mut world.rng;
         let speaker = &mut world.speaker;
         
-        let killed_mob_list = map.update(dt, inv, rng, speaker);
+        let (killed_mob_list, transition_opt) = map.update(dt, inv, rng, speaker);
 
         drop_loot(map, killed_mob_list, rng, speaker);
-
-        let transition_opt = map.check_player_transition(rng);
 
         if transition_opt.is_some() {
             let index = transition_opt.unwrap();
@@ -189,8 +215,12 @@ impl UiController for Game
                     return true;        
                 },
                 TransitionDestination::Shop { kind: _ } => {
-                    // todo
-                    return false;
+                    if !self.show_shop_inventory {
+                        speaker.play(Sound::Click, 0.5);
+                        self.show_shop_inventory = true;
+                        self.show_player_inventory = true;
+                        return true;
+                    }
                 }
             }
         }
@@ -202,17 +232,26 @@ impl UiController for Game
 
 impl Game {
 
-    pub fn new(inventory_bg: Texture2d, ui: &UI, item_tiles: &TileSet) -> Game {
-
-        let piv = PlayerInventoryView::new(
+    pub fn new(inventory_bg: Texture2d, shop_bg: Texture2d, ui: &UI, item_tiles: &TileSet) -> Game 
+    {
+        let piv = InventoryView::new(
             (ui.context.window_size[0] as i32) / 2, 0,
             &ui.context.font_14,
             &item_tiles.shallow_copy(),
             inventory_bg,);
     
-        Game {
+        let shop_view = InventoryView::new(
+            0, 0,
+            &ui.context.font_14,
+            &item_tiles.shallow_copy(),
+            shop_bg,);
+        
+        Game 
+        {
             piv,
-            show_inventory: false,
+            shop_view,
+            show_player_inventory: false,
+            show_shop_inventory: false,
         }
     }
 }

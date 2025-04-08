@@ -53,4 +53,5 @@ begin map objects
 end map objects
 begin map transitions
 626,1730,100,501,0,0
+1496,1016,100,stash
 end map transitions

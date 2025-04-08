@@ -49,7 +49,7 @@ mod sound;
 mod particle_driver;
 mod animation;
 mod mob_group;
-mod player_inventory_view;
+mod inventory_view;
 mod gl_support;
 
 use dungeon::*;
@@ -193,7 +193,8 @@ impl App {
         let editor = MapEditor::new();
 
         let inventory_bg = load_texture(&ui.display, "resources/gfx/ui/inventory_bg.png");
-        let game = Game::new(inventory_bg, &ui, &world.layer_tileset[6]);
+        let shop_bg = load_texture(&ui.display, "resources/gfx/ui/inventory_bg.png");
+        let game = Game::new(inventory_bg, shop_bg, &ui, &world.layer_tileset[6]);
 
 
         // Some inventory contents for testing

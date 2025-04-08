@@ -237,8 +237,9 @@ impl Map {
      */
     pub fn update(&mut self, dt: f32, 
                   inventory: &mut Inventory, rng: &mut StdRng, speaker: &mut SoundPlayer) 
-        -> Vec<MapObject>
+        -> (Vec<MapObject>, Option<usize>)
     {
+        let mut transition = None;
         let mut kill_list = Vec::new();
         let mut phit_list = Vec::new();
 
@@ -314,6 +315,8 @@ impl Map {
         if pickup_position.is_some() {
             Self::check_pickup(&mut self.layers[MAP_OBJECT_LAYER], &pickup_position.unwrap(), 
                                inventory, self.player_id, speaker);
+
+            transition = self.check_player_transition();
         }
 
         for (_key, mob) in &self.layers[MAP_OBJECT_LAYER] {
@@ -361,7 +364,7 @@ impl Map {
             }
         }
 
-        killed_mob_list
+        (killed_mob_list, transition)
     }
 
 
@@ -395,7 +398,8 @@ impl Map {
     }
 
 
-    pub fn check_player_transition(&mut self, rng: &mut StdRng) -> Option<usize> {
+    pub fn check_player_transition(&mut self) -> Option<usize> 
+    {
         let player_pos = self.layers[MAP_OBJECT_LAYER].get(&self.player_id).unwrap().position;
         let mut best_index = None;
         
