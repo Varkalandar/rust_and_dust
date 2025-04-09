@@ -18,6 +18,8 @@ use crate::sound::Sound;
 use crate::ui::UI;
 use crate::ui::Button;
 use crate::ui::ButtonState;
+use crate::views::inventory_view::InventoryView;
+use crate::views::inventory_view::draw_item;
 
 use crate::gl_support::BlendMode;
 use crate::gl_support::draw_texture;
@@ -30,6 +32,7 @@ pub struct PlayerItemsView {
 
     slot_offsets: HashMap<Slot, [i32; 2]>,
     slot_sizes: HashMap<Slot, [i32; 2]>,
+    inventory_view: InventoryView,
 
     hover_item: Option<u64>,
     dragged_item: Option<u64>,
@@ -71,6 +74,7 @@ impl PlayerItemsView {
 
             slot_offsets,
             slot_sizes,
+            inventory_view: InventoryView::new(),
             hover_item: None,
             dragged_item: None,
             drag_x: 0.0,
@@ -183,50 +187,9 @@ impl PlayerItemsView {
     }
 
 
-    fn draw_item(&self,
-                 display: &Display<WindowSurface>, target: &mut Frame, program: &Program,
-                 id: usize,
-                 stack_size: u32, 
-                 entry_x: f32, entry_y: f32, 
-                 slot_w: f32, slot_h: f32,
-                 item_inventory_w: f32, item_inventory_h: f32,
-                 inventory_scale: f32,
-                 color: &[f32; 4]) {
-
-        // item stacks have several images.
-        let mut image_id = id;
-
-        if stack_size > 1 {
-            let offset = Item::calc_image_offset_for_stack_size(stack_size);
-            image_id += offset;
-        }
-
-        let tile = self.item_tiles.tiles_by_id.get(&image_id).unwrap();
-
-        let mut tw = tile.tex.width() as f32;
-        let mut th = tile.tex.height() as f32;
-
-        let s1 = item_inventory_w / tw;
-        let s2 = item_inventory_h / th;
-
-        let scale = if s1 < s2 { s1 } else { s2 };
-        let scale = scale * 0.95 * inventory_scale;
-
-        tw = tw * scale;
-        th = th * scale;
-
-        let origin_x = (slot_w - tw) / 2.0;
-        let origin_y = (slot_h - th) / 2.0;
-
-        draw_texture(&display, target, program, BlendMode::Blend, 
-                     &tile.tex, 
-                     entry_x + origin_x, entry_y + origin_y, scale, scale, color);
-    }
-
-
-    pub fn draw(&self, 
-                ui: &UI, target: &mut Frame,
-                x: i32, y: i32, inventory: &Inventory) {
+    pub fn draw(&self, ui: &UI, target: &mut Frame,
+                x: i32, y: i32, inventory: &Inventory) 
+    {
         let area = &self.area;
         let xp = x + area.x;
         let yp = y + area.y;
@@ -265,11 +228,9 @@ impl PlayerItemsView {
                         &[0.0, 0.02, 0.1, 0.7]);
                 }
 
-                self.draw_item(&ui.display, target, &ui.program,
-                    item.inventory_tile_id, item.stack_size,
-                    entry_x, entry_y, w, h, 
-                    (item.inventory_w * 32) as f32, (item.inventory_h * 32) as f32,
-                    item.inventory_scale, &item.color);
+                draw_item(&ui.display, target, &ui.program,
+                        entry_x, entry_y, w, h, 
+                        item, &self.item_tiles);
             }
         }
        
@@ -296,12 +257,10 @@ impl PlayerItemsView {
             Some(id) => {
                 let item = inventory.bag.get(&id).unwrap();
 
-                self.draw_item(&ui.display, target, &ui.program,
-                    item.inventory_tile_id, item.stack_size,
-                    (self.drag_x - 16.0) as f32, (self.drag_y - 16.0) as f32, 
-                    (item.inventory_w * 32) as f32, (item.inventory_h * 32) as f32, 
-                    (item.inventory_w * 32) as f32, (item.inventory_h * 32) as f32,
-                    item.inventory_scale, &item.color);
+                draw_item(&ui.display, target, &ui.program,
+                        (self.drag_x - 16.0) as f32, (self.drag_y - 16.0) as f32, 
+                        (item.inventory_w * 32) as f32, (item.inventory_h * 32) as f32,
+                        item, &self.item_tiles);
             }
         }
     }
