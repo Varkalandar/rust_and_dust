@@ -19,7 +19,6 @@ use glium::VertexBuffer;
 pub use tileset::*;
 pub use font::UiFont;
 use crate::BlendMode;
-use crate::gl_support::draw_texture;
 use crate::gl_support::texture_from_data;
 use crate::gl_support::draw_texture_wb;
 use crate::gl_support::draw_tex_area_wb;

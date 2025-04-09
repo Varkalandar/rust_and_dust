@@ -10,7 +10,7 @@ use crate::ui::{UI, UiController, MouseButton, Button, ButtonState, ButtonEvent,
 use crate::GameWorld;
 use crate::move_player;
 use crate::screen_to_world_pos;
-use crate::views::inventory_view::InventoryView;
+use crate::views::player_items_view::PlayerItemsView;
 use crate::views::shop_view::ShopView;
 use crate::TileSet;
 use crate::Map;
@@ -29,7 +29,7 @@ use crate::map_pos;
 
 pub struct Game 
 {
-    piv: InventoryView,
+    piv: PlayerItemsView,
     shop_view: ShopView,
 
     show_player_inventory: bool,
@@ -235,7 +235,7 @@ impl Game {
 
     pub fn new(inventory_bg: Texture2d, shop_bg: Texture2d, ui: &UI, item_tiles: &TileSet) -> Game 
     {
-        let piv = InventoryView::new(
+        let piv = PlayerItemsView::new(
             (ui.context.window_size[0] as i32) / 2, 0,
             &ui.context.font_14,
             &item_tiles.shallow_copy(),

@@ -23,7 +23,7 @@ use crate::gl_support::BlendMode;
 use crate::gl_support::draw_texture;
 
 
-pub struct InventoryView {
+pub struct PlayerItemsView {
     area: UiArea,
     texture: Texture2d,
     item_tiles: TileSet,
@@ -40,9 +40,9 @@ pub struct InventoryView {
 }
 
 
-impl InventoryView {
+impl PlayerItemsView {
 
-    pub fn new(x: i32, y: i32, font: &Rc<UiFont>, tiles: &TileSet, texture: Texture2d) -> InventoryView {
+    pub fn new(x: i32, y: i32, font: &Rc<UiFont>, tiles: &TileSet, texture: Texture2d) -> PlayerItemsView {
 
         let mut slot_offsets = HashMap::new();
         slot_offsets.insert(Slot::Bag, [10, 452]);
@@ -58,9 +58,7 @@ impl InventoryView {
         slot_sizes.insert(Slot::Engine, [2*32, 3*32]);
         slot_sizes.insert(Slot::Body, [2*32, 3*32]);
 
-        // let query = texture.query();
-
-        InventoryView {
+        PlayerItemsView {
             area: UiArea {
                 x, 
                 y,

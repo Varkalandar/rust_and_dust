@@ -32,7 +32,6 @@ use crate::parse_rgba;
 use crate::gl_support::BlendMode;
 use crate::Slot;
 use crate::generate_dungeon;
-use crate::map_pos;
 
 
 pub const MAP_GROUND_LAYER:usize = 0;
