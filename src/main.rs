@@ -45,11 +45,11 @@ mod map;
 mod editor;
 mod game;
 mod ui;
+mod views;
 mod sound;
 mod particle_driver;
 mod animation;
 mod mob_group;
-mod inventory_view;
 mod gl_support;
 
 use dungeon::*;

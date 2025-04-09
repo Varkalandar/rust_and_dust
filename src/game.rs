@@ -10,7 +10,7 @@ use crate::ui::{UI, UiController, MouseButton, Button, ButtonState, ButtonEvent,
 use crate::GameWorld;
 use crate::move_player;
 use crate::screen_to_world_pos;
-use crate::inventory_view::InventoryView;
+use crate::views::inventory_view::InventoryView;
 use crate::TileSet;
 use crate::Map;
 use crate::map::MoveEndAction;
