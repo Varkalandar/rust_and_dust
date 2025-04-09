@@ -11,6 +11,7 @@ use crate::GameWorld;
 use crate::move_player;
 use crate::screen_to_world_pos;
 use crate::views::inventory_view::InventoryView;
+use crate::views::shop_view::ShopView;
 use crate::TileSet;
 use crate::Map;
 use crate::map::MoveEndAction;
@@ -29,7 +30,7 @@ use crate::map_pos;
 pub struct Game 
 {
     piv: InventoryView,
-    shop_view: InventoryView,
+    shop_view: ShopView,
 
     show_player_inventory: bool,
     show_shop_inventory: bool,
@@ -158,7 +159,7 @@ impl UiController for Game
         }
 
         if self.show_shop_inventory {
-            self.shop_view.draw(ui, target, 0, 10, &world.player_inventory)
+            self.shop_view.draw(ui, target)
         }
     }
 
@@ -218,7 +219,7 @@ impl UiController for Game
                     if !self.show_shop_inventory {
                         speaker.play(Sound::Click, 0.5);
                         self.show_shop_inventory = true;
-                        self.show_player_inventory = true;
+                        self.show_player_inventory = false;
                         return true;
                     }
                 }
@@ -240,11 +241,7 @@ impl Game {
             &item_tiles.shallow_copy(),
             inventory_bg,);
     
-        let shop_view = InventoryView::new(
-            0, 0,
-            &ui.context.font_14,
-            &item_tiles.shallow_copy(),
-            shop_bg,);
+        let shop_view = ShopView::new();
         
         Game 
         {
