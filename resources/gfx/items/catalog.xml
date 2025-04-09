@@ -219,16 +219,16 @@
       <Description>
         <version>4</version>
         <id>13</id>
-        <width>64</width>
-        <height>38</height>
+        <width>57</width>
+        <height>24</height>
         <offsetX>0</offsetX>
         <offsetY>0</offsetY>
-        <footX>40</footX>
-        <footY>28</footY>
+        <footX>28</footX>
+        <footY>15</footY>
       </Description>
       <Metadata>
         <int>0</int>
-        <string>blaster_m</string>
+        <string>silver_ring_map</string>
         <string></string>
       </Metadata>
     </Tile>
@@ -236,8 +236,8 @@
       <Description>
         <version>4</version>
         <id>14</id>
-        <width>46</width>
-        <height>175</height>
+        <width>91</width>
+        <height>115</height>
         <offsetX>0</offsetX>
         <offsetY>0</offsetY>
         <footX>0</footX>
@@ -245,7 +245,7 @@
       </Description>
       <Metadata>
         <int>0</int>
-        <string>blaster_i</string>
+        <string>silver_ring_inv</string>
         <string></string>
       </Metadata>
     </Tile>
@@ -321,16 +321,16 @@
       <Description>
         <version>4</version>
         <id>19</id>
-        <width>70</width>
-        <height>53</height>
+        <width>51</width>
+        <height>22</height>
         <offsetX>0</offsetX>
         <offsetY>0</offsetY>
-        <footX>38</footX>
-        <footY>38</footY>
+        <footX>23</footX>
+        <footY>12</footY>
       </Description>
       <Metadata>
         <int>0</int>
-        <string>uberlaser_m</string>
+        <string>gold_ring_map</string>
         <string></string>
       </Metadata>
     </Tile>
@@ -338,8 +338,8 @@
       <Description>
         <version>4</version>
         <id>20</id>
-        <width>48</width>
-        <height>196</height>
+        <width>90</width>
+        <height>113</height>
         <offsetX>0</offsetX>
         <offsetY>0</offsetY>
         <footX>0</footX>
@@ -347,7 +347,7 @@
       </Description>
       <Metadata>
         <int>0</int>
-        <string>uberlaser_i</string>
+        <string>gold_ring_inv</string>
         <string></string>
       </Metadata>
     </Tile>

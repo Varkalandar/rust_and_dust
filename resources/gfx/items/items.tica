@@ -207,15 +207,15 @@ scroll_inv
 Tile Description
 v.5
 13
-64 38
+57 24
 0 0
-40 28
+28 15
 End Of Header
 Item
 v.1
 data
 2
-blaster_m
+silver_ring_map
 
 1
 0
@@ -223,7 +223,7 @@ blaster_m
 Tile Description
 v.5
 14
-46 175
+91 115
 0 0
 0 0
 End Of Header
@@ -231,7 +231,7 @@ Item
 v.1
 data
 2
-blaster_i
+silver_ring_inv
 
 1
 0
@@ -303,15 +303,15 @@ blue_powerup_i
 Tile Description
 v.5
 19
-70 53
+51 22
 0 0
-38 38
+23 12
 End Of Header
 Item
 v.1
 data
 2
-uberlaser_m
+gold_ring_map
 
 1
 0
@@ -319,7 +319,7 @@ uberlaser_m
 Tile Description
 v.5
 20
-48 196
+90 113
 0 0
 0 0
 End Of Header
@@ -327,7 +327,7 @@ Item
 v.1
 data
 2
-uberlaser_i
+gold_ring_inv
 
 1
 0
