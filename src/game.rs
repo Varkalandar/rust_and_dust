@@ -159,7 +159,7 @@ impl UiController for Game
         }
 
         if self.show_shop_inventory {
-            self.shop_view.draw(ui, target)
+            self.shop_view.draw(ui, target, &world.player_inventory)
         }
     }
 
@@ -235,13 +235,11 @@ impl Game {
 
     pub fn new(inventory_bg: Texture2d, shop_bg: Texture2d, ui: &UI, item_tiles: &TileSet) -> Game 
     {
-        let piv = PlayerItemsView::new(
-            (ui.context.window_size[0] as i32) / 2, 0,
-            &ui.context.font_14,
-            &item_tiles.shallow_copy(),
-            inventory_bg,);
+        let piv = PlayerItemsView::new((ui.context.window_size[0] as i32) / 2, 0,
+                                       &item_tiles.shallow_copy(),
+                                       inventory_bg,);
     
-        let shop_view = ShopView::new();
+        let shop_view = ShopView::new(&item_tiles.shallow_copy(), shop_bg);
         
         Game 
         {

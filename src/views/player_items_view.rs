@@ -38,14 +38,12 @@ pub struct PlayerItemsView {
     dragged_item: Option<u64>,
     drag_x: f32,
     drag_y: f32,
-
-    font: Rc<UiFont>,
 }
 
 
 impl PlayerItemsView {
 
-    pub fn new(x: i32, y: i32, font: &Rc<UiFont>, tiles: &TileSet, texture: Texture2d) -> PlayerItemsView {
+    pub fn new(x: i32, y: i32, tiles: &TileSet, texture: Texture2d) -> PlayerItemsView {
 
         let mut slot_offsets = HashMap::new();
         slot_offsets.insert(Slot::Bag, [10, 452]);
@@ -79,7 +77,6 @@ impl PlayerItemsView {
             dragged_item: None,
             drag_x: 0.0,
             drag_y: 0.0,
-            font: font.clone(),
         }
     }
 
@@ -97,8 +94,10 @@ impl PlayerItemsView {
 
     fn show_item_popup(&self, 
                        ui: &UI, target: &mut Frame,
-                       x: i32, y: i32, item: &Item) {
-
+                       x: i32, y: i32, item: &Item) 
+    {
+        let font = &ui.context.font_14;
+                    
         let line_space = 20;
 
         let mut line_count = 1; // first line is item name
@@ -121,8 +120,8 @@ impl PlayerItemsView {
 
         line += 5;
 
-        let headline_width = self.font.calc_string_width(&item.name()) as i32;
-        self.font.draw(&ui.display, target, &ui.program, x + (200 - headline_width) / 2, line, &item.name(), &[0.8, 1.0, 0.2, 1.0]);
+        let headline_width = font.calc_string_width(&item.name()) as i32;
+        font.draw(&ui.display, target, &ui.program, x + (200 - headline_width) / 2, line, &item.name(), &[0.8, 1.0, 0.2, 1.0]);
 
         line += 2;
         line += line_space;
@@ -140,7 +139,7 @@ impl PlayerItemsView {
                 };
 
                 let text = modifier.attribute.to_string() + ": " + &range;
-                self.font.draw(&ui.display, target, &ui.program, left, line, &text, &[0.8, 0.8, 0.8, 1.0]);
+                font.draw(&ui.display, target, &ui.program, left, line, &text, &[0.8, 0.8, 0.8, 1.0]);
                 line += line_space;
             }
         }
@@ -188,7 +187,7 @@ impl PlayerItemsView {
 
 
     pub fn draw(&self, ui: &UI, target: &mut Frame,
-                x: i32, y: i32, inventory: &Inventory) 
+                x: i32, y: i32, inventory: &Inventory)
     {
         let area = &self.area;
         let xp = x + area.x;

@@ -1,4 +1,5 @@
 use glium::Frame;
+use glium::Texture2d;
 
 use crate::Inventory;
 use crate::GameWorld;
@@ -6,26 +7,28 @@ use crate::ButtonEvent;
 use crate::MouseMoveEvent;
 use crate::ui::UI;
 use crate::ui::MouseState;
+use crate::views::player_items_view::PlayerItemsView;
+use crate::TileSet;
 
 
 pub struct ShopView
 {
-
+    player_items_view: PlayerItemsView,
 }
 
 
 impl ShopView
 {
-    pub fn new() -> ShopView 
+    pub fn new(tiles: &TileSet, texture: Texture2d) -> ShopView 
     {
         ShopView 
         {
-
+            player_items_view: PlayerItemsView::new(0, 0, tiles, texture),
         }
     }
 
 
-    pub fn draw(&self, ui: &UI, target: &mut Frame) 
+    pub fn draw(&self, ui: &UI, target: &mut Frame, inventory: &Inventory) 
     {
         let size = ui.context.window_size;
         let left = 40;
@@ -35,6 +38,8 @@ impl ShopView
 
         ui.draw_box(target, left, top, width, height, &[0.6, 0.6, 0.6, 1.0]);
         ui.fill_box(target, left + 1, top + 1, width - 2, height -2 , &[0.3, 0.3, 0.3, 1.0]);
+
+        self.player_items_view.draw(ui, target, left + 500, top, inventory);
 
         let font = &ui.context.font_14;
         let text = "Shop under construction, no sales today.";
