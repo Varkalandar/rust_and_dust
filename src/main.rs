@@ -21,7 +21,7 @@ use glium::winit::event::MouseScrollDelta;
 use glium::VertexBuffer;
 use glium::Surface;
 
-use vecmath::{vec2_add, vec2_len, vec2_scale, vec2_sub, Vector2};
+use vecmath::{vec2_add, vec2_len, vec2_scale, Vector2};
 use geo::Polygon;
 use geo::CoordsIter;
 use geo::LineString;
@@ -58,6 +58,7 @@ use ui::{UI, UiController, TileSet, Button, ButtonState, ButtonArgs, MouseButton
 use editor::MapEditor;
 use game::Game;
 use item::ItemFactory;
+use item::Activation;
 use inventory::{Inventory, Slot};
 use sound::SoundPlayer;
 
@@ -202,7 +203,8 @@ impl App {
         let wand = world.map.item_factory.create("wooden_wand");
         world.player_inventory.put_item(wand, Slot::Bag);
 
-        let wand = world.map.item_factory.create("engraved_wand");
+        let mut wand = world.map.item_factory.create("engraved_wand");
+        wand.activation = Activation::Fireball;
         world.player_inventory.put_item(wand, Slot::RWing);
 
         let mut coins = world.map.item_factory.create("copper_coin");

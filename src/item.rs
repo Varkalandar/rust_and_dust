@@ -7,6 +7,22 @@ use crate::inventory::Slot;
 use crate::read_lines;
 use crate::parse_rgba;
 
+#[derive(Clone, Debug, PartialEq)]
+pub enum Activation
+{
+    None,
+    Fireball,
+}
+
+
+#[derive(Clone, Debug, PartialEq)]
+pub enum DropEffect
+{
+    None,
+    EnchantFireball,
+}
+
+
 #[derive(Debug)]
 pub struct Item 
 {   
@@ -29,6 +45,8 @@ pub struct Item
     pub slot: Slot,
     pub stack_size: u32,         // some items can be stacked and must have a stack count
     pub max_stack_size: u32,
+    pub activation: Activation,
+    pub drop_effect: DropEffect,
 }
 
 
@@ -137,6 +155,8 @@ impl ItemFactory {
             map_tile_id: proto.map_tile_id,
             stack_size: 1,
             max_stack_size: proto.max_stack_size,
+            activation: proto.activation.clone(),
+            drop_effect: proto.drop_effect.clone(),
         }
     }
 
@@ -189,6 +209,8 @@ fn read_proto_items() -> HashMap<String, Item>
                 stack_size: 1,
                 max_stack_size: parts.next().unwrap().parse::<u32>().unwrap(),
                 mods: parse_mods(&mut parts),
+                activation: Activation::None,
+                drop_effect: parse_drop_effect(parts.next().unwrap()),
             }
         );
     }
@@ -222,6 +244,8 @@ fn read_plugins() -> Vec<Item> {
             stack_size: 1,
             max_stack_size: 1,
             mods: Vec::new(),
+            activation: Activation::None,
+            drop_effect: DropEffect::None,
         });
     }
 
@@ -269,9 +293,8 @@ fn parse_mod(input: Option<&str>, attribute: Attribute) -> Mod {
 }
 
 
-fn parse_range(input: &str) -> (i32, i32) {
-    // .parse::<i32>().unwrap();
-
+fn parse_range(input: &str) -> (i32, i32) 
+{
     if input.contains("-") {
         let mut parts = input.split("-");
         let min_value = parts.next().unwrap().parse::<i32>().unwrap();
@@ -281,6 +304,17 @@ fn parse_range(input: &str) -> (i32, i32) {
     else {
         let value = input.parse::<i32>().unwrap();
         (value, value)
+    }
+}
+
+
+fn parse_drop_effect(input: &str) -> DropEffect
+{
+    if "enchant_fireball" == input {
+        return DropEffect::EnchantFireball
+    }
+    else {
+        return DropEffect::None
     }
 }
 

@@ -13,6 +13,8 @@ use crate::inventory::Slot;
 use crate::inventory::Entry;
 use crate::TileSet;
 use crate::item::Item;
+use crate::item::Activation;
+use crate::item::DropEffect;
 use crate::GameWorld;
 use crate::sound::Sound;
 use crate::ui::UI;
@@ -108,6 +110,10 @@ impl PlayerItemsView {
             }
         }
 
+        if item.activation != Activation::None {
+            line_count += 1;
+        }
+
         let mut line = y - line_count * line_space;
         let bottom_margin = if line_count > 1 {8} else {4};
 
@@ -125,6 +131,12 @@ impl PlayerItemsView {
 
         line += 2;
         line += line_space;
+
+        if item.activation != Activation::None {
+            font.draw(&ui.display, target, &ui.program, left, line, 
+                      "Activation: Fireball", &[0.8, 0.8, 0.8, 1.0]);
+            line += line_space;
+        }
 
         for modifier in &item.mods {
 
@@ -162,6 +174,9 @@ impl PlayerItemsView {
     }
 
 
+    /**
+     * @return the id of the found item or None
+     */
     fn find_item_at(&self, inventory: &Inventory, mx: i32, my: i32) -> Option<u64> {
         let area = &self.area;
 
@@ -173,6 +188,8 @@ impl PlayerItemsView {
                 
                 let item = inventory.bag.get(&entry.item_id).unwrap();
                 let size = self.find_slot_size(item, entry.slot);
+
+                // println!("Chzecking {}, {} vs entry {}, {}, {}, {}", mx, my, entry_x, entry_y, size[0], size[1]);
 
                 if mx >= entry_x && my >= entry_y &&
                    mx < entry_x + size[0] && my < entry_y + size[1] {
@@ -284,48 +301,33 @@ impl PlayerItemsView {
                     }
                 },
                 Some(id) => {
-                    let inventory = &mut world.player_inventory;
-                    let item = inventory.bag.get(&id).unwrap();
 
                     world.speaker.play(Sound::Click, 0.5);
-
-                    let idx = inventory.find_entry_for_id(id).unwrap();
-                    let entry: &mut Entry = &mut inventory.entries[idx];
 
                     let mx = (mouse.position[0] as i32) - self.area.x;
                     let my = (mouse.position[1] as i32) - self.area.y;
                     
                     let slot_opt = self.find_slot_at(mx, my);
 
-                    if slot_opt.is_some() {
-                        let slot = slot_opt.unwrap();
-                        entry.slot = slot;
-                        self.dragged_item = None;
-
-                        println!("Dropped an {} to slot {:?}", item.name(), slot);
-
-                        if slot == Slot::Bag {
-                            let offsets = self.slot_offsets.get(&Slot::Bag).unwrap();
-                            let rel_x = mx - offsets[0];
-                            let rel_y = my - offsets[1];
-                            entry.location_x = rel_x / 32;
-                            entry.location_y = rel_y / 32;
+                    match slot_opt {
+                        None => {
+                            if mx < 0 { // dropped to the map floor?
+                                self.dragged_item = None;
+                                self.drop_item(world, id);
+        
+                                return true;
+                            }
+                            else {
+                                println!("No suitable drop location {}, {}", mx, my);
+                            }
+                        },
+                        Some(slot) => {
+                            let inventory = &mut world.player_inventory;
+                            self.drop_item_to_slot(inventory, id, slot, mx, my);
+                            self.dragged_item = None;
+        
+                            return true;
                         }
-                        else {
-                            entry.location_x = 0;
-                            entry.location_y = 0;
-                        }
-    
-                        return true;
-                    }
-                    else if mx < 0 { // dropped to the map floor?
-                        self.dragged_item = None;
-                        self.drop_item(world, id);
-
-                        return true;
-                    }
-                    else {
-                        println!("No suitable drop location {}, {}", mx, my);
                     }
                 }
             }
@@ -335,8 +337,27 @@ impl PlayerItemsView {
     }
 
 
-    pub fn drop_item(&mut self, world: &mut GameWorld, id: u64) {
+    pub fn drop_item_to_slot(&self, inventory: &mut Inventory, item_id: u64, slot: Slot,
+                            mx: i32, my: i32)
+    {
+        println!("Dropped item id={} to slot {:?}", item_id, slot);
 
+        if slot == Slot::Bag {                            
+            self.handle_item_dropped_to_bag(inventory, mx, my, item_id);
+        }
+        else {
+            let entry_idx = inventory.find_entry_for_id(item_id).unwrap();
+            let entry: &mut Entry = &mut inventory.entries[entry_idx];
+    
+            entry.slot = slot;
+            entry.location_x = 0;
+            entry.location_y = 0;
+        }
+    }
+
+
+    pub fn drop_item(&mut self, world: &mut GameWorld, id: u64) 
+    {
         let inventory = &mut world.player_inventory;
         let item_opt = inventory.remove_item(id);
 
@@ -365,4 +386,59 @@ impl PlayerItemsView {
 
         false
     }
+
+
+    fn handle_item_dropped_to_bag(&self, inventory: &mut Inventory,
+                                  mx: i32, my: i32, 
+                                  item_id: u64)
+    {
+        let item_opt = self.find_item_at(inventory, mx + self.area.x, my + self.area.y);
+
+        println!("Found {:?} at drop location {}, {}", item_opt, mx, my);
+
+        let offsets = self.slot_offsets.get(&Slot::Bag).unwrap();
+        let rel_x = mx - offsets[0];
+        let rel_y = my - offsets[1];
+
+        match item_opt {
+            None => {
+                // dropped on nothing -> just set the new location for the item
+                let entry_idx = inventory.find_entry_for_id(item_id).unwrap();
+                let entry: &mut Entry = &mut inventory.entries[entry_idx];
+
+                entry.slot = Slot::Bag;
+                entry.location_x = rel_x / 32;
+                entry.location_y = rel_y / 32;
+            }
+            Some(target_item_id) => {
+                // the item was dropped onto another item.
+
+                // Merge stacks if possible (todo)
+
+                // Merge items if there is a possible merge recipe
+                
+                let _ok = try_merge_items(inventory, item_id, target_item_id);
+            }
+        }
+    }
+}
+
+
+fn try_merge_items(inventory: &mut Inventory, dropped_item_id: u64, target_item_id: u64) -> bool
+{
+    let drop_effect;
+    {
+        let dropped_item = inventory.bag.get(&dropped_item_id).unwrap();
+        drop_effect = dropped_item.drop_effect.clone();
+    }
+    
+    let target_item = inventory.bag.get_mut(&target_item_id).unwrap();
+
+    if drop_effect == DropEffect::EnchantFireball {
+        // todo: Check for correct target type. Not all items can take all enchantment types
+        target_item.activation = Activation::Fireball;
+        return true;
+    }
+    
+    false
 }
