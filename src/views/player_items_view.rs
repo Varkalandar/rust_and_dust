@@ -201,38 +201,34 @@ impl PlayerItemsView {
         // show all items which are in the inventory space
         for entry in &inventory.entries {
 
-            if entry.slot != Slot::Stash && entry.slot != Slot::OnCursor {
+            if entry.slot != Slot::Stash && entry.slot != Slot::OnCursor && entry.slot != Slot::Bag {
                 let offsets = self.slot_offsets.get(&entry.slot).unwrap();
-                let entry_x = (xp + offsets[0] + entry.location_x * 32) as f32;
-                let entry_y = (yp + offsets[1] + entry.location_y * 32) as f32;
+                let entry_x = xp + offsets[0] + entry.location_x * 32;
+                let entry_y = yp + offsets[1] + entry.location_y * 32;
                 
                 let item = inventory.bag.get(&entry.item_id).unwrap();
                 let size = self.find_slot_size(item, entry.slot);
-                let w = size[0] as f32;
-                let h = size[1] as f32;
+                let w = size[0];
+                let h = size[1];
 
                 if self.hover_item == Some(item.id) {
-                    draw_texture(&ui.display, target, &ui.program, BlendMode::Blend, 
-                                 &ui.context.tex_white, 
-                                 entry_x as f32 + 1.0, entry_y as f32 + 1.0, 
-                                 (w - 2.0) / 16.0, 
-                                 (h - 2.0) / 16.0, 
-                                 &[0.2, 0.7, 0.0, 0.05]);
+                    ui.fill_box(target,
+                                entry_x + 1, entry_y + 1, w - 2, h - 2, &[0.2, 0.7, 0.0, 0.05]);
                 }
                 else {
-                    draw_texture(&ui.display, target, &ui.program, BlendMode::Blend, 
-                        &ui.context.tex_white, 
-                        entry_x as f32 + 1.0, entry_y as f32 + 1.0, 
-                        (w - 2.0) / 16.0, 
-                        (h - 2.0) / 16.0, 
-                        &[0.0, 0.02, 0.1, 0.7]);
+                    ui.fill_box(target,
+                                entry_x + 1, entry_y + 1, w - 2, h - 2, &[0.0, 0.02, 0.1, 0.7]);
                 }
 
-                draw_item(&ui.display, target, &ui.program,
-                        entry_x, entry_y, w, h, 
-                        item, &self.item_tiles);
+                draw_item(ui, target, &ui.program,
+                          entry_x as f32, entry_y as f32, w as f32, h as f32, 
+                          item, &self.item_tiles);
             }
         }
+
+        let ipos = self.slot_offsets.get(&Slot::Bag).unwrap();
+        self.inventory_view.draw(ui, target, xp + ipos[0], yp + ipos[1], 
+                                 inventory, &self.item_tiles);
        
         match self.hover_item {
             None => {},
@@ -257,10 +253,10 @@ impl PlayerItemsView {
             Some(id) => {
                 let item = inventory.bag.get(&id).unwrap();
 
-                draw_item(&ui.display, target, &ui.program,
-                        (self.drag_x - 16.0) as f32, (self.drag_y - 16.0) as f32, 
-                        (item.inventory_w * 32) as f32, (item.inventory_h * 32) as f32,
-                        item, &self.item_tiles);
+                draw_item(ui, target, &ui.program,
+                          (self.drag_x - 16.0) as f32, (self.drag_y - 16.0) as f32, 
+                          (item.inventory_w * 32) as f32, (item.inventory_h * 32) as f32,
+                          item, &self.item_tiles);
             }
         }
     }

@@ -1,5 +1,5 @@
 use crate::BlendMode;
-use crate::draw_texture;
+use crate::draw_texture_wb;
 use crate::item::Item;
 use crate::Slot;
 use crate::Display;
@@ -16,6 +16,7 @@ pub struct InventoryView
 {
 
 }
+
 
 impl InventoryView
 {
@@ -34,33 +35,17 @@ impl InventoryView
         for entry in &inventory.entries {
 
             if entry.slot == Slot::Bag {
-                let entry_x = (x + entry.location_x * 32) as f32;
-                let entry_y = (y + entry.location_y * 32) as f32;
-                
                 let item = inventory.bag.get(&entry.item_id).unwrap();
+                let entry_x = x + entry.location_x * 32;
+                let entry_y = y + entry.location_y * 32;
+                let w = item.inventory_w * 32;
+                let h = item.inventory_h * 32;
 
-                /*
-                if self.hover_item == Some(item.id) {
-                    draw_texture(&ui.display, target, &ui.program, BlendMode::Blend, 
-                                 &ui.context.tex_white, 
-                                 entry_x as f32 + 1.0, entry_y as f32 + 1.0, 
-                                 (w - 2.0) / 16.0, 
-                                 (h - 2.0) / 16.0, 
-                                 &[0.2, 0.7, 0.0, 0.05]);
-                }
-                else {
-                    draw_texture(&ui.display, target, &ui.program, BlendMode::Blend, 
-                        &ui.context.tex_white, 
-                        entry_x as f32 + 1.0, entry_y as f32 + 1.0, 
-                        (w - 2.0) / 16.0, 
-                        (h - 2.0) / 16.0, 
-                        &[0.0, 0.02, 0.1, 0.7]);
-                }
-                */
+                ui.fill_box(target, entry_x + 1, entry_y + 1, w - 2, h - 2, &[0.0, 0.02, 0.1, 0.7]);
 
-                draw_item(&ui.display, target, &ui.program,
-                          entry_x, entry_y, 
-                          (item.inventory_w * 32) as f32, (item.inventory_h * 32) as f32, 
+                draw_item(ui, target, &ui.program,
+                          entry_x as f32, entry_y as f32, 
+                          w as f32, h as f32, 
                           item, tiles);
             }
         }
@@ -68,7 +53,7 @@ impl InventoryView
 }
 
 
-pub fn draw_item(display: &Display<WindowSurface>, target: &mut Frame, program: &Program,
+pub fn draw_item(ui: &UI, target: &mut Frame, program: &Program,
                  entry_x: f32, entry_y: f32, 
                  slot_w: f32, slot_h: f32,
                  item: &Item,
@@ -103,7 +88,10 @@ pub fn draw_item(display: &Display<WindowSurface>, target: &mut Frame, program: 
     let origin_x = (slot_w - tw) / 2.0;
     let origin_y = (slot_h - th) / 2.0;
 
-    draw_texture(&display, target, program, BlendMode::Blend, 
-                 &tile.tex, 
-                 entry_x + origin_x, entry_y + origin_y, scale, scale, &item.color);
+    let size = ui.context.window_size;
+
+    draw_texture_wb(target, program, &ui.context.vertex_buffer, BlendMode::Blend,
+                    size[0], size[1],
+                    &tile.tex, 
+                    entry_x + origin_x, entry_y + origin_y, scale, scale, &item.color);
 }
