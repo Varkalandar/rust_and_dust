@@ -100,8 +100,9 @@ impl PlayerItemsView {
     {
         let font = &ui.context.font_14;
                     
+        let left = x + 6;
         let line_space = 20;
-
+        let box_width = 200;
         let mut line_count = 1; // first line is item name
 
         for modifier in &item.mods {
@@ -114,20 +115,26 @@ impl PlayerItemsView {
             line_count += 1;
         }
 
+        if item.description.len() > 0 {
+            line_count += 
+                ui.context.font_10.draw_multiline(&ui.display, target, &ui.program, 
+                    0, 0, box_width,
+                    &item.description, &[0.8, 0.8, 0.8, 1.0], false);
+        }
+
         let mut line = y - line_count * line_space;
         let bottom_margin = if line_count > 1 {8} else {4};
 
-        ui.fill_box(target, x, line, 200, (line_count * line_space) + bottom_margin, &[0.1, 0.1, 0.1, 0.9]);
-        ui.draw_box(target, x, line, 200, (line_count * line_space) + bottom_margin, &[0.6, 0.6, 0.6, 1.0]);
+        ui.fill_box(target, x, line, box_width, (line_count * line_space) + bottom_margin, &[0.1, 0.1, 0.1, 0.9]);
+        ui.draw_box(target, x, line, box_width, (line_count * line_space) + bottom_margin, &[0.6, 0.6, 0.6, 1.0]);
         
         // ui.draw_hline(target, x, line, 200, &[0.6, 0.6, 0.6, 1.0]);
 
-        let left = x + 6;
 
         line += 5;
 
         let headline_width = font.calc_string_width(&item.name()) as i32;
-        font.draw(&ui.display, target, &ui.program, x + (200 - headline_width) / 2, line, &item.name(), &[0.8, 1.0, 0.2, 1.0]);
+        font.draw(&ui.display, target, &ui.program, x + (box_width - headline_width) / 2, line, &item.name(), &[1.0, 1.0, 1.0, 1.0]);
 
         line += 2;
         line += line_space;
@@ -155,6 +162,14 @@ impl PlayerItemsView {
                 line += line_space;
             }
         }
+
+        if item.description.len() > 0 {
+            ui.context.font_10.draw_multiline(&ui.display, target, &ui.program, 
+                                              left, line, box_width,
+                                              &item.description, &[0.8, 0.8, 0.8, 1.0], true);
+            line += line_space;
+        }
+
     }
 
 

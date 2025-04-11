@@ -110,6 +110,90 @@ impl UiFont {
             xp += glyph.advance;                
         }
     }
+
+    pub fn draw_multiline(&self,
+                          display: &Display<WindowSurface>, target: &mut Frame, program: &Program,
+                          x: i32, y: i32, width: i32, text: &str, color: &[f32; 4], 
+                          actually_draw: bool) -> i32
+    {
+        let (d_width, d_height) = display.get_framebuffer_dimensions();
+
+        let mut run_x = 0.0;
+        let xp = x as f32;
+        let mut yp = (y as f32) + (self.face.ascender() / 64) as f32;
+        let mut lines = 1;
+        let mut iter = text.chars();
+        let mut eof = false;
+
+        loop {
+            
+            // println!("char {} usize {}", ch, ch);
+
+            // scan one word ahead, we don't know yet if this word will fit on the current line
+            let mut word = Vec::new();
+            let mut word_width = 0.0;
+                        
+            loop {
+                let ch_opt = iter.next();
+                
+                if ch_opt.is_some() {
+                    let ch = ch_opt.unwrap();
+                    let idx = ch as usize;
+                    let glyph = self.glyphs.get(&idx).unwrap();
+        
+                    word_width += glyph.advance;
+                    word.push(glyph);
+    
+                    if ch.is_whitespace() {
+                        // the word ends here, exit loop
+                        break;
+                    } 
+                }
+                else {
+                    // end of text
+                    eof = true;
+                    break;
+                }
+            }
+
+            // we now have a word of glyphs in the vector.
+            // -> see if it will fit on the current line or if we need
+            // to start a new line
+
+            if run_x + word_width > width as f32 {
+                // we need to start a new line for this word.
+                run_x = 0.0;
+                yp += self.lineheight as f32;
+                lines += 1;
+            }
+
+            if actually_draw {
+                // display the word
+                for glyph in &word {
+                    draw_tex_area_wb(target, program, &self.vertex_buffer,
+                        BlendMode::Blend,
+                        d_width, d_height,
+                        &self.texture,
+                        RectF32::new(glyph.tex_x as f32, glyph.tex_y as f32, glyph.bm_w, glyph.bm_h),
+                        RectF32::new(xp + run_x +  glyph.left, yp - glyph.top, glyph.bm_w, glyph.bm_h),
+                        color);
+
+                    run_x += glyph.advance;
+                }
+            }
+            else {
+                run_x += word_width;
+            }
+
+            if eof {
+                break;
+            }
+        }
+
+        // println!("Text '{}' requires {} lines", text, lines);
+
+        return lines;
+    }
 }
 
 

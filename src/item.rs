@@ -57,6 +57,8 @@ pub struct Item
     pub max_stack_size: u32,
     pub activation: Activation,
     pub drop_effect: DropEffect,
+
+    pub description: String,
 }
 
 
@@ -167,6 +169,7 @@ impl ItemFactory {
             max_stack_size: proto.max_stack_size,
             activation: proto.activation.clone(),
             drop_effect: proto.drop_effect.clone(),
+            description: proto.description.to_string(),
         }
     }
 
@@ -221,6 +224,7 @@ fn read_proto_items() -> HashMap<String, Item>
                 mods: parse_mods(&mut parts),
                 activation: Activation::None,
                 drop_effect: parse_drop_effect(parts.next().unwrap()),
+                description: parts.next().unwrap().to_string(),
             }
         );
     }
@@ -256,6 +260,7 @@ fn read_plugins() -> Vec<Item> {
             mods: Vec::new(),
             activation: Activation::None,
             drop_effect: DropEffect::None,
+            description: "".to_string(), 
         });
     }
 
