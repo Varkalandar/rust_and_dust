@@ -23,6 +23,16 @@ pub enum DropEffect
 }
 
 
+#[derive(Clone, Debug, PartialEq)]
+pub enum ItemKind
+{
+    Misc,
+    Wand,
+    Ring,
+    Scroll,
+}
+
+
 #[derive(Debug)]
 pub struct Item 
 {   
@@ -42,7 +52,7 @@ pub struct Item
     pub map_scale: f32,
     pub color: [f32; 4],
     pub ilvl: u32,
-    pub slot: Slot,
+    pub kind: ItemKind,
     pub stack_size: u32,         // some items can be stacked and must have a stack count
     pub max_stack_size: u32,
     pub activation: Activation,
@@ -150,7 +160,7 @@ impl ItemFactory {
             map_scale: proto.map_scale,
             color: proto.color,
             ilvl: proto.ilvl,
-            slot: proto.slot,
+            kind: proto.kind.clone(),
         
             map_tile_id: proto.map_tile_id,
             stack_size: 1,
@@ -205,7 +215,7 @@ fn read_proto_items() -> HashMap<String, Item>
                 map_scale: parts.next().unwrap().parse::<f32>().unwrap(),
                 color: parse_rgba(parts.next().unwrap()),
                 ilvl: parts.next().unwrap().parse::<u32>().unwrap(),
-                slot: calc_slot(parts.next().unwrap().parse::<i32>().unwrap()),
+                kind: parse_item_type(parts.next().unwrap()),
                 stack_size: 1,
                 max_stack_size: parts.next().unwrap().parse::<u32>().unwrap(),
                 mods: parse_mods(&mut parts),
@@ -240,7 +250,7 @@ fn read_plugins() -> Vec<Item> {
             map_scale: parts.next().unwrap().parse::<f32>().unwrap(),
             color: parse_rgba(parts.next().unwrap()),
             ilvl: parts.next().unwrap().parse::<u32>().unwrap(),
-            slot: Slot::Bag,
+            kind: ItemKind::Misc,
             stack_size: 1,
             max_stack_size: 1,
             mods: Vec::new(),
@@ -315,6 +325,23 @@ fn parse_drop_effect(input: &str) -> DropEffect
     }
     else {
         return DropEffect::None
+    }
+}
+
+
+fn parse_item_type(input: &str) -> ItemKind
+{
+    if "wand" == input {
+        return ItemKind::Wand;
+    }
+    else if "ring" == input {
+        return ItemKind::Wand;
+    }
+    else if "scroll" == input {
+        return ItemKind::Wand;
+    }
+    else {
+        return ItemKind::Misc;
     }
 }
 
