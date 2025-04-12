@@ -627,16 +627,16 @@
       <Description>
         <version>4</version>
         <id>37</id>
-        <width>1</width>
-        <height>1</height>
+        <width>53</width>
+        <height>23</height>
         <offsetX>0</offsetX>
         <offsetY>0</offsetY>
-        <footX>0</footX>
-        <footY>0</footY>
+        <footX>118</footX>
+        <footY>65</footY>
       </Description>
       <Metadata>
         <int>0</int>
-        <string></string>
+        <string>topaz_ring_map</string>
         <string></string>
       </Metadata>
     </Tile>
@@ -644,8 +644,8 @@
       <Description>
         <version>4</version>
         <id>38</id>
-        <width>1</width>
-        <height>1</height>
+        <width>95</width>
+        <height>103</height>
         <offsetX>0</offsetX>
         <offsetY>0</offsetY>
         <footX>0</footX>
@@ -653,7 +653,7 @@
       </Description>
       <Metadata>
         <int>0</int>
-        <string></string>
+        <string>topaz_ring_inv</string>
         <string></string>
       </Metadata>
     </Tile>
@@ -899,7 +899,7 @@
       <Description>
         <version>4</version>
         <id>53</id>
-        <width>19</width>
+        <width>21</width>
         <height>11</height>
         <offsetX>0</offsetX>
         <offsetY>0</offsetY>
@@ -917,7 +917,7 @@
         <version>4</version>
         <id>54</id>
         <width>38</width>
-        <height>21</height>
+        <height>19</height>
         <offsetX>0</offsetX>
         <offsetY>0</offsetY>
         <footX>0</footX>
@@ -933,16 +933,16 @@
       <Description>
         <version>4</version>
         <id>55</id>
-        <width>1</width>
-        <height>1</height>
+        <width>23</width>
+        <height>14</height>
         <offsetX>0</offsetX>
         <offsetY>0</offsetY>
-        <footX>0</footX>
-        <footY>0</footY>
+        <footX>11</footX>
+        <footY>9</footY>
       </Description>
       <Metadata>
         <int>0</int>
-        <string></string>
+        <string>copper_7_map</string>
         <string></string>
       </Metadata>
     </Tile>
@@ -950,8 +950,8 @@
       <Description>
         <version>4</version>
         <id>56</id>
-        <width>1</width>
-        <height>1</height>
+        <width>43</width>
+        <height>23</height>
         <offsetX>0</offsetX>
         <offsetY>0</offsetY>
         <footX>0</footX>
@@ -959,7 +959,7 @@
       </Description>
       <Metadata>
         <int>0</int>
-        <string></string>
+        <string>copper_7_inv</string>
         <string></string>
       </Metadata>
     </Tile>
@@ -1001,16 +1001,16 @@
       <Description>
         <version>4</version>
         <id>59</id>
-        <width>1</width>
-        <height>1</height>
+        <width>6</width>
+        <height>5</height>
         <offsetX>0</offsetX>
         <offsetY>0</offsetY>
-        <footX>0</footX>
-        <footY>0</footY>
+        <footX>2</footX>
+        <footY>3</footY>
       </Description>
       <Metadata>
         <int>0</int>
-        <string></string>
+        <string>silver_1_map</string>
         <string></string>
       </Metadata>
     </Tile>
@@ -1018,8 +1018,8 @@
       <Description>
         <version>4</version>
         <id>60</id>
-        <width>1</width>
-        <height>1</height>
+        <width>38</width>
+        <height>21</height>
         <offsetX>0</offsetX>
         <offsetY>0</offsetY>
         <footX>0</footX>
@@ -1027,7 +1027,7 @@
       </Description>
       <Metadata>
         <int>0</int>
-        <string></string>
+        <string>silver_1_inv</string>
         <string></string>
       </Metadata>
     </Tile>
@@ -1035,16 +1035,16 @@
       <Description>
         <version>4</version>
         <id>61</id>
-        <width>1</width>
-        <height>1</height>
+        <width>9</width>
+        <height>6</height>
         <offsetX>0</offsetX>
         <offsetY>0</offsetY>
-        <footX>0</footX>
-        <footY>0</footY>
+        <footX>4</footX>
+        <footY>3</footY>
       </Description>
       <Metadata>
         <int>0</int>
-        <string></string>
+        <string>silver_2_map</string>
         <string></string>
       </Metadata>
     </Tile>
@@ -1052,8 +1052,8 @@
       <Description>
         <version>4</version>
         <id>62</id>
-        <width>1</width>
-        <height>1</height>
+        <width>38</width>
+        <height>21</height>
         <offsetX>0</offsetX>
         <offsetY>0</offsetY>
         <footX>0</footX>
@@ -1061,7 +1061,7 @@
       </Description>
       <Metadata>
         <int>0</int>
-        <string></string>
+        <string>silver_2_inv</string>
         <string></string>
       </Metadata>
     </Tile>
@@ -1069,16 +1069,16 @@
       <Description>
         <version>4</version>
         <id>63</id>
-        <width>1</width>
-        <height>1</height>
+        <width>10</width>
+        <height>8</height>
         <offsetX>0</offsetX>
         <offsetY>0</offsetY>
-        <footX>0</footX>
-        <footY>0</footY>
+        <footX>6</footX>
+        <footY>5</footY>
       </Description>
       <Metadata>
         <int>0</int>
-        <string></string>
+        <string>silver_3_map</string>
         <string></string>
       </Metadata>
     </Tile>
@@ -1086,8 +1086,8 @@
       <Description>
         <version>4</version>
         <id>64</id>
-        <width>1</width>
-        <height>1</height>
+        <width>38</width>
+        <height>21</height>
         <offsetX>0</offsetX>
         <offsetY>0</offsetY>
         <footX>0</footX>
@@ -1095,7 +1095,7 @@
       </Description>
       <Metadata>
         <int>0</int>
-        <string></string>
+        <string>silver_3_inv</string>
         <string></string>
       </Metadata>
     </Tile>
@@ -1103,16 +1103,16 @@
       <Description>
         <version>4</version>
         <id>65</id>
-        <width>1</width>
-        <height>1</height>
+        <width>16</width>
+        <height>8</height>
         <offsetX>0</offsetX>
         <offsetY>0</offsetY>
-        <footX>0</footX>
-        <footY>0</footY>
+        <footX>8</footX>
+        <footY>4</footY>
       </Description>
       <Metadata>
         <int>0</int>
-        <string></string>
+        <string>silver_4_map</string>
         <string></string>
       </Metadata>
     </Tile>
@@ -1120,8 +1120,8 @@
       <Description>
         <version>4</version>
         <id>66</id>
-        <width>1</width>
-        <height>1</height>
+        <width>38</width>
+        <height>21</height>
         <offsetX>0</offsetX>
         <offsetY>0</offsetY>
         <footX>0</footX>
@@ -1129,7 +1129,7 @@
       </Description>
       <Metadata>
         <int>0</int>
-        <string></string>
+        <string>silver_4_inv</string>
         <string></string>
       </Metadata>
     </Tile>
@@ -1137,16 +1137,16 @@
       <Description>
         <version>4</version>
         <id>67</id>
-        <width>1</width>
-        <height>1</height>
+        <width>20</width>
+        <height>11</height>
         <offsetX>0</offsetX>
         <offsetY>0</offsetY>
-        <footX>0</footX>
-        <footY>0</footY>
+        <footX>9</footX>
+        <footY>7</footY>
       </Description>
       <Metadata>
         <int>0</int>
-        <string></string>
+        <string>silver_5_map</string>
         <string></string>
       </Metadata>
     </Tile>
@@ -1154,8 +1154,8 @@
       <Description>
         <version>4</version>
         <id>68</id>
-        <width>1</width>
-        <height>1</height>
+        <width>38</width>
+        <height>20</height>
         <offsetX>0</offsetX>
         <offsetY>0</offsetY>
         <footX>0</footX>
@@ -1163,7 +1163,7 @@
       </Description>
       <Metadata>
         <int>0</int>
-        <string></string>
+        <string>silver_5_inv</string>
         <string></string>
       </Metadata>
     </Tile>
@@ -1171,16 +1171,16 @@
       <Description>
         <version>4</version>
         <id>69</id>
-        <width>1</width>
-        <height>1</height>
+        <width>23</width>
+        <height>13</height>
         <offsetX>0</offsetX>
         <offsetY>0</offsetY>
-        <footX>0</footX>
-        <footY>0</footY>
+        <footX>12</footX>
+        <footY>8</footY>
       </Description>
       <Metadata>
         <int>0</int>
-        <string></string>
+        <string>silver_6_map</string>
         <string></string>
       </Metadata>
     </Tile>
@@ -1188,8 +1188,8 @@
       <Description>
         <version>4</version>
         <id>70</id>
-        <width>1</width>
-        <height>1</height>
+        <width>43</width>
+        <height>23</height>
         <offsetX>0</offsetX>
         <offsetY>0</offsetY>
         <footX>0</footX>
@@ -1197,7 +1197,7 @@
       </Description>
       <Metadata>
         <int>0</int>
-        <string></string>
+        <string>silver_6_inv</string>
         <string></string>
       </Metadata>
     </Tile>

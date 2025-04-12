@@ -5,6 +5,8 @@ silver_ring,Silver Ring,,14,13,1,1,0.6,0.2,1 1 1 1,1,ring,1,0,0,0,0,0,0-0,0-0,,
 gold_ring,Gold Ring,,20,19,1,1,0.6,0.2,1 1 1 1,1,ring,1,0,0,0,0,0,0-0,0-0,,
 ruby_ring,Ruby Ring,,2,1,1,1,0.6,0.2,1 1 1 1,1,ring,1,0,0,0,0,0,0-0,0-0,,
 sapphire_ring,Sapphire Ring,,22,21,1,1,0.6,0.2,1 1 1 1,1,ring,1,0,0,0,0,0,0-0,0-0,,
+topaz_ring,Topaz Ring,,38,37,1,1,0.6,0.2,1 1 1 1,1,ring,1,0,0,0,0,0,0-0,0-0,,
 copper_coin,Copper Coin,Copper Coins,44,43,1,1,1,1,1 1 1 1,1,currency,2000,0,0,0,0,0,0-0,0-0,,
+silver_coin,Silver Coin,Silver Coins,60,59,1,1,1,1,1 1 1 1,1,currency,2000,0,0,0,0,0,0-0,0-0,,
 fireball_scroll,Scroll of Enchant Fireball,Scrolls of Enchant Fireball,11,11,2,1,1.2,0.1,1.0 0.8 0.6 1.0,1,scroll,10,0,0,0,0,0,0-0,0-0,enchant_fireball,Drop this scroll onto a wand to give it a fireball activation.
 identify_scroll,Scroll of Identify,Scrolls of Identify,11,11,2,1,1.2,0.1,1 1 1 1,0,scroll,10,0,0,0,0,0,0-0,0-0,,

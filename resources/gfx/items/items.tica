@@ -591,15 +591,15 @@ alien
 Tile Description
 v.5
 37
-1 1
+53 23
 0 0
-0 0
+118 65
 End Of Header
 Item
 v.1
 data
 2
-
+topaz_ring_map
 
 1
 0
@@ -607,7 +607,7 @@ data
 Tile Description
 v.5
 38
-1 1
+95 103
 0 0
 0 0
 End Of Header
@@ -615,7 +615,7 @@ Item
 v.1
 data
 2
-
+topaz_ring_inv
 
 1
 0
@@ -847,7 +847,7 @@ copper_5_inv
 Tile Description
 v.5
 53
-19 11
+21 11
 0 0
 10 7
 End Of Header
@@ -863,7 +863,7 @@ copper_6_map
 Tile Description
 v.5
 54
-38 21
+38 19
 0 0
 0 0
 End Of Header
@@ -879,15 +879,15 @@ copper_6_inv
 Tile Description
 v.5
 55
-1 1
+23 14
 0 0
-0 0
+11 9
 End Of Header
 Item
 v.1
 data
 2
-
+copper_7_map
 
 1
 0
@@ -895,7 +895,7 @@ data
 Tile Description
 v.5
 56
-1 1
+43 23
 0 0
 0 0
 End Of Header
@@ -903,7 +903,7 @@ Item
 v.1
 data
 2
-
+copper_7_inv
 
 1
 0
@@ -943,15 +943,15 @@ data
 Tile Description
 v.5
 59
-1 1
+6 5
 0 0
-0 0
+2 3
 End Of Header
 Item
 v.1
 data
 2
-
+silver_1_map
 
 1
 0
@@ -959,7 +959,7 @@ data
 Tile Description
 v.5
 60
-1 1
+38 21
 0 0
 0 0
 End Of Header
@@ -967,7 +967,7 @@ Item
 v.1
 data
 2
-
+silver_1_inv
 
 1
 0
@@ -975,15 +975,15 @@ data
 Tile Description
 v.5
 61
-1 1
+9 6
 0 0
-0 0
+4 3
 End Of Header
 Item
 v.1
 data
 2
-
+silver_2_map
 
 1
 0
@@ -991,7 +991,7 @@ data
 Tile Description
 v.5
 62
-1 1
+38 21
 0 0
 0 0
 End Of Header
@@ -999,7 +999,7 @@ Item
 v.1
 data
 2
-
+silver_2_inv
 
 1
 0
@@ -1007,15 +1007,15 @@ data
 Tile Description
 v.5
 63
-1 1
+10 8
 0 0
-0 0
+6 5
 End Of Header
 Item
 v.1
 data
 2
-
+silver_3_map
 
 1
 0
@@ -1023,7 +1023,7 @@ data
 Tile Description
 v.5
 64
-1 1
+38 21
 0 0
 0 0
 End Of Header
@@ -1031,7 +1031,7 @@ Item
 v.1
 data
 2
-
+silver_3_inv
 
 1
 0
@@ -1039,15 +1039,15 @@ data
 Tile Description
 v.5
 65
-1 1
+16 8
 0 0
-0 0
+8 4
 End Of Header
 Item
 v.1
 data
 2
-
+silver_4_map
 
 1
 0
@@ -1055,7 +1055,7 @@ data
 Tile Description
 v.5
 66
-1 1
+38 21
 0 0
 0 0
 End Of Header
@@ -1063,7 +1063,7 @@ Item
 v.1
 data
 2
-
+silver_4_inv
 
 1
 0
@@ -1071,15 +1071,15 @@ data
 Tile Description
 v.5
 67
-1 1
+20 11
 0 0
-0 0
+9 7
 End Of Header
 Item
 v.1
 data
 2
-
+silver_5_map
 
 1
 0
@@ -1087,7 +1087,7 @@ data
 Tile Description
 v.5
 68
-1 1
+38 20
 0 0
 0 0
 End Of Header
@@ -1095,7 +1095,7 @@ Item
 v.1
 data
 2
-
+silver_5_inv
 
 1
 0
@@ -1103,15 +1103,15 @@ data
 Tile Description
 v.5
 69
-1 1
+23 13
 0 0
-0 0
+12 8
 End Of Header
 Item
 v.1
 data
 2
-
+silver_6_map
 
 1
 0
@@ -1119,7 +1119,7 @@ data
 Tile Description
 v.5
 70
-1 1
+43 23
 0 0
 0 0
 End Of Header
@@ -1127,7 +1127,7 @@ Item
 v.1
 data
 2
-
+silver_6_inv
 
 1
 0
