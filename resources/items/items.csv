@@ -1,4 +1,4 @@
-Key,Singular,Plural,Inventory tile id,Map tile id,Inventory width,Inventory height,Inventory scale,Map Scale,Color,Ilvl,Type,Max Stack Size,Health,Agility,Defense,Intelligence,Speed,Physical Dam,Spell Dam,Drop Effect,Description
+Key,Singular,Plural,Inventory tile id,Map tile id,Inventory width,Inventory height,Inventory scale,Map Scale,Color,Ilvl,Type,Stack Size,Health,Agility,Defense,Intelligence,Speed,Phys Dam,Spell Dam,Drop Effect,Description
 wooden_wand,Wooden Wand,,86,85,1,3,0.9,0.2,1 1 1 1,1,wand,1,0,0,0,0,0,0-0,5-9,,
 engraved_wand,Engraved Wand,,88,87,1,3,0.9,0.2,1 1 1 1,1,wand,1,0,0,0,0,0,0-0,10-14,,
 silver_ring,Silver Ring,,14,13,1,1,0.6,0.2,1 1 1 1,1,ring,1,0,0,0,0,0,0-0,0-0,,
@@ -10,3 +10,11 @@ copper_coin,Copper Coin,Copper Coins,44,43,1,1,1,1,1 1 1 1,1,currency,2000,0,0,0
 silver_coin,Silver Coin,Silver Coins,60,59,1,1,1,1,1 1 1 1,1,currency,2000,0,0,0,0,0,0-0,0-0,,
 fireball_scroll,Scroll of Enchant Fireball,Scrolls of Enchant Fireball,11,11,2,1,1.2,0.1,1.0 0.8 0.6 1.0,1,scroll,10,0,0,0,0,0,0-0,0-0,enchant_fireball,Drop this scroll onto a wand to give it a fireball activation.
 identify_scroll,Scroll of Identify,Scrolls of Identify,11,11,2,1,1.2,0.1,1 1 1 1,0,scroll,10,0,0,0,0,0,0-0,0-0,,
+,,,,,,,,,,,,,,,,,,,,,
+pl_dumbbell,Dumbbell Plugin,,24,24,1,1,1,0.2,1 1 1 1,0,plugin,1,0,0,0,0,0,0-0,0-0,,
+pl_green_twist,Green Twist Plugin,,26,26,1,1,1,0.2,1 1 1 1,0,plugin,1,0,0,0,0,0,0-0,0-0,,
+pl_four_leaf,Four Leaf Plugin,,28,28,1,1,1,0.2,1 1 1 1,0,plugin,1,0,0,0,0,0,0-0,0-0,,
+pl_twisted_gears,Twisted Gears Plugin,,30,30,1,1,1,0.2,1 1 1 1,0,plugin,1,0,0,0,0,0,0-0,0-0,,
+pl_crazy,Crazy Object Plugin,,32,32,1,1,1,0.2,1 1 1 1,0,plugin,1,0,0,0,0,0,0-0,0-0,,
+pl_angry,Angry High Power Plugin,,34,34,1,1,1,0.2,1 1 1 1,0,plugin,1,0,0,0,0,0,0-0,0-0,,
+pl_compute,Compute Plugin,,36,36,1,1,1,0.2,1 1 1 1,0,plugin,1,0,0,0,0,0,0-0,0-0,,

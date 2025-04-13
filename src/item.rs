@@ -30,6 +30,7 @@ pub enum ItemKind
     Wand,
     Ring,
     Scroll,
+    Currency
 }
 
 
@@ -126,13 +127,7 @@ pub struct ItemFactory
 impl ItemFactory {
     pub fn new() -> ItemFactory 
     {
-        let mut proto_items = read_proto_items();
-        let plugins = read_plugins();
-
-        for plugin in plugins {
-            let key = plugin.key.to_string();
-            proto_items.insert(key, plugin);
-        }
+        let proto_items = read_proto_items();
         
         ItemFactory {
             next_id: 0,
@@ -203,68 +198,36 @@ fn read_proto_items() -> HashMap<String, Item>
         let mut parts = lines[i].split(",");
         let key = parts.next().unwrap().to_string();
         
-        proto_items.insert(
-            key.to_string(),
-            Item {
-                id: 0,      // just a placeholder in case of item prototypes.
-                key,
-                singular: parts.next().unwrap().to_string(),
-                plural:  parts.next().unwrap().to_string(),
-                inventory_tile_id: parts.next().unwrap().parse::<usize>().unwrap(),
-                map_tile_id: parts.next().unwrap().parse::<usize>().unwrap(),
-                inventory_w: parts.next().unwrap().parse::<i32>().unwrap(),
-                inventory_h: parts.next().unwrap().parse::<i32>().unwrap(),
-                inventory_scale: parts.next().unwrap().parse::<f32>().unwrap(),
-                map_scale: parts.next().unwrap().parse::<f32>().unwrap(),
-                color: parse_rgba(parts.next().unwrap()),
-                ilvl: parts.next().unwrap().parse::<u32>().unwrap(),
-                kind: parse_item_type(parts.next().unwrap()),
-                stack_size: 1,
-                max_stack_size: parts.next().unwrap().parse::<u32>().unwrap(),
-                mods: parse_mods(&mut parts),
-                activation: Activation::None,
-                drop_effect: parse_drop_effect(parts.next().unwrap()),
-                description: parts.next().unwrap().to_string(),
-            }
-        );
+        // ignore empty lines, they are just to separate sections
+        if key.len() > 0 {
+            proto_items.insert(
+                key.to_string(),
+                Item {
+                    id: 0,      // just a placeholder in case of item prototypes.
+                    key,
+                    singular: parts.next().unwrap().to_string(),
+                    plural:  parts.next().unwrap().to_string(),
+                    inventory_tile_id: parts.next().unwrap().parse::<usize>().unwrap(),
+                    map_tile_id: parts.next().unwrap().parse::<usize>().unwrap(),
+                    inventory_w: parts.next().unwrap().parse::<i32>().unwrap(),
+                    inventory_h: parts.next().unwrap().parse::<i32>().unwrap(),
+                    inventory_scale: parts.next().unwrap().parse::<f32>().unwrap(),
+                    map_scale: parts.next().unwrap().parse::<f32>().unwrap(),
+                    color: parse_rgba(parts.next().unwrap()),
+                    ilvl: parts.next().unwrap().parse::<u32>().unwrap(),
+                    kind: parse_item_type(parts.next().unwrap()),
+                    stack_size: 1,
+                    max_stack_size: parts.next().unwrap().parse::<u32>().unwrap(),
+                    mods: parse_mods(&mut parts),
+                    activation: Activation::None,
+                    drop_effect: parse_drop_effect(parts.next().unwrap()),
+                    description: parts.next().unwrap().to_string(),
+                }
+            );
+        }
     }
 
     proto_items
-}
-
-
-fn read_plugins() -> Vec<Item> {
-
-    let lines = read_lines("resources/items/plugins.csv");
-    let mut plugins: Vec<Item> = Vec::new();
-
-    for i in 1..lines.len() {
-        let mut parts = lines[i].split(",");
-
-        plugins.push(Item {
-            id: 0,
-            key: parts.next().unwrap().to_string(),
-            singular: parts.next().unwrap().to_string(),
-            plural: "".to_string(),
-            inventory_tile_id: parts.next().unwrap().parse::<usize>().unwrap(),
-            map_tile_id: parts.next().unwrap().parse::<usize>().unwrap(),
-            inventory_w: parts.next().unwrap().parse::<i32>().unwrap(),
-            inventory_h: parts.next().unwrap().parse::<i32>().unwrap(),
-            inventory_scale: parts.next().unwrap().parse::<f32>().unwrap(),
-            map_scale: parts.next().unwrap().parse::<f32>().unwrap(),
-            color: parse_rgba(parts.next().unwrap()),
-            ilvl: parts.next().unwrap().parse::<u32>().unwrap(),
-            kind: ItemKind::Misc,
-            stack_size: 1,
-            max_stack_size: 1,
-            mods: Vec::new(),
-            activation: Activation::None,
-            drop_effect: DropEffect::None,
-            description: "".to_string(), 
-        });
-    }
-
-    plugins
 }
 
 
@@ -351,7 +314,11 @@ fn parse_item_type(input: &str) -> ItemKind
     else if "scroll" == input {
         return ItemKind::Wand;
     }
+    else if "currency" == input {
+        return ItemKind::Currency;
+    }
     else {
+        println!("parse_item_type: Unknown item type '{}'", input);
         return ItemKind::Misc;
     }
 }

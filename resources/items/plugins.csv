@@ -1,8 +1,0 @@
-Key,Name,Inventory tile id,Map tile id,Inventory width,Inventory height,Inventory scale,Map Scale,Color,Ilvl,Effect Hook
-pl_dumbbell,Dumbbell Plugin,24,24,1,1,1,0.2,1 1 1 1,0,
-pl_green_twist,Green Twist Plugin,26,26,1,1,1,0.2,1 1 1 1,0,
-pl_four_leaf,Four Leaf Plugin,28,28,1,1,1,0.2,1 1 1 1,0,
-pl_twisted_gears,Twisted Gears Plugin,30,30,1,1,1,0.2,1 1 1 1,0,
-pl_crazy,Crazy Object Plugin,32,32,1,1,1,0.2,1 1 1 1,0,
-pl_angry,Angry High Power Plugin,34,34,1,1,1,0.2,1 1 1 1,0,
-pl_compute,Compute Plugin,36,36,1,1,1,0.2,1 1 1 1,0,
