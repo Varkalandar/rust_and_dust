@@ -107,6 +107,7 @@ impl Item
         }
     }
 
+
     pub fn print_debug(&self) 
     {
         println!("{}", self.name());
@@ -269,14 +270,20 @@ fn read_plugins() -> Vec<Item> {
 
 fn calc_slot(v: i32) -> Slot {
     match v {
-        0 => Slot::Bag,
-        1 => Slot::Stash,
-        2 => Slot::Nose,
-        3 => Slot::Body,
-        4 => Slot::LWing,
-        5 => Slot::RWing,
-        6 => Slot::Engine,
-        _ => Slot::Bag,
+        0 => Slot::OnCursor,
+        1 => Slot::Bag,
+        2 => Slot::Stash,
+        3 => Slot::Head,
+        4 => Slot::Body,
+        5 => Slot::LHand,
+        6 => Slot::RHand,
+        7 => Slot::Amulet,
+        8 => Slot::LRing,
+        9 => Slot::RRing,
+        _ => {
+            println!("calc_slot: Cannot find slot for input value {}, using Slot::Bag.", v);
+            Slot::Bag
+        }
     }
 }
 

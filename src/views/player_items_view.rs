@@ -49,17 +49,23 @@ impl PlayerItemsView {
 
         let mut slot_offsets = HashMap::new();
         slot_offsets.insert(Slot::Bag, [10, 452]);
-        slot_offsets.insert(Slot::Body, [204, 213]);
-        slot_offsets.insert(Slot::LWing, [400, 202]);
-        slot_offsets.insert(Slot::RWing, [20, 205]);
-        slot_offsets.insert(Slot::Engine, [214, 96]);
+        slot_offsets.insert(Slot::Head, [107, 63]);
+        slot_offsets.insert(Slot::Body, [314, 311]);
+        slot_offsets.insert(Slot::LHand, [400, 202]);
+        slot_offsets.insert(Slot::RHand, [20, 205]);
+        slot_offsets.insert(Slot::Amulet, [230, 52]);
+        slot_offsets.insert(Slot::LRing, [367, 150]);
+        slot_offsets.insert(Slot::RRing, [80, 154]);
 
         let mut slot_sizes = HashMap::new();
         slot_sizes.insert(Slot::Bag, [15*32, 9*32]);
-        slot_sizes.insert(Slot::LWing, [2*32, 3*32]);
-        slot_sizes.insert(Slot::RWing, [2*32, 3*32]);
-        slot_sizes.insert(Slot::Engine, [2*32, 3*32]);
+        slot_sizes.insert(Slot::Head, [2*32, 2*32]);
         slot_sizes.insert(Slot::Body, [2*32, 3*32]);
+        slot_sizes.insert(Slot::LHand, [2*32, 3*32]);
+        slot_sizes.insert(Slot::RHand, [2*32, 3*32]);
+        slot_sizes.insert(Slot::Amulet, [1*32, 1*32]);
+        slot_sizes.insert(Slot::LRing, [1*32, 1*32]);
+        slot_sizes.insert(Slot::RRing, [1*32, 1*32]);
 
         PlayerItemsView {
             area: UiArea {

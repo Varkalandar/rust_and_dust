@@ -7,11 +7,13 @@ pub enum Slot {
     OnCursor = 0,
     Bag = 1,
     Stash = 2,
-    Nose = 3,
+    Head = 3,
     Body = 4,
-    LWing = 5,
-    RWing = 6,
-    Engine = 7,
+    LHand = 5,
+    RHand = 6,
+    Amulet = 7,
+    LRing = 8,
+    RRing = 9,
 }
 
 #[derive(Debug)]

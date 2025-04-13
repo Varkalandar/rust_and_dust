@@ -205,7 +205,7 @@ impl App {
 
         let mut wand = world.map.item_factory.create("engraved_wand");
         wand.activation = Activation::Fireball;
-        world.player_inventory.put_item(wand, Slot::RWing);
+        world.player_inventory.put_item(wand, Slot::RHand);
 
         let mut coins = world.map.item_factory.create("copper_coin");
         coins.stack_size = 1000;

@@ -51,7 +51,8 @@ impl UiFont {
         let face = ft.new_face(font, 0).unwrap();
         face.set_pixel_sizes(0, size).unwrap();
 
-        let lineheight = ((face.ascender() - face.descender()) / 64) as i32 + 5; // TODO: line gap?
+        let char_height = ((face.ascender() - face.descender()) / 64) as f64; 
+        let lineheight = (char_height * 1.2) as i32;
 
         // println!("Ascend {} descend {}", face.ascender(), face.descender());
 
@@ -208,7 +209,7 @@ fn create_glyphs(display: &Display<WindowSurface>, face: &freetype::Face, glyphs
         }
     }
 
-    println!("Found {} glyphs in font, lineheight={}", num_glyphs, lineheight);
+    println!("Found {} glyphs in font, lineheight={}, has_kerning={}", num_glyphs, lineheight, face.has_kerning());
 
     let b_width = PITCH;
     let b_height = (num_glyphs / 32) * lineheight;
