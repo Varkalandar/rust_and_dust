@@ -436,12 +436,39 @@ impl PlayerItemsView {
 
                 // Merge stacks if possible (todo)
 
+                let ok = try_merge_stacks(inventory, item_id, target_item_id);
+
                 // Merge items if there is a possible merge recipe
-                
-                let _ok = try_merge_items(inventory, item_id, target_item_id);
+                if !ok {
+                    let _ok = try_merge_items(inventory, item_id, target_item_id);
+                }
             }
         }
     }
+}
+
+
+fn try_merge_stacks(inventory: &mut Inventory, dropped_item_id: u64, target_item_id: u64) -> bool
+{
+    let dropped_item_key;
+    let dropped_item_stack;
+
+    {
+        let dropped_item = inventory.bag.get(&dropped_item_id).unwrap();
+        dropped_item_key = dropped_item.key.to_string();
+        dropped_item_stack = dropped_item.stack_size;
+    }
+    
+    let target_item = inventory.bag.get_mut(&target_item_id).unwrap();
+
+    if dropped_item_key == target_item.key && 
+       dropped_item_stack < target_item.max_stack_size - target_item.stack_size 
+    {
+        target_item.stack_size += dropped_item_stack;
+        return true;
+    }
+    
+    false
 }
 
 
