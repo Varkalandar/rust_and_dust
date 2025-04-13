@@ -125,14 +125,14 @@ impl UiFont {
         let mut lines = 1;
         let mut iter = text.chars();
         let mut eof = false;
+        let mut word = Vec::with_capacity(16);
 
         loop {
-            
             // println!("char {} usize {}", ch, ch);
 
             // scan one word ahead, we don't know yet if this word will fit on the current line
-            let mut word = Vec::new();
             let mut word_width = 0.0;
+            word.clear();
                         
             loop {
                 let ch_opt = iter.next();
