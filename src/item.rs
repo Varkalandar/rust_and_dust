@@ -218,9 +218,9 @@ fn read_proto_items() -> HashMap<String, Item>
                     kind: parse_item_type(parts.next().unwrap()),
                     stack_size: 1,
                     max_stack_size: parts.next().unwrap().parse::<u32>().unwrap(),
+                    drop_effect: parse_drop_effect(parts.next().unwrap()),
                     mods: parse_mods(&mut parts),
                     activation: Activation::None,
-                    drop_effect: parse_drop_effect(parts.next().unwrap()),
                     description: parts.next().unwrap().to_string(),
                 }
             );
@@ -231,7 +231,8 @@ fn read_proto_items() -> HashMap<String, Item>
 }
 
 
-fn calc_slot(v: i32) -> Slot {
+fn calc_slot(v: i32) -> Slot 
+{
     match v {
         0 => Slot::OnCursor,
         1 => Slot::Bag,
@@ -251,22 +252,45 @@ fn calc_slot(v: i32) -> Slot {
 }
 
 
-fn parse_mods(parts: &mut Split<&str>) -> Vec<Mod> {
+fn parse_mods(parts: &mut Split<&str>) -> Vec<Mod>
+{
     let mut result = Vec::new();
 
-    result.push(parse_mod(parts.next(), Attribute::Structure));
-    result.push(parse_mod(parts.next(), Attribute::Agility));
-    result.push(parse_mod(parts.next(), Attribute::Armor));
-    result.push(parse_mod(parts.next(), Attribute::Computation));
-    result.push(parse_mod(parts.next(), Attribute::Speed));
-    result.push(parse_mod(parts.next(), Attribute::PhysicalDamage));
-    result.push(parse_mod(parts.next(), Attribute::SpellDamage));
+    loop {
+        let key = parts.next();
+        if key.is_some() {
+            let key = key.unwrap();
+
+            match key {
+                "spell_dam" => {
+                    result.push(parse_mod(parts.next(), Attribute::SpellDamage));
+                }
+                "info" => {
+                    // info must be the last key and it's not a mod, 
+                    // so we stop parsing mods here
+                    break;
+                }
+                "" => {
+                    // end of data
+                    break;
+                }
+                _ => {
+                    println!("parse_mods: unknown modifier key found: '{}'", key);
+                } 
+            }
+        }
+        else {
+            // out of data
+            break;
+        }
+    }
 
     result
 }
 
-fn parse_mod(input: Option<&str>, attribute: Attribute) -> Mod {
 
+fn parse_mod(input: Option<&str>, attribute: Attribute) -> Mod 
+{
     let (min_value, max_value) = parse_range(input.unwrap());
 
     Mod { 
