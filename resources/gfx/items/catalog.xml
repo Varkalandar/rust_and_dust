@@ -15,11 +15,11 @@
       <Description>
         <version>4</version>
         <id>1</id>
-        <width>55</width>
-        <height>24</height>
+        <width>52</width>
+        <height>28</height>
         <offsetX>0</offsetX>
         <offsetY>0</offsetY>
-        <footX>28</footX>
+        <footX>29</footX>
         <footY>17</footY>
       </Description>
       <Metadata>
@@ -32,8 +32,8 @@
       <Description>
         <version>4</version>
         <id>2</id>
-        <width>100</width>
-        <height>109</height>
+        <width>130</width>
+        <height>142</height>
         <offsetX>0</offsetX>
         <offsetY>0</offsetY>
         <footX>0</footX>
@@ -355,12 +355,12 @@
       <Description>
         <version>4</version>
         <id>21</id>
-        <width>56</width>
-        <height>25</height>
+        <width>52</width>
+        <height>28</height>
         <offsetX>0</offsetX>
         <offsetY>0</offsetY>
-        <footX>31</footX>
-        <footY>19</footY>
+        <footX>26</footX>
+        <footY>18</footY>
       </Description>
       <Metadata>
         <int>0</int>
@@ -372,8 +372,8 @@
       <Description>
         <version>4</version>
         <id>22</id>
-        <width>98</width>
-        <height>107</height>
+        <width>130</width>
+        <height>142</height>
         <offsetX>0</offsetX>
         <offsetY>0</offsetY>
         <footX>0</footX>
@@ -627,12 +627,12 @@
       <Description>
         <version>4</version>
         <id>37</id>
-        <width>53</width>
-        <height>23</height>
+        <width>52</width>
+        <height>29</height>
         <offsetX>0</offsetX>
         <offsetY>0</offsetY>
-        <footX>118</footX>
-        <footY>65</footY>
+        <footX>27</footX>
+        <footY>19</footY>
       </Description>
       <Metadata>
         <int>0</int>
@@ -644,8 +644,8 @@
       <Description>
         <version>4</version>
         <id>38</id>
-        <width>95</width>
-        <height>103</height>
+        <width>130</width>
+        <height>141</height>
         <offsetX>0</offsetX>
         <offsetY>0</offsetY>
         <footX>0</footX>

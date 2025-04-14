@@ -352,17 +352,11 @@ fn parse_item_type(input: &str) -> ItemKind
 #[derive(PartialEq, Eq, Debug, Clone)]
 pub enum Attribute {
 
-    Structure,
     Agility,
     Armor,
-    Computation,
     Speed,
     PhysicalDamage,
     SpellDamage,
-    RadiationDamage,
-
-    Integrity,
-    Energy,
 }
 
 
@@ -370,17 +364,11 @@ impl std::fmt::Display for Attribute {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
 
         let name = match self {
-            Attribute::Structure => "Structure",
             Attribute::Agility => "Agility",
             Attribute::Armor => "Armor",
-            Attribute::Computation => "Computation",
             Attribute::Speed => "Speed",
             Attribute::PhysicalDamage => "Physical Damage",
             Attribute::SpellDamage => "Added Spell Damage",
-            Attribute::RadiationDamage => "Radiation Damage",
-                
-            Attribute::Integrity => "Integrity",
-            Attribute::Energy => "Energy",        
         };
 
         write!(f, "{}", name)
