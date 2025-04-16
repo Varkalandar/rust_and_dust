@@ -15,6 +15,9 @@ use crate::TileSet;
 use crate::item::Item;
 use crate::item::Activation;
 use crate::item::DropEffect;
+use crate::item::Unit;
+use crate::item::Mod;
+
 use crate::GameWorld;
 use crate::sound::Sound;
 use crate::ui::UI;
@@ -152,21 +155,9 @@ impl PlayerItemsView {
         }
 
         for modifier in &item.mods {
-
-            let min_value = modifier.min_value;
-            let max_value = modifier.max_value;
-
-            if max_value > 0 {
-                let range = if min_value == max_value {
-                    min_value.to_string()
-                } else {
-                    min_value.to_string() + "-" + &max_value.to_string()
-                };
-
-                let text = modifier.attribute.to_string() + ": " + &range;
-                font.draw(&ui.display, target, &ui.program, left, line, &text, &[0.8, 0.8, 0.8, 1.0]);
-                line += line_space;
-            }
+            let text = Self::assemble_mod_line_text(modifier);
+            font.draw(&ui.display, target, &ui.program, left, line, &text, &[0.8, 0.8, 0.8, 1.0]);
+            line += line_space;
         }
 
         if item.description.len() > 0 {
@@ -175,7 +166,31 @@ impl PlayerItemsView {
                                               &item.description, &[0.8, 0.8, 0.8, 1.0], true);
             line += line_space;
         }
+    }
 
+
+    fn assemble_mod_line_text(modifier: &Mod) -> String 
+    {
+        let mut text;
+        let min_value = modifier.min_value;
+        let max_value = modifier.max_value;
+
+        if max_value > 0 {
+            let range = if min_value == max_value {
+                min_value.to_string()
+            } else {
+                min_value.to_string() + "-" + &max_value.to_string()
+            };
+
+            let unit_sign = if modifier.unit == Unit::Percent {"%"} else {""};
+
+            text = modifier.attribute.to_string() + ": " + &range + unit_sign;
+        }
+        else {
+            text = "".to_string();
+        }
+        
+        text
     }
 
 

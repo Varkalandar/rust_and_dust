@@ -214,7 +214,7 @@ fn furnish_dungeon<R: Rng + ?Sized>(dungeon: &Dungeon, map: &mut Map, rng: &mut 
         place_coins(map,
                     rng.random_range(dungeon.rooms[i].x1 .. dungeon.rooms[i].x2), 
                     rng.random_range(dungeon.rooms[i].y1 .. dungeon.rooms[i].y2), 
-                    "copper_coin", rng.random_range(1 .. 6));
+                    "copper_coin", rng.random_range(1 .. 6), rng);
     }
 }
 
@@ -574,9 +574,11 @@ fn place_wall_tile(map: &mut Map, x: i32, y: i32, z_off: i32, id: usize, color: 
 }
 
 
-fn place_coins(map: &mut Map,
-               x: i32, y: i32, id: &str, count: u32) -> u64 {
-    let mut item = map.item_factory.create(id);
+fn place_coins<R: Rng + ?Sized>(map: &mut Map,
+                                x: i32, y: i32, id: &str, count: u32,
+                                rng: &mut R) -> u64 
+{
+    let mut item = map.item_factory.create(id, rng);
     item.stack_size = count;
 
     map.place_item(item, map_pos(x, y, 0))

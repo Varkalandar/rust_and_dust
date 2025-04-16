@@ -136,7 +136,7 @@ impl ItemFactory {
     }
 
 
-    pub fn create(&mut self, key: &str) -> Item 
+    pub fn create<R: Rng + ?Sized>(&mut self, key: &str, rng: &mut R) -> Item 
     {
         let id = self.next_id;
         self.next_id += 1;
@@ -148,7 +148,7 @@ impl ItemFactory {
             key: proto.key.to_string(),
             singular: proto.singular.to_string(),
             plural: proto.plural.to_string(),
-            mods: proto.mods.clone(),
+            mods: process_proto_mods(&proto.mods, rng), // proto.mods.clone(),
 
             inventory_tile_id: proto.inventory_tile_id,
             inventory_w: proto.inventory_w,
@@ -184,7 +184,7 @@ impl ItemFactory {
         // pick a random one
         let index = rng.random_range(0 .. matches.len());
 
-        self.create(&matches[index])
+        self.create(&matches[index], rng)
     }
 }
 
@@ -263,7 +263,16 @@ fn parse_mods(parts: &mut Split<&str>) -> Vec<Mod>
 
             match key {
                 "spell_dam" => {
-                    result.push(parse_mod(parts.next(), Attribute::SpellDamage));
+                    result.push(parse_mod(parts.next(), Attribute::SpellDamage, Unit::Integer));
+                }
+                "res_fire" => {
+                    result.push(parse_mod(parts.next(), Attribute::ResFire, Unit::Percent));
+                }
+                "res_light" => {
+                    result.push(parse_mod(parts.next(), Attribute::ResLight, Unit::Percent));
+                }
+                "res_cold" => {
+                    result.push(parse_mod(parts.next(), Attribute::ResCold, Unit::Percent));
                 }
                 "info" => {
                     // info must be the last key and it's not a mod, 
@@ -289,7 +298,7 @@ fn parse_mods(parts: &mut Split<&str>) -> Vec<Mod>
 }
 
 
-fn parse_mod(input: Option<&str>, attribute: Attribute) -> Mod 
+fn parse_mod(input: Option<&str>, attribute: Attribute, unit: Unit) -> Mod 
 {
     let (min_value, max_value) = parse_range(input.unwrap());
 
@@ -297,6 +306,7 @@ fn parse_mod(input: Option<&str>, attribute: Attribute) -> Mod
         attribute,
         min_value,
         max_value,
+        unit,
     }
 }
 
@@ -357,10 +367,14 @@ pub enum Attribute {
     Speed,
     PhysicalDamage,
     SpellDamage,
+    ResFire,
+    ResLight,
+    ResCold,
 }
 
 
-impl std::fmt::Display for Attribute {
+impl std::fmt::Display for Attribute 
+{
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
 
         let name = match self {
@@ -369,6 +383,29 @@ impl std::fmt::Display for Attribute {
             Attribute::Speed => "Speed",
             Attribute::PhysicalDamage => "Physical Damage",
             Attribute::SpellDamage => "Added Spell Damage",
+            Attribute::ResFire => "Fire Resistance",
+            Attribute::ResLight => "Lightning Resistance",
+            Attribute::ResCold => "Cold Resistance",
+        };
+
+        write!(f, "{}", name)
+    }
+}
+
+
+#[derive(PartialEq, Debug, Clone)]
+pub enum Unit {
+    Percent,
+    Integer,
+}
+
+
+impl std::fmt::Display for Unit {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+
+        let name = match self {
+            Unit::Percent => "Percent",
+            Unit::Integer => "Integer",
         };
 
         write!(f, "{}", name)
@@ -381,4 +418,39 @@ pub struct Mod {
     pub attribute: Attribute,
     pub min_value: i32,
     pub max_value: i32,
+    pub unit: Unit,
+}
+
+
+fn process_proto_mods<R: Rng + ?Sized>(mods: &Vec<Mod>, rng: &mut R) -> Vec<Mod>
+{
+    let mut result = Vec::with_capacity(mods.len());
+
+    for modifier in mods {
+
+        if modifier.attribute == Attribute::ResFire || 
+           modifier.attribute == Attribute::ResLight ||
+           modifier.attribute == Attribute::ResCold {
+            // the proto mod is a range, we need to pick one value
+            // from that range to produce a concrete mod for our item
+            result.push(random_from_range(modifier, rng));
+        }
+        else {
+            result.push(modifier.clone());
+        }
+    }
+
+
+    result
+}
+
+
+fn random_from_range<R: Rng + ?Sized>(modifier: &Mod, rng: &mut R) -> Mod 
+{
+    let mut new = modifier.clone();
+    let actual_value = rng.random_range(modifier.min_value .. modifier.max_value);
+    new.min_value = actual_value;
+    new.max_value = actual_value;
+
+    new
 }

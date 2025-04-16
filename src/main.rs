@@ -200,21 +200,21 @@ impl App {
 
         // Some inventory contents for testing
 
-        let wand = world.map.item_factory.create("wooden_wand");
+        let wand = world.map.item_factory.create("wooden_wand", &mut world.rng);
         world.player_inventory.put_item(wand, Slot::Bag);
 
-        let mut wand = world.map.item_factory.create("engraved_wand");
+        let mut wand = world.map.item_factory.create("engraved_wand", &mut world.rng);
         wand.activation = Activation::Fireball;
         world.player_inventory.put_item(wand, Slot::RHand);
 
-        let mut coins = world.map.item_factory.create("copper_coin");
+        let mut coins = world.map.item_factory.create("copper_coin", &mut world.rng);
         coins.stack_size = 1000;
         world.player_inventory.put_item(coins, Slot::Bag);
 
-        let scroll = world.map.item_factory.create("fireball_scroll");
+        let scroll = world.map.item_factory.create("fireball_scroll", &mut world.rng);
         world.player_inventory.put_item(scroll, Slot::Bag);
 
-        let scroll = world.map.item_factory.create("identify_scroll");
+        let scroll = world.map.item_factory.create("identify_scroll", &mut world.rng);
         world.player_inventory.put_item(scroll, Slot::Bag);
 
         App {        
