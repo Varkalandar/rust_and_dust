@@ -16,6 +16,7 @@ use std::boxed::Box;
 use rand::Rng;
 use rand::rngs::StdRng;
 
+use crate::shop::Shop;
 use crate::item::Item;
 use crate::ItemFactory;
 use crate::creature::Creature;
@@ -52,8 +53,7 @@ pub struct Map {
     // 'AI' controlled objects
     pub mob_groups: Vec<MobGroup>,
 
-    // all items on this map
-    pub items: Inventory,
+    pub shops: Vec<Shop>,
 
     pub has_selection: bool,
     pub selected_item: u64,
@@ -138,7 +138,7 @@ impl Map {
             walkable,
             blocked: Vec::new(),
 
-            items: Inventory::new(),
+            shops: Vec::new(),
             has_selection: false,
             selected_item: 0,
             selected_layer: 0,
@@ -629,8 +629,10 @@ impl Map {
             destination = TransitionDestination::Map {to_map: map_id, to_location};
         }
         else {
-            let kind = "general_store".to_string();
-            destination = TransitionDestination::Shop {kind};
+            let shop = Shop::new();
+            let index = self.shops.len();
+            destination = TransitionDestination::Shop {index};
+            self.shops.push(shop);
         }
 
         self.add_transition([x, y], r, destination);
@@ -725,8 +727,8 @@ impl Map {
                         &to_location[0].to_string() + "," +
                         &to_location[1].to_string()
                     },
-                    TransitionDestination::Shop { kind } => {
-                        kind.to_string()
+                    TransitionDestination::Shop { index } => {
+                        index.to_string()
                     }
                 };
 
@@ -1077,7 +1079,7 @@ pub enum TransitionDestination
         to_location: Vector2<f32>,
     },
     Shop {
-        kind: String,
+        index: usize,
     }, 
 }
 

@@ -159,7 +159,8 @@ impl UiController for Game
         }
 
         if self.show_shop_inventory {
-            self.shop_view.draw(ui, target, &world.player_inventory)
+            let shop = &world.map.shops[self.shop_view.shop_index];
+            self.shop_view.draw(ui, target, shop, &world.player_inventory)
         }
     }
 
@@ -215,11 +216,12 @@ impl UiController for Game
 
                     return true;        
                 },
-                TransitionDestination::Shop { kind: _ } => {
+                TransitionDestination::Shop { index } => {
                     if !self.show_shop_inventory {
                         speaker.play(Sound::Click, 0.5);
                         self.show_shop_inventory = true;
                         self.show_player_inventory = false;
+                        self.shop_view.shop_index = index;
                         return true;
                     }
                 }

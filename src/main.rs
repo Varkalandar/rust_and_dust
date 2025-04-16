@@ -42,6 +42,7 @@ mod inventory;
 mod projectile;
 mod dungeon;
 mod map;
+mod shop;
 mod editor;
 mod game;
 mod ui;

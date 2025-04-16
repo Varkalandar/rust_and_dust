@@ -1,6 +1,7 @@
 use glium::Frame;
 use glium::Texture2d;
 
+use crate::shop::Shop;
 use crate::Inventory;
 use crate::GameWorld;
 use crate::ButtonEvent;
@@ -14,6 +15,8 @@ use crate::TileSet;
 pub struct ShopView
 {
     player_items_view: PlayerItemsView,
+
+    pub shop_index: usize,     // the index of the shop in the current map to show
 }
 
 
@@ -24,11 +27,13 @@ impl ShopView
         ShopView 
         {
             player_items_view: PlayerItemsView::new(0, 0, tiles, texture),
+            shop_index: 0,
         }
     }
 
 
-    pub fn draw(&self, ui: &UI, target: &mut Frame, inventory: &Inventory) 
+    pub fn draw(&self, ui: &UI, target: &mut Frame, 
+                shop: &Shop, player_inventory: &Inventory) 
     {
         let size = ui.context.window_size;
         let left = 40;
@@ -39,9 +44,14 @@ impl ShopView
         ui.draw_box(target, left, top, width, height, &[0.6, 0.6, 0.6, 1.0]);
         ui.fill_box(target, left + 1, top + 1, width - 2, height -2 , &[0.3, 0.3, 0.3, 1.0]);
 
-        self.player_items_view.draw(ui, target, left + 500, top, inventory);
+        self.player_items_view.draw(ui, target, left + 500, top, player_inventory);
 
         let font = &ui.context.font_14;
+
+        font.draw(&ui.display, target, &ui.program, 
+                  left + 10, top + 20, &shop.name, &[1.0, 1.0, 1.0, 1.0]);
+
+
         let text = "Shop under construction, no sales today.";
         let headline_width = font.calc_string_width(text) as i32;
         font.draw(&ui.display, target, &ui.program, 
