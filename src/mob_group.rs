@@ -81,8 +81,9 @@ impl MobGroup {
                             let len = vec2_square_len(vec2_sub(mob.position, player_position));
                             let reach = 500.0 * 500.0;
                             if len < reach {
-
-                                let mut projectile = launch_projectile(mob.position, player_position, MobType::CreatureProjectile, factory);
+                                
+                                let projectile_spawn_distance = mob.creature.as_ref().unwrap().projectile_spawn_distance;
+                                let mut projectile = launch_projectile(mob.position, player_position, projectile_spawn_distance, MobType::CreatureProjectile, factory);
                                 projectile_builder.configure_projectile("Iron shot", &mut projectile.visual, &mut projectile.velocity, speaker);
                                 mobs.insert(projectile.uid, projectile);
 

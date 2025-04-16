@@ -13,6 +13,7 @@ struct CreaturePrototype {
     pub speed: f32,
     pub min_hp: i32,
     pub max_hp: i32,
+    pub projectile_spawn_distance: f32,
 }
 
 
@@ -21,12 +22,14 @@ pub struct Creature {
     pub frames: usize,
     pub base_speed: f32,
     pub hit_points: i32,
+    pub projectile_spawn_distance: f32,
 }
 
 
 impl CreatureFactory {
 
-    pub fn new() -> CreatureFactory {
+    pub fn new() -> CreatureFactory 
+    {
         let prototypes = read_creature_prototypes();
 
         CreatureFactory {
@@ -35,7 +38,8 @@ impl CreatureFactory {
     }
 
 
-    pub fn create(&self, key: &str) -> Creature {
+    pub fn create(&self, key: &str) -> Creature 
+    {
         let proto = self.prototypes.get(&key.to_string()).unwrap();
 
         Creature {
@@ -43,13 +47,14 @@ impl CreatureFactory {
             frames: proto.frames,
             base_speed: proto.speed,
             hit_points: (proto.max_hp + proto.min_hp) / 2,
+            projectile_spawn_distance: proto.projectile_spawn_distance,
         }
     }
 }
 
 
-fn read_creature_prototypes() -> HashMap <String, CreaturePrototype> {
-
+fn read_creature_prototypes() -> HashMap <String, CreaturePrototype> 
+{
     let lines = read_lines("resources/creatures/creatures.csv");
     let mut prototypes = HashMap::new();
 
@@ -65,6 +70,7 @@ fn read_creature_prototypes() -> HashMap <String, CreaturePrototype> {
                 speed: parts.next().unwrap().parse::<f32>().unwrap(),
                 min_hp: parts.next().unwrap().parse::<i32>().unwrap(),
                 max_hp: parts.next().unwrap().parse::<i32>().unwrap(),
+                projectile_spawn_distance: parts.next().unwrap().parse::<f32>().unwrap(),
             });
     }
 

@@ -164,14 +164,14 @@ impl PlayerItemsView {
             ui.context.font_10.draw_multiline(&ui.display, target, &ui.program, 
                                               left, line, box_width,
                                               &item.description, &[0.8, 0.8, 0.8, 1.0], true);
-            line += line_space;
+            // line += line_space;
         }
     }
 
 
     fn assemble_mod_line_text(modifier: &Mod) -> String 
     {
-        let mut text;
+        let text;
         let min_value = modifier.min_value;
         let max_value = modifier.max_value;
 

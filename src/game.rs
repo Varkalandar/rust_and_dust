@@ -90,7 +90,7 @@ impl UiController for Game
 
                                 if target.creature.is_some() {
                                     let target_pos = target.position;
-                                    fire_projectile(&mut world.map, "Fireball", target_pos, &mut world.speaker);
+                                    fire_player_projectile(&mut world.map, target_pos, &mut world.speaker);
                                     return true;
                                 }
                             }
@@ -110,7 +110,7 @@ impl UiController for Game
                     }
 
                     if event.args.button == Button::Mouse(MouseButton::Right) {
-                        fire_projectile(&mut world.map, "Fireball", pos, &mut world.speaker);
+                        fire_player_projectile(&mut world.map, pos, &mut world.speaker);
                     }
                 },
                 Some(_comp) => {
@@ -252,13 +252,25 @@ impl Game {
 }
 
 
-pub fn fire_projectile(map: &mut Map, kind: &str, fire_at: Vector2<f32>, speaker: &mut SoundPlayer) -> u64 
+fn fire_player_projectile(map: &mut Map, fire_at: Vector2<f32>, speaker: &mut SoundPlayer) -> u64
+{
+    let player = map.layers[MAP_OBJECT_LAYER].get(&map.player_id).unwrap();
+    let pc = player.creature.as_ref().unwrap();
+
+    fire_projectile(map, "Fireball", fire_at, pc.projectile_spawn_distance, speaker)
+}
+
+
+pub fn fire_projectile(map: &mut Map, kind: &str, fire_at: Vector2<f32>, 
+                       start_distance: f32,
+                       speaker: &mut SoundPlayer) -> u64 
 {
     let id = map.player_id;
     let player = map.layers[MAP_OBJECT_LAYER].get_mut(&id).unwrap();
     let factory = &mut map.factory;
 
-    let mut projectile = launch_projectile(player.position, fire_at, MobType::PlayerProjectile, factory);
+    let mut projectile = launch_projectile(player.position, fire_at, start_distance, 
+                                           MobType::PlayerProjectile, factory);
     map.projectile_builder.configure_projectile(kind, &mut projectile.visual, &mut projectile.velocity, speaker);
 
     let uid = projectile.uid;
@@ -268,14 +280,15 @@ pub fn fire_projectile(map: &mut Map, kind: &str, fire_at: Vector2<f32>, speaker
 }
 
 
-pub fn launch_projectile(shooter_position: Vector2<f32>, fire_at: Vector2<f32>, 
-                       projectile_type: MobType, factory: &mut MapObjectFactory) -> MapObject 
+pub fn launch_projectile(shooter_position: Vector2<f32>, fire_at: Vector2<f32>,
+                         start_distance: f32, 
+                         projectile_type: MobType, factory: &mut MapObjectFactory) -> MapObject 
 {
     println!("New projectile fired at {:?}", fire_at);
 
     let np = vec2_sub(fire_at, shooter_position);
     let dir = vec2_normalized(np);
-    let start_pos = vec2_add(shooter_position, vec2_scale(dir, 80.0));
+    let start_pos = vec2_add(shooter_position, vec2_scale(dir, start_distance));
 
     let mut projectile = factory.create_mob(1, PROJECTILE_TILESET, start_pos, 12.0, 0.5);
     projectile.velocity = dir;
