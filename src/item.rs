@@ -35,6 +35,32 @@ pub enum ItemKind
 
 
 #[derive(Debug)]
+pub struct ItemPrototype 
+{   
+    pub key: String,              // for prototype lookup
+    pub singular: String,         // name for stack size == 1
+    pub plural: String,           // name for stack size >= 2
+    pub mods: Vec<Mod>,
+    
+    pub inventory_tile_id: usize,
+    pub inventory_w: i32,
+    pub inventory_h: i32,
+    pub inventory_scale: f32,
+    pub map_tile_id: usize,
+    pub map_scale: f32,
+    pub color: [f32; 4],
+    pub ilvl: u32,
+    pub kind: ItemKind,
+    pub stack_size: u32,         // some items can be stacked and must have a stack count
+    pub max_stack_size: u32,
+    pub activation: Activation,
+    pub drop_effect: DropEffect,
+
+    pub description: String,
+}
+
+
+#[derive(Debug)]
 pub struct Item 
 {   
     // the ID must be unique in a game
@@ -120,7 +146,7 @@ pub struct ItemFactory
 {
     next_id: u64,
 
-    proto_items: HashMap<String, Item>,
+    proto_items: HashMap<String, ItemPrototype>,
 }
 
 
@@ -189,10 +215,10 @@ impl ItemFactory {
 }
 
 
-fn read_proto_items() -> HashMap<String, Item> 
+fn read_proto_items() -> HashMap<String, ItemPrototype> 
 {
     let lines = read_lines("resources/items/items.csv");
-    let mut proto_items: HashMap<String, Item> = HashMap::new();
+    let mut proto_items: HashMap<String, ItemPrototype> = HashMap::new();
 
     for i in 1..lines.len() {
         let mut parts = lines[i].split(",");
@@ -202,8 +228,7 @@ fn read_proto_items() -> HashMap<String, Item>
         if key.len() > 0 {
             proto_items.insert(
                 key.to_string(),
-                Item {
-                    id: 0,      // just a placeholder in case of item prototypes.
+                ItemPrototype {
                     key,
                     singular: parts.next().unwrap().to_string(),
                     plural:  parts.next().unwrap().to_string(),
