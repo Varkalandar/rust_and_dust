@@ -53,6 +53,8 @@ pub struct ItemPrototype
     pub kind: ItemKind,
     pub stack_size: u32,         // some items can be stacked and must have a stack count
     pub max_stack_size: u32,
+    pub base_price: i32,
+
     pub activation: Activation,
     pub drop_effect: DropEffect,
 
@@ -82,6 +84,8 @@ pub struct Item
     pub kind: ItemKind,
     pub stack_size: u32,         // some items can be stacked and must have a stack count
     pub max_stack_size: u32,
+    pub base_price: i32,
+
     pub activation: Activation,
     pub drop_effect: DropEffect,
 
@@ -188,6 +192,8 @@ impl ItemFactory {
             map_tile_id: proto.map_tile_id,
             stack_size: 1,
             max_stack_size: proto.max_stack_size,
+            base_price: proto.base_price,
+
             activation: proto.activation.clone(),
             drop_effect: proto.drop_effect.clone(),
             description: proto.description.to_string(),
@@ -243,6 +249,8 @@ fn read_proto_items() -> HashMap<String, ItemPrototype>
                     kind: parse_item_type(parts.next().unwrap()),
                     stack_size: 1,
                     max_stack_size: parts.next().unwrap().parse::<u32>().unwrap(),
+                    base_price: parts.next().unwrap().parse::<i32>().unwrap(),
+
                     drop_effect: parse_drop_effect(parts.next().unwrap()),
                     mods: parse_mods(&mut parts),
                     activation: Activation::None,
@@ -444,6 +452,33 @@ pub struct Mod {
     pub min_value: i32,
     pub max_value: i32,
     pub unit: Unit,
+}
+
+impl Mod 
+{
+    pub fn assemble_mod_line_text(&self) -> String 
+    {
+        let text;
+        let min_value = self.min_value;
+        let max_value = self.max_value;
+
+        if max_value > 0 {
+            let range = if min_value == max_value {
+                min_value.to_string()
+            } else {
+                min_value.to_string() + "-" + &max_value.to_string()
+            };
+
+            let unit_sign = if self.unit == Unit::Percent {"%"} else {""};
+
+            text = self.attribute.to_string() + ": " + &range + unit_sign;
+        }
+        else {
+            text = "".to_string();
+        }
+        
+        text
+    }
 }
 
 

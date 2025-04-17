@@ -2,6 +2,7 @@ use glium::Frame;
 use glium::Texture2d;
 
 use crate::shop::Shop;
+use crate::item::Item;
 use crate::Inventory;
 use crate::GameWorld;
 use crate::ButtonEvent;
@@ -9,13 +10,15 @@ use crate::MouseMoveEvent;
 use crate::ui::UI;
 use crate::ui::MouseState;
 use crate::views::player_items_view::PlayerItemsView;
-use crate::views::inventory_view::draw_item;
+use crate::views::draw_item;
+use crate::views::show_item_popup;
 use crate::TileSet;
 
 
 pub struct ShopView
 {
     player_items_view: PlayerItemsView,
+    shop_item_index: i32,      // the index of the shop item the mouse point is currently pointing at
 
     pub shop_index: usize,     // the index of the shop in the current map to show
 }
@@ -29,6 +32,7 @@ impl ShopView
         {
             player_items_view: PlayerItemsView::new(0, 0, texture),
             shop_index: 0,
+            shop_item_index: -1,
         }
     }
 
@@ -68,8 +72,25 @@ impl ShopView
     }
 
 
-    pub fn handle_mouse_move_event(&mut self, _event: &MouseMoveEvent, _mouse: &MouseState, _player_inventory: &mut Inventory) -> bool 
+    pub fn handle_mouse_move_event(&mut self, event: &MouseMoveEvent, _mouse: &MouseState, _player_inventory: &mut Inventory) -> bool 
     {
+        // these must match the display code
+        let left = 84;
+        let top = 60;
+
+        let w = 106;
+        let h = 96;
+
+        let x = event.mx as i32 - left;
+        let y = event.my as i32 - top;
+
+        if x >= 0 && x < w * 5 && y >= 0 && y < h * 4 {
+            self.shop_item_index = (y / h) * 5 + x / w;
+        }
+        else {
+            self.shop_item_index = -1;
+        }
+
         false
     }
 
@@ -77,7 +98,7 @@ impl ShopView
     fn draw_shop_inventory(&self, ui: &UI, target: &mut Frame, shop: &Shop, item_tiles: &TileSet)
     {
         let font = &ui.context.font_14;
-        let x = 80;
+        let x = 84;
         let y = 60;
         
         let mut row = 0;
@@ -134,7 +155,7 @@ impl ShopView
                     // there is a space at the end of each line, we must subract one space width
                     let text_width = font.calc_string_width(&text_line) as i32 - 4;
                     font.draw(&ui.display, target, &ui.program, 
-                                            entry_x + (w - text_width) / 2, entry_y + line_y, &text_line, &[0.9, 0.9, 0.9, 1.0]);
+                              entry_x + (w - text_width) / 2, entry_y + line_y, &text_line, &[0.9, 0.9, 0.9, 1.0]);
         
                     line_y += font.lineheight;
 
@@ -146,7 +167,7 @@ impl ShopView
                     // draw the line as it is, even if it didn't reach "limit" characters
                     let text_width = font.calc_string_width(&text_line) as i32 - 4;
                     font.draw(&ui.display, target, &ui.program, 
-                                            entry_x + (w - text_width) / 2, entry_y + line_y, &text_line, &[0.9, 0.9, 0.9, 1.0]);
+                              entry_x + (w - text_width) / 2, entry_y + line_y, &text_line, &[0.9, 0.9, 0.9, 1.0]);
                     
                     // there are no more words to process.
                     break;
@@ -154,10 +175,10 @@ impl ShopView
             }
 
             // display the price at the bottom
-            let text_line = "100c";
+            let text_line = calculate_price_string(item); // "100c";
             let text_width = font.calc_string_width(&text_line) as i32;
             font.draw(&ui.display, target, &ui.program, 
-                                    entry_x + (w - text_width) / 2, entry_y + h - 18, &text_line, &[1.0, 0.9, 0.5, 1.0]);
+                      entry_x + (w - text_width) / 2, entry_y + h - 18, &text_line, &[1.0, 0.9, 0.5, 1.0]);
 
 
             col += 1;
@@ -167,7 +188,30 @@ impl ShopView
                 row += 1;
             }
         }
+
+        // if the mouse was pointing at something in the shop inventory,
+        // show the item details, too
+
+        if self.shop_item_index >= 0 && (self.shop_item_index as usize) < shop.items.len() {
+            // println!("Shop item index={}", self.shop_item_index);
+
+            let item = &shop.items[self.shop_item_index as usize];
+            let mx = ui.context.mouse_state.position[0] as i32;
+            let my = ui.context.mouse_state.position[1] as i32;
+            show_item_popup(ui, target, mx, my, item);
+        }
     }
 }
 
 
+fn calculate_price_string(item: &Item) -> String
+{
+    let copper = item.base_price % 100;
+    let silver = item.base_price / 100;
+    
+    if silver > 0 {
+        return silver.to_string() + "s " + &copper.to_string() + "c";
+    }
+
+    return copper.to_string() + "c";
+}

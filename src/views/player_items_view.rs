@@ -1,12 +1,10 @@
 use std::collections::HashMap;
 
 use glium::Texture2d;
-use glium::Program;
 use glium::Frame;
 use glutin::surface::WindowSurface;
-use glium::Display;
 
-use crate::ui::{UiArea, UiFont, MouseButton, MouseMoveEvent, MouseState, ButtonEvent};
+use crate::ui::{UiArea, MouseButton, MouseMoveEvent, MouseState, ButtonEvent};
 use crate::Inventory;
 use crate::inventory::Slot;
 use crate::inventory::Entry;
@@ -14,8 +12,6 @@ use crate::TileSet;
 use crate::item::Item;
 use crate::item::Activation;
 use crate::item::DropEffect;
-use crate::item::Unit;
-use crate::item::Mod;
 
 use crate::GameWorld;
 use crate::sound::Sound;
@@ -23,7 +19,8 @@ use crate::ui::UI;
 use crate::ui::Button;
 use crate::ui::ButtonState;
 use crate::views::inventory_view::InventoryView;
-use crate::views::inventory_view::draw_item;
+use crate::views::draw_item;
+use crate::views::show_item_popup;
 
 use crate::gl_support::BlendMode;
 use crate::gl_support::draw_texture;
@@ -97,97 +94,6 @@ impl PlayerItemsView {
         else {
             *self.slot_sizes.get(&slot).unwrap()
         }
-    }
-
-
-    fn show_item_popup(&self, 
-                       ui: &UI, target: &mut Frame,
-                       x: i32, y: i32, item: &Item) 
-    {
-        let font = &ui.context.font_14;
-                    
-        let left = x + 6;
-        let line_space = 20;
-        let box_width = 200;
-        let mut line_count = 1; // first line is item name
-
-        for modifier in &item.mods {
-            if modifier.max_value > 0 {
-                line_count += 1;
-            }
-        }
-
-        if item.activation != Activation::None {
-            line_count += 1;
-        }
-
-        if item.description.len() > 0 {
-            line_count += 
-                ui.context.font_10.draw_multiline(&ui.display, target, &ui.program, 
-                    0, 0, box_width,
-                    &item.description, &[0.8, 0.8, 0.8, 1.0], false);
-        }
-
-        let mut line = y - line_count * line_space;
-        let bottom_margin = if line_count > 1 {8} else {4};
-
-        ui.fill_box(target, x, line, box_width, (line_count * line_space) + bottom_margin, &[0.1, 0.1, 0.1, 0.9]);
-        ui.draw_box(target, x, line, box_width, (line_count * line_space) + bottom_margin, &[0.6, 0.6, 0.6, 1.0]);
-        
-        // ui.draw_hline(target, x, line, 200, &[0.6, 0.6, 0.6, 1.0]);
-
-
-        line += 5;
-
-        let headline_width = font.calc_string_width(&item.name()) as i32;
-        font.draw(&ui.display, target, &ui.program, x + (box_width - headline_width) / 2, line, &item.name(), &[1.0, 1.0, 1.0, 1.0]);
-
-        line += 2;
-        line += line_space;
-
-        if item.activation != Activation::None {
-            font.draw(&ui.display, target, &ui.program, left, line, 
-                      "Activation: Fireball", &[0.8, 0.8, 0.8, 1.0]);
-            line += line_space;
-        }
-
-        for modifier in &item.mods {
-            let text = Self::assemble_mod_line_text(modifier);
-            font.draw(&ui.display, target, &ui.program, left, line, &text, &[0.8, 0.8, 0.8, 1.0]);
-            line += line_space;
-        }
-
-        if item.description.len() > 0 {
-            ui.context.font_10.draw_multiline(&ui.display, target, &ui.program, 
-                                              left, line, box_width,
-                                              &item.description, &[0.8, 0.8, 0.8, 1.0], true);
-            // line += line_space;
-        }
-    }
-
-
-    fn assemble_mod_line_text(modifier: &Mod) -> String 
-    {
-        let text;
-        let min_value = modifier.min_value;
-        let max_value = modifier.max_value;
-
-        if max_value > 0 {
-            let range = if min_value == max_value {
-                min_value.to_string()
-            } else {
-                min_value.to_string() + "-" + &max_value.to_string()
-            };
-
-            let unit_sign = if modifier.unit == Unit::Percent {"%"} else {""};
-
-            text = modifier.attribute.to_string() + ": " + &range + unit_sign;
-        }
-        else {
-            text = "".to_string();
-        }
-        
-        text
     }
 
 
@@ -293,7 +199,7 @@ impl PlayerItemsView {
                     let entry_x = xp + offsets[0] + entry.location_x * 32;
                     let entry_y = yp + offsets[1] + entry.location_y * 32;
 
-                    self.show_item_popup(ui, target, entry_x - 4, entry_y, item);
+                    show_item_popup(ui, target, entry_x - 4, entry_y, item);
                 }
             }
         }
