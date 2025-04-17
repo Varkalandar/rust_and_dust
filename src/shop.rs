@@ -1,13 +1,12 @@
-use rand::Rng;
+use std::vec::Vec;
 use rand::SeedableRng;
 
-use crate::inventory::Inventory;
-use crate::Slot;
 use crate::ItemFactory;
+use crate::item::Item;
 
 pub struct Shop
 {
-    pub inventory: Inventory,
+    pub items: Vec<Item>,
     pub name: String,
 }
 
@@ -18,7 +17,7 @@ impl Shop
     {
         Shop
         {
-            inventory: Inventory::new(),
+            items: Vec::new(),
             name: "Test Shop".to_string(),
         }
     }
@@ -26,13 +25,13 @@ impl Shop
 
     pub fn restock(&mut self, item_factory: &mut ItemFactory)
     {
-        self.inventory.clear();
+        self.items.clear();
 
         let mut rng = rand::rngs::StdRng::seed_from_u64(12345678901);
 
         for _i in 0 .. 20 {
             let item = item_factory.create_random(&mut rng, 1);
-            self.inventory.put_item(item, Slot::Bag);
+            self.items.push(item);
         }
     }
 }
