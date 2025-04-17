@@ -32,7 +32,6 @@ use crate::gl_support::draw_texture;
 pub struct PlayerItemsView {
     area: UiArea,
     texture: Texture2d,
-    item_tiles: TileSet,
 
     slot_offsets: HashMap<Slot, [i32; 2]>,
     slot_sizes: HashMap<Slot, [i32; 2]>,
@@ -47,7 +46,7 @@ pub struct PlayerItemsView {
 
 impl PlayerItemsView {
 
-    pub fn new(x: i32, y: i32, tiles: &TileSet, texture: Texture2d) -> PlayerItemsView {
+    pub fn new(x: i32, y: i32, texture: Texture2d) -> PlayerItemsView {
 
         let mut slot_offsets = HashMap::new();
         slot_offsets.insert(Slot::Bag, [10, 452]);
@@ -78,7 +77,6 @@ impl PlayerItemsView {
             },
             
             texture,
-            item_tiles: tiles.shallow_copy(),
 
             slot_offsets,
             slot_sizes,
@@ -239,7 +237,8 @@ impl PlayerItemsView {
 
 
     pub fn draw(&self, ui: &UI, target: &mut Frame,
-                x: i32, y: i32, inventory: &Inventory)
+                x: i32, y: i32, inventory: &Inventory,
+                item_tiles: &TileSet)
     {
         let area = &self.area;
         let xp = x + area.x;
@@ -273,13 +272,13 @@ impl PlayerItemsView {
 
                 draw_item(ui, target, &ui.program,
                           entry_x as f32, entry_y as f32, w as f32, h as f32, 
-                          item, &self.item_tiles);
+                          item, item_tiles);
             }
         }
 
         let ipos = self.slot_offsets.get(&Slot::Bag).unwrap();
         self.inventory_view.draw(ui, target, xp + ipos[0], yp + ipos[1], 
-                                 inventory, &self.item_tiles);
+                                 inventory, item_tiles);
        
         match self.hover_item {
             None => {},
@@ -307,7 +306,7 @@ impl PlayerItemsView {
                 draw_item(ui, target, &ui.program,
                           (self.drag_x - 16.0) as f32, (self.drag_y - 16.0) as f32, 
                           (item.inventory_w * 32) as f32, (item.inventory_h * 32) as f32,
-                          item, &self.item_tiles);
+                          item, item_tiles);
             }
         }
     }

@@ -43,6 +43,14 @@ impl Inventory {
         }
     }
 
+
+    pub fn clear(&mut self)
+    {
+        self.bag.clear();
+        self.entries.clear();
+    }
+
+
     pub fn put_item(&mut self, item: Item, slot: Slot) {
 
         println!("Adding item {:?} to inventory slot {:?}", item, slot);

@@ -31,6 +31,7 @@ pub struct Game
 {
     piv: PlayerItemsView,
     shop_view: ShopView,
+    item_tiles: TileSet,
 
     show_player_inventory: bool,
     show_shop_inventory: bool,
@@ -155,12 +156,12 @@ impl UiController for Game
         ui.draw(target);
  
         if self.show_player_inventory {
-            self.piv.draw(ui, target, 0, 10, &world.player_inventory)
+            self.piv.draw(ui, target, 0, 10, &world.player_inventory, &self.item_tiles);
         }
 
         if self.show_shop_inventory {
             let shop = &world.map.shops[self.shop_view.shop_index];
-            self.shop_view.draw(ui, target, shop, &world.player_inventory)
+            self.shop_view.draw(ui, target, shop, &world.player_inventory, &self.item_tiles);
         }
     }
 
@@ -237,11 +238,9 @@ impl Game {
 
     pub fn new(inventory_bg: Texture2d, shop_bg: Texture2d, ui: &UI, item_tiles: &TileSet) -> Game 
     {
-        let piv = PlayerItemsView::new((ui.context.window_size[0] as i32) / 2, 0,
-                                       &item_tiles.shallow_copy(),
-                                       inventory_bg,);
+        let piv = PlayerItemsView::new((ui.context.window_size[0] as i32) / 2, 0, inventory_bg,);
     
-        let shop_view = ShopView::new(&item_tiles.shallow_copy(), shop_bg);
+        let shop_view = ShopView::new(shop_bg);
         
         Game 
         {
@@ -249,6 +248,7 @@ impl Game {
             shop_view,
             show_player_inventory: false,
             show_shop_inventory: false,
+            item_tiles: item_tiles.shallow_copy(),
         }
     }
 }

@@ -629,7 +629,8 @@ impl Map {
             destination = TransitionDestination::Map {to_map: map_id, to_location};
         }
         else {
-            let shop = Shop::new();
+            let mut shop = Shop::new();
+            shop.restock(&mut self.item_factory);
             let index = self.shops.len();
             destination = TransitionDestination::Shop {index};
             self.shops.push(shop);
