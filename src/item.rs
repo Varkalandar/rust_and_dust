@@ -30,7 +30,8 @@ pub enum ItemKind
     Wand,
     Ring,
     Scroll,
-    Currency
+    Currency,
+    Plugin
 }
 
 
@@ -53,7 +54,7 @@ pub struct ItemPrototype
     pub kind: ItemKind,
     pub stack_size: u32,         // some items can be stacked and must have a stack count
     pub max_stack_size: u32,
-    pub base_price: i32,
+    pub base_price: u32,
 
     pub activation: Activation,
     pub drop_effect: DropEffect,
@@ -84,7 +85,7 @@ pub struct Item
     pub kind: ItemKind,
     pub stack_size: u32,         // some items can be stacked and must have a stack count
     pub max_stack_size: u32,
-    pub base_price: i32,
+    pub base_price: u32,
 
     pub activation: Activation,
     pub drop_effect: DropEffect,
@@ -249,7 +250,7 @@ fn read_proto_items() -> HashMap<String, ItemPrototype>
                     kind: parse_item_type(parts.next().unwrap()),
                     stack_size: 1,
                     max_stack_size: parts.next().unwrap().parse::<u32>().unwrap(),
-                    base_price: parts.next().unwrap().parse::<i32>().unwrap(),
+                    base_price: parts.next().unwrap().parse::<u32>().unwrap(),
 
                     drop_effect: parse_drop_effect(parts.next().unwrap()),
                     mods: parse_mods(&mut parts),
@@ -383,6 +384,9 @@ fn parse_item_type(input: &str) -> ItemKind
     }
     else if "currency" == input {
         return ItemKind::Currency;
+    }
+    else if "plugin" == input {
+        return ItemKind::Plugin;
     }
     else {
         println!("parse_item_type: Unknown item type '{}'", input);

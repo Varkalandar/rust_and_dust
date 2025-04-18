@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use crate::item::Item;
+use crate::item::ItemKind;
 use crate::ui::UiArea;
 
 #[derive(PartialEq, Eq, Debug, Hash, Clone, Copy)]
@@ -87,13 +88,11 @@ impl Inventory {
     }
 
 
-    fn find_free_location(&self, item: &Item) -> [i32; 2] {
-
+    fn find_free_location(&self, item: &Item) -> [i32; 2] 
+    {
         // look for free space
-        for grid_y in 0..8 
-        {
-            for grid_x in 0..14 
-            {
+        for grid_y in 0..8 {
+            for grid_x in 0..14 {
                 let mut free = true;
 
                 for entry in &self.entries {
@@ -137,6 +136,29 @@ impl Inventory {
         None
     }
     
+
+    /**
+     * @return The total amount of curency in this inventoy, measured in copper coins
+     */ 
+    pub fn total_money(&self) -> u32
+    {
+        let mut total = 0;
+
+        for (key, item) in &self.bag {
+            if item.kind == ItemKind::Currency {
+                let mut count = item.stack_size;
+
+                if "silver_coin" == item.key {
+                    count *= 100;
+                }
+
+                total += count;
+            }
+        }
+
+        total
+    }
+
 
     #[allow(dead_code)]
     pub fn print_contents(&self) {

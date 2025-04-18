@@ -47,7 +47,7 @@ impl ShopView
         let height = (size[1] as i32) - top * 2;
 
         ui.draw_box(target, left, top, width, height, &[0.6, 0.6, 0.6, 1.0]);
-        ui.fill_box(target, left + 1, top + 1, width - 2, height -2 , &[0.1, 0.06, 0.03, 1.0]);
+        ui.fill_box(target, left + 1, top + 1, width - 2, height -2 , &[0.08, 0.06, 0.03, 1.0]);
 
         self.player_items_view.draw(ui, target, 0, 0, player_inventory, item_tiles);
 
@@ -56,7 +56,7 @@ impl ShopView
         font.draw(&ui.display, target, &ui.program, 
                   left + 10, top + 20, &shop.name, &[1.0, 1.0, 1.0, 1.0]);
 
-        self.draw_shop_inventory(ui, target, shop, item_tiles);
+        self.draw_shop_inventory(ui, target, shop, item_tiles, player_inventory.total_money());
 /*
         let text = "Shop under construction, no sales today.";
         let headline_width = font.calc_string_width(text) as i32;
@@ -99,7 +99,8 @@ impl ShopView
     }
 
 
-    fn draw_shop_inventory(&self, ui: &UI, target: &mut Frame, shop: &Shop, item_tiles: &TileSet)
+    fn draw_shop_inventory(&self, ui: &UI, target: &mut Frame, 
+                          shop: &Shop, item_tiles: &TileSet, player_money: u32)
     {
         let font = &ui.context.font_14;
         let x = 84;
@@ -116,8 +117,10 @@ impl ShopView
             let entry_x = x + col * w;
             let entry_y = y + row * h;
 
+            let back_color = if item.base_price <= player_money {[0.0, 0.02, 0.1, 0.7]} else {[0.12, 0.02, 0.0, 0.7]};
+
             ui.draw_box(target, entry_x, entry_y, w, h, &[0.4, 0.5, 0.6, 1.0]);
-            ui.fill_box(target, entry_x + 1, entry_y + 1, w - 2, h - 2, &[0.0, 0.02, 0.1, 0.7]);
+            ui.fill_box(target, entry_x + 1, entry_y + 1, w - 2, h - 2, &back_color);
 
             draw_item(ui, target, &ui.program,
                       entry_x as f32, entry_y as f32, 
@@ -214,7 +217,12 @@ fn calculate_price_string(item: &Item) -> String
     let silver = item.base_price / 100;
     
     if silver > 0 {
-        return silver.to_string() + "s " + &copper.to_string() + "c";
+        if copper > 0 {
+            return silver.to_string() + "s " + &copper.to_string() + "c";
+        }
+        else {
+            return silver.to_string() + "s";
+        }
     }
 
     return copper.to_string() + "c";
