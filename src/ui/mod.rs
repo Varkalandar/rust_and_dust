@@ -157,6 +157,7 @@ pub struct UiContext
 {
     pub font_10: Rc<UiFont>,
     pub font_14: Rc<UiFont>,
+    pub font_24: Rc<UiFont>,
     pub tex_white: Rc<Texture2d>,
 
     pub vertex_buffer: VertexBuffer<Vertex>,
@@ -192,6 +193,7 @@ impl UI {
 
             font_10: Rc::new(UiFont::new(&display, 10)),
             font_14: Rc::new(UiFont::new(&display, 14)),
+            font_24: Rc::new(UiFont::new(&display, 24)),
             tex_white: Rc::new(tex_white),
 
             vertex_buffer: build_dynamic_quad_buffer(&display),

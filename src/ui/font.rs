@@ -43,7 +43,8 @@ pub struct UiFont {
 
 impl UiFont {
 
-    pub fn new(display: &Display<WindowSurface>, size: u32) -> UiFont {
+    pub fn new(display: &Display<WindowSurface>, size: u32) -> UiFont 
+    {
         let ft = freetype::Library::init().unwrap();
         let font = "resources/font/FiraSans-Regular.ttf";
         // let font = "resources/font/Humanistic.ttf";

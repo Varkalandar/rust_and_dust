@@ -51,7 +51,7 @@ impl ShopView
 
         self.player_items_view.draw(ui, target, 0, 0, player_inventory, item_tiles);
 
-        let font = &ui.context.font_14;
+        let font = &ui.context.font_24;
 
         font.draw(&ui.display, target, &ui.program, 
                   left + 10, top + 20, &shop.name, &[1.0, 1.0, 1.0, 1.0]);

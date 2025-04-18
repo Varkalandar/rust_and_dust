@@ -449,9 +449,7 @@ fn build_tunnel_from_coordinates(map: &mut Map, floors: &HashMap<i32, [i32; 2]>)
 
         let end_piece = connections == 1;
 
-        if end_piece {
-            println!("End piece detected at {}, {}", x, y);
-        }
+        // if end_piece { println!("End piece detected at {}, {}", x, y); }
 
         // placement helper
         // place_wall_tile(map, x, y+1, 0, 692, [1.0, 1.0, 1.0, 1.0]);
@@ -513,9 +511,7 @@ fn build_corridor_from_coordinates(map: &mut Map, floors: &HashMap<i32, [i32; 2]
 
         let end_piece = connections == 1;
 
-        if end_piece {
-            println!("End piece detected at {}, {}", x, y);
-        }
+        // if end_piece { println!("End piece detected at {}, {}", x, y); }
 
         // place walls if there is no connection
 
