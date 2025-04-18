@@ -128,7 +128,7 @@ impl PlayerItemsView {
                 let item = inventory.bag.get(&entry.item_id).unwrap();
                 let size = self.find_slot_size(item, entry.slot);
 
-                // println!("Chzecking {}, {} vs entry {}, {}, {}, {}", mx, my, entry_x, entry_y, size[0], size[1]);
+                // println!("Checking {}, {} vs entry {}, {}, {}, {}", mx, my, entry_x, entry_y, size[0], size[1]);
 
                 if mx >= entry_x && my >= entry_y &&
                    mx < entry_x + size[0] && my < entry_y + size[1] {

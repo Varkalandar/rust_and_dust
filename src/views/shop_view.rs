@@ -30,7 +30,7 @@ impl ShopView
     {
         ShopView 
         {
-            player_items_view: PlayerItemsView::new(0, 0, texture),
+            player_items_view: PlayerItemsView::new(70 + 560, 10, texture),
             shop_index: 0,
             shop_item_index: -1,
         }
@@ -49,7 +49,7 @@ impl ShopView
         ui.draw_box(target, left, top, width, height, &[0.6, 0.6, 0.6, 1.0]);
         ui.fill_box(target, left + 1, top + 1, width - 2, height -2 , &[0.1, 0.06, 0.03, 1.0]);
 
-        self.player_items_view.draw(ui, target, left + 560, top, player_inventory, item_tiles);
+        self.player_items_view.draw(ui, target, 0, 0, player_inventory, item_tiles);
 
         let font = &ui.context.font_14;
 
@@ -66,13 +66,14 @@ impl ShopView
     }
 
 
-    pub fn handle_button_event(&mut self, _event: &ButtonEvent, _mouse: &MouseState, _world: &mut GameWorld) -> bool 
+    pub fn handle_button_event(&mut self, event: &ButtonEvent, mouse_state: &MouseState, world: &mut GameWorld) -> bool 
     {
-        false
+        // forward the event to the player item view
+        self.player_items_view.handle_button_event(event, mouse_state, world)
     }
 
 
-    pub fn handle_mouse_move_event(&mut self, event: &MouseMoveEvent, _mouse: &MouseState, _player_inventory: &mut Inventory) -> bool 
+    pub fn handle_mouse_move_event(&mut self, event: &MouseMoveEvent, mouse_state: &MouseState, player_inventory: &mut Inventory) -> bool 
     {
         // these must match the display code
         let left = 84;
@@ -90,6 +91,9 @@ impl ShopView
         else {
             self.shop_item_index = -1;
         }
+
+        // forward the event to the player item view
+        self.player_items_view.handle_mouse_move_event(event, mouse_state, player_inventory);
 
         false
     }
