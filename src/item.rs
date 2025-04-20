@@ -140,6 +140,13 @@ impl Item
     }
 
 
+    pub fn calc_price(&self) -> u32
+    {
+        // todo: factor in the mods
+        return self.base_price;
+    }
+
+
     pub fn print_debug(&self) 
     {
         println!("{}", self.name());

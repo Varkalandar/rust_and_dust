@@ -4,6 +4,7 @@ use glium::Texture2d;
 use crate::shop::Shop;
 use crate::item::Item;
 use crate::Inventory;
+use crate::Slot;
 use crate::GameWorld;
 use crate::ButtonEvent;
 use crate::MouseMoveEvent;
@@ -68,6 +69,15 @@ impl ShopView
 
     pub fn handle_button_event(&mut self, event: &ButtonEvent, mouse_state: &MouseState, world: &mut GameWorld) -> bool 
     {
+        // did the player click a shop item?
+        let item_index = find_item_at(event.mx, event.my);
+        let shop = &mut world.map.shops[self.shop_index];
+
+        if item_index >= 0 && (item_index as usize) < shop.items.len() &&
+            shop.items[item_index as usize].calc_price() <= world.player_inventory.total_money() {
+            buy_item_from_shop(item_index as usize, shop, &mut self.player_items_view, &mut world.player_inventory);
+        }
+
         // forward the event to the player item view
         self.player_items_view.handle_button_event(event, mouse_state, world)
     }
@@ -75,22 +85,7 @@ impl ShopView
 
     pub fn handle_mouse_move_event(&mut self, event: &MouseMoveEvent, mouse_state: &MouseState, player_inventory: &mut Inventory) -> bool 
     {
-        // these must match the display code
-        let left = 84;
-        let top = 60;
-
-        let w = 106;
-        let h = 96;
-
-        let x = event.mx as i32 - left;
-        let y = event.my as i32 - top;
-
-        if x >= 0 && x < w * 5 && y >= 0 && y < h * 4 {
-            self.shop_item_index = (y / h) * 5 + x / w;
-        }
-        else {
-            self.shop_item_index = -1;
-        }
+        self.shop_item_index = find_item_at(event.mx, event.my);
 
         // forward the event to the player item view
         self.player_items_view.handle_mouse_move_event(event, mouse_state, player_inventory);
@@ -117,7 +112,7 @@ impl ShopView
             let entry_x = x + col * w;
             let entry_y = y + row * h;
 
-            let back_color = if item.base_price <= player_money {[0.0, 0.02, 0.1, 0.7]} else {[0.12, 0.02, 0.0, 0.7]};
+            let back_color = if item.base_price <= player_money {[0.0, 0.02, 0.1, 0.7]} else {[0.1, 0.01, 0.0, 0.7]};
 
             ui.draw_box(target, entry_x, entry_y, w, h, &[0.4, 0.5, 0.6, 1.0]);
             ui.fill_box(target, entry_x + 1, entry_y + 1, w - 2, h - 2, &back_color);
@@ -227,3 +222,35 @@ fn calculate_price_string(item: &Item) -> String
 
     return copper.to_string() + "c";
 }
+
+
+fn find_item_at(mx: f32, my: f32) -> i32
+{
+    // these must match the display code
+    let left = 84;
+    let top = 60;
+
+    let w = 106;
+    let h = 96;
+
+    let x = mx as i32 - left;
+    let y = my as i32 - top;
+
+    if x >= 0 && x < w * 5 && y >= 0 && y < h * 4 {
+        return (y / h) * 5 + x / w;
+    }
+    else {
+        return -1;
+    }
+}
+
+
+fn buy_item_from_shop(item_index: usize, shop: &mut Shop, 
+                      piv: &mut PlayerItemsView, inventory: &mut Inventory)
+{
+    let item = shop.items.remove(item_index);
+    piv.hover_item = Some(item.id);
+    inventory.take_money(item.calc_price());
+    inventory.put_item(item, Slot::OnCursor);
+}
+ 

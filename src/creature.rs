@@ -17,6 +17,7 @@ struct CreaturePrototype {
 }
 
 
+#[allow(dead_code)]
 pub struct Creature {
     pub base_tile_id: usize,
     pub frames: usize,

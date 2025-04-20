@@ -2,7 +2,6 @@ use std::collections::HashMap;
 
 use glium::Texture2d;
 use glium::Frame;
-use glutin::surface::WindowSurface;
 
 use crate::ui::{UiArea, MouseButton, MouseMoveEvent, MouseState, ButtonEvent};
 use crate::Inventory;
@@ -34,7 +33,7 @@ pub struct PlayerItemsView {
     slot_sizes: HashMap<Slot, [i32; 2]>,
     inventory_view: InventoryView,
 
-    hover_item: Option<u64>,
+    pub hover_item: Option<u64>,
     dragged_item: Option<u64>,
     drag_x: f32,
     drag_y: f32,

@@ -822,7 +822,7 @@ fn main() {
         .expect("event loop building");
 
     let (window, display) = glium::backend::glutin::SimpleWindowBuilder::new()
-        .with_title("Rust and Dust Collector v0.0.1")
+        .with_title("Rust and Dust Collector v0.0.2")
         .with_inner_size(window_size[0], window_size[1])
         .build(&event_loop);
 

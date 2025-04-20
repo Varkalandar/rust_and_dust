@@ -144,7 +144,7 @@ impl Inventory {
     {
         let mut total = 0;
 
-        for (key, item) in &self.bag {
+        for (_key, item) in &self.bag {
             if item.kind == ItemKind::Currency {
                 let mut count = item.stack_size;
 
@@ -157,6 +157,52 @@ impl Inventory {
         }
 
         total
+    }
+
+
+    /**
+     * Reduce the currency in the inventory by the given amount
+     */
+    pub fn take_money(&mut self, mut amount: u32)
+    {
+        let mut items_to_remove = Vec::new();
+
+        for (_key, item) in &mut self.bag {
+            if item.kind == ItemKind::Currency {
+                let mut count = item.stack_size;
+
+                if "silver_coin" == item.key {
+                    count *= 100;
+                    amount -= count;
+
+                    if count > amount {
+                        item.stack_size -= amount / 100;
+                        amount = 0;
+                    }
+                    else {
+                        items_to_remove.push(item.id);
+                        amount -= count / 100;
+                    }
+                }
+
+                if "copper_coin" == item.key {
+                    if count > amount {
+                        item.stack_size -= amount;
+                        amount = 0;
+                    }
+                    else {
+                        items_to_remove.push(item.id);
+                        amount -= count;
+                    }
+                }
+            }
+
+            if amount == 0 { break; }
+        }
+
+        for id in items_to_remove {
+            self.remove_item(id);
+        }
     }
 
 
