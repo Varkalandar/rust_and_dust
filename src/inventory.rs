@@ -172,16 +172,14 @@ impl Inventory {
                 let mut count = item.stack_size;
 
                 if "silver_coin" == item.key {
-                    count *= 100;
-                    amount -= count;
-
-                    if count > amount {
-                        item.stack_size -= amount / 100;
-                        amount = 0;
+                    if count * 100 > amount {
+                        let reduction = amount / 100;
+                        item.stack_size -= reduction;
+                        amount = amount - reduction * 100;
                     }
                     else {
                         items_to_remove.push(item.id);
-                        amount -= count / 100;
+                        amount -= count * 100;
                     }
                 }
 

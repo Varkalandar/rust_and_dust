@@ -25,7 +25,7 @@ pub struct ShopView
     player_items_view: PlayerItemsView,
     shop_item_index: Option<usize>,      // the index of the shop item the mouse point is currently pointing at
 
-    pub shop_index: usize,     // the index of the shop in the current map to show
+    shop_index: usize,     // the index of the shop in the current map to show
 }
 
 
@@ -39,6 +39,19 @@ impl ShopView
             shop_index: 0,
             shop_item_index: None,
         }
+    }
+
+
+    pub fn get_shop_index(&self) -> usize
+    {
+        self.shop_index
+    } 
+
+
+    pub fn set_shop_index(&mut self, shop_index: usize)
+    {
+        self.shop_index = shop_index;
+        self.player_items_view.drop_shop = Some(shop_index);
     }
 
 
@@ -62,12 +75,10 @@ impl ShopView
                   left + 10, top + 20, &shop.name, &[1.0, 1.0, 1.0, 1.0]);
 
         self.draw_shop_inventory(ui, target, shop, item_tiles, player_inventory.total_money());
-/*
-        let text = "Shop under construction, no sales today.";
-        let headline_width = font.calc_string_width(text) as i32;
+
+        let text = "Drop items here to sell.";
         font.draw(&ui.display, target, &ui.program, 
-                  left + (width - headline_width) / 2, top + height/2 - 20, text, &[1.0, 0.8, 0.2, 1.0]);
-                  */
+                  left + 130, top + 570, text, &[1.0, 0.8, 0.2, 1.0]);
     }
 
 

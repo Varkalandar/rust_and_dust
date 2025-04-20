@@ -162,7 +162,8 @@ pub struct ItemFactory
 }
 
 
-impl ItemFactory {
+impl ItemFactory 
+{
     pub fn new() -> ItemFactory 
     {
         let proto_items = read_proto_items();
@@ -174,7 +175,7 @@ impl ItemFactory {
     }
 
 
-    pub fn create<R: Rng + ?Sized>(&mut self, key: &str, rng: &mut R) -> Item 
+    pub fn create_base(&mut self, key: &str) -> Item 
     {
         let id = self.next_id;
         self.next_id += 1;
@@ -186,7 +187,7 @@ impl ItemFactory {
             key: proto.key.to_string(),
             singular: proto.singular.to_string(),
             plural: proto.plural.to_string(),
-            mods: process_proto_mods(&proto.mods, rng), // proto.mods.clone(),
+            mods: Vec::new(),
 
             inventory_tile_id: proto.inventory_tile_id,
             inventory_w: proto.inventory_w,
@@ -206,6 +207,16 @@ impl ItemFactory {
             drop_effect: proto.drop_effect.clone(),
             description: proto.description.to_string(),
         }
+    }
+
+
+    pub fn create<R: Rng + ?Sized>(&mut self, key: &str, rng: &mut R) -> Item 
+    {
+        let mut item = self.create_base(key);
+        let proto = self.proto_items.get(key).unwrap();
+        item.mods = process_proto_mods(&proto.mods, rng); // proto.mods.clone()
+
+        item
     }
 
 

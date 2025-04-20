@@ -25,7 +25,8 @@ use crate::gl_support::BlendMode;
 use crate::gl_support::draw_texture;
 
 
-pub struct PlayerItemsView {
+pub struct PlayerItemsView 
+{
     area: UiArea,
     texture: Texture2d,
 
@@ -37,11 +38,14 @@ pub struct PlayerItemsView {
     dragged_item: Option<u64>,
     drag_x: f32,
     drag_y: f32,
+
+    // if we are inside a shop, sell the item instead of dropping it to the floor
+    pub drop_shop: Option<usize>,
 }
 
 
-impl PlayerItemsView {
-
+impl PlayerItemsView 
+{
     pub fn new(x: i32, y: i32, texture: Texture2d) -> PlayerItemsView {
 
         let mut slot_offsets = HashMap::new();
@@ -81,6 +85,8 @@ impl PlayerItemsView {
             dragged_item: None,
             drag_x: 0.0,
             drag_y: 0.0,
+
+            drop_shop: None,
         }
     }
 
@@ -303,11 +309,25 @@ impl PlayerItemsView {
         match item_opt {
             None => {},
             Some(item) => {
-                let position = world.map.get_player_position();
 
-                println!("Dropping an {} to map floor at {}, {}", item.name(), position[0], position[1]);
-        
-                world.map.place_item(item, position);
+                match self.drop_shop {
+                    None => {
+                        let position = world.map.get_player_position();
+
+                        println!("player_items_view: Dropping an {} to map floor at {}, {}", item.name(), position[0], position[1]);
+                        world.map.place_item(item, position);
+                    },
+                    Some(shop_index) => {
+
+                        println!("player_items_view: Selling an {} to shop #{}", item.name(), shop_index);
+                        
+                        let shop = &mut world.map.shops[shop_index];
+                        let player_inventory = &mut world.player_inventory;
+                        let item_factory = &mut world.map.item_factory;
+
+                        shop.sell_item_to_shop(item, player_inventory, item_factory);
+                    },
+                }
             }
         }
     }

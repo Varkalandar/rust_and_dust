@@ -160,7 +160,7 @@ impl UiController for Game
         }
 
         if self.show_shop_inventory {
-            let shop = &world.map.shops[self.shop_view.shop_index];
+            let shop = &world.map.shops[self.shop_view.get_shop_index()];
             self.shop_view.draw(ui, target, shop, &world.player_inventory, &self.item_tiles);
         }
     }
@@ -222,7 +222,7 @@ impl UiController for Game
                         speaker.play(Sound::Click, 0.5);
                         self.show_shop_inventory = true;
                         self.show_player_inventory = false;
-                        self.shop_view.shop_index = index;
+                        self.shop_view.set_shop_index(index);
                         return true;
                     }
                 }
