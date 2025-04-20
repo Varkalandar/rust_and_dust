@@ -1,5 +1,8 @@
 use glium::Frame;
 use glium::Texture2d;
+use glium::Program;
+use glutin::surface::WindowSurface;
+use glium::Display;
 
 use crate::shop::Shop;
 use crate::item::Item;
@@ -10,6 +13,7 @@ use crate::ButtonEvent;
 use crate::MouseMoveEvent;
 use crate::ui::UI;
 use crate::ui::MouseState;
+use crate::ui::UiFont;
 use crate::views::player_items_view::PlayerItemsView;
 use crate::views::draw_item;
 use crate::views::show_item_popup;
@@ -19,7 +23,7 @@ use crate::TileSet;
 pub struct ShopView
 {
     player_items_view: PlayerItemsView,
-    shop_item_index: i32,      // the index of the shop item the mouse point is currently pointing at
+    shop_item_index: Option<usize>,      // the index of the shop item the mouse point is currently pointing at
 
     pub shop_index: usize,     // the index of the shop in the current map to show
 }
@@ -33,7 +37,7 @@ impl ShopView
         {
             player_items_view: PlayerItemsView::new(70 + 560, 10, texture),
             shop_index: 0,
-            shop_item_index: -1,
+            shop_item_index: None,
         }
     }
 
@@ -73,9 +77,9 @@ impl ShopView
         let item_index = find_item_at(event.mx, event.my);
         let shop = &mut world.map.shops[self.shop_index];
 
-        if item_index >= 0 && (item_index as usize) < shop.items.len() &&
-            shop.items[item_index as usize].calc_price() <= world.player_inventory.total_money() {
-            buy_item_from_shop(item_index as usize, shop, &mut self.player_items_view, &mut world.player_inventory);
+        if item_index.is_some() && item_index.unwrap() < shop.items.len() &&
+            shop.items[item_index.unwrap()].calc_price() <= world.player_inventory.total_money() {
+            buy_item_from_shop(item_index.unwrap(), shop, &mut self.player_items_view, &mut world.player_inventory);
         }
 
         // forward the event to the player item view
@@ -124,64 +128,14 @@ impl ShopView
 
             let limit = 17;
             let name = item.name().to_string();
-            let mut parts = name.split(" ");
-            let mut line_y = 12 - (name.len() / limit) as i32 * 8;
 
-            // try to assemble lines which are short enough for 64 pixels.
-            // we make a rough guess of about 'limit' character to fit on such a line
-
-            let mut text_line = parts.next().unwrap().to_string() + " ";
-
-            loop {
-                let mut word_opt = parts.next();
-                
-                if word_opt.is_some() {
-                    let mut word = word_opt.unwrap();
-    
-                    // collect as many words as fit into "limit" characters, but not more
-                    while text_line.len() + word.len() < limit {
-                        text_line = text_line + word + " ";
-
-                        word_opt = parts.next();
-                        if word_opt.is_none() {
-                            // no more words
-                            word = "";
-                            break;
-                        }
-                        word = word_opt.unwrap();
-                    }
-    
-                    // keep in mind, there is now one word that isn't part of the line
-                    // yet, display what we have assembled so far
-
-                    // there is a space at the end of each line, we must subract one space width
-                    let text_width = font.calc_string_width(&text_line) as i32 - 4;
-                    font.draw(&ui.display, target, &ui.program, 
-                              entry_x + (w - text_width) / 2, entry_y + line_y, &text_line, &[0.9, 0.9, 0.9, 1.0]);
-        
-                    line_y += font.lineheight;
-
-                    // now start a new text line with the remaining word
-                    text_line = word.to_string() + " ";
-                }
-                else {
-                    
-                    // draw the line as it is, even if it didn't reach "limit" characters
-                    let text_width = font.calc_string_width(&text_line) as i32 - 4;
-                    font.draw(&ui.display, target, &ui.program, 
-                              entry_x + (w - text_width) / 2, entry_y + line_y, &text_line, &[0.9, 0.9, 0.9, 1.0]);
-                    
-                    // there are no more words to process.
-                    break;
-                }
-            }
+            draw_multiline_centered(&ui.display, target, &ui.program, &name, entry_x, entry_y, w, limit, font);
 
             // display the price at the bottom
             let text_line = calculate_price_string(item); // "100c";
             let text_width = font.calc_string_width(&text_line) as i32;
             font.draw(&ui.display, target, &ui.program, 
                       entry_x + (w - text_width) / 2, entry_y + h - 18, &text_line, &[1.0, 0.9, 0.5, 1.0]);
-
 
             col += 1;
 
@@ -194,10 +148,10 @@ impl ShopView
         // if the mouse was pointing at something in the shop inventory,
         // show the item details, too
 
-        if self.shop_item_index >= 0 && (self.shop_item_index as usize) < shop.items.len() {
+        if self.shop_item_index.is_some() && self.shop_item_index.unwrap() < shop.items.len() {
             // println!("Shop item index={}", self.shop_item_index);
 
-            let item = &shop.items[self.shop_item_index as usize];
+            let item = &shop.items[self.shop_item_index.unwrap()];
             let mx = ui.context.mouse_state.position[0] as i32;
             let my = ui.context.mouse_state.position[1] as i32;
             show_item_popup(ui, target, mx, my, item);
@@ -206,10 +160,69 @@ impl ShopView
 }
 
 
+fn draw_multiline_centered(display: &Display<WindowSurface>, target: &mut Frame, program: &Program,
+                           name: &String, x: i32, y:i32,
+                            box_width: i32, limit: usize, font: &UiFont)
+{
+    let mut parts = name.split(" ");
+    let mut line_y = 12 - (name.len() / limit) as i32 * 8;
+
+    // try to assemble lines which are short enough for 64 pixels.
+    // we make a rough guess of about 'limit' character to fit on such a line
+
+    let mut text_line = parts.next().unwrap().to_string() + " ";
+
+    loop {
+        let mut word_opt = parts.next();
+        
+        if word_opt.is_some() {
+            let mut word = word_opt.unwrap();
+
+            // collect as many words as fit into "limit" characters, but not more
+            while text_line.len() + word.len() < limit {
+                text_line = text_line + word + " ";
+
+                word_opt = parts.next();
+                if word_opt.is_none() {
+                    // no more words
+                    word = "";
+                    break;
+                }
+                word = word_opt.unwrap();
+            }
+
+            // keep in mind, there is now one word that isn't part of the line
+            // yet, display what we have assembled so far
+
+            // there is a space at the end of each line, we must subract one space width
+            let text_width = font.calc_string_width(&text_line) as i32 - 4;
+            font.draw(display, target, program, 
+                      x + (box_width - text_width) / 2, y + line_y, &text_line, &[0.9, 0.9, 0.9, 1.0]);
+
+            line_y += font.lineheight;
+
+            // now start a new text line with the remaining word
+            text_line = word.to_string() + " ";
+        }
+        else {
+            
+            // draw the line as it is, even if it didn't reach "limit" characters
+            let text_width = font.calc_string_width(&text_line) as i32 - 4;
+            font.draw(display, target, program, 
+                      x + (box_width - text_width) / 2, y + line_y, &text_line, &[0.9, 0.9, 0.9, 1.0]);
+            
+            // there are no more words to process.
+            break;
+        }
+    }
+}
+
+
 fn calculate_price_string(item: &Item) -> String
 {
-    let copper = item.base_price % 100;
-    let silver = item.base_price / 100;
+    let price = item.calc_price();
+    let copper = price % 100;
+    let silver = price / 100;
     
     if silver > 0 {
         if copper > 0 {
@@ -224,7 +237,7 @@ fn calculate_price_string(item: &Item) -> String
 }
 
 
-fn find_item_at(mx: f32, my: f32) -> i32
+fn find_item_at(mx: f32, my: f32) -> Option<usize>
 {
     // these must match the display code
     let left = 84;
@@ -237,11 +250,10 @@ fn find_item_at(mx: f32, my: f32) -> i32
     let y = my as i32 - top;
 
     if x >= 0 && x < w * 5 && y >= 0 && y < h * 4 {
-        return (y / h) * 5 + x / w;
+        return Some(((y / h) * 5 + x / w) as usize);
     }
-    else {
-        return -1;
-    }
+
+    None
 }
 
 
