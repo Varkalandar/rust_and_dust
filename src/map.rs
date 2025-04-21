@@ -544,7 +544,7 @@ impl Map {
 
         let object_end_marker = "end map objects".to_string();
         while object_end_marker != line {
-            println!("line='{}'", line);
+            // println!("line='{}'", line);
             self.load_mob(line);
             line = lines.next().unwrap();
         }
@@ -554,7 +554,7 @@ impl Map {
 
         let transition_end_marker = "end map transitions".to_string();
         while transition_end_marker != line {
-            println!("line='{}'", line);
+            // println!("line='{}'", line);
             self.load_transition(line);
             line = lines.next().unwrap();
         }

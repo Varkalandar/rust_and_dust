@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use crate::item::Item;
 use crate::item::ItemKind;
+use crate::ItemFactory;
 use crate::ui::UiArea;
 
 #[derive(PartialEq, Eq, Debug, Hash, Clone, Copy)]
@@ -161,46 +162,135 @@ impl Inventory {
 
 
     /**
+     * Counts items of the given type, accumulates stack sizes
+     */
+    pub fn count(&self, key: &str) -> u32
+    {
+        let mut count = 0;
+
+        for (_key, item) in &self.bag {
+            if item.key == key {
+                count += item.stack_size;
+            }
+        }
+
+        count
+    }
+
+
+    /**
      * Reduce the currency in the inventory by the given amount
      */
-    pub fn take_money(&mut self, mut amount: u32)
+    pub fn withdraw_money(&mut self, mut amount: u32, item_factory: &mut ItemFactory)
+    {
+        let silver = amount / 100;
+        let copper = amount % 100;
+
+        let mut copper_available = self.count("copper_coin");
+
+        println!("To pay: {} silver and {} copper. Available copper is {}", silver, copper, copper_available);
+
+        if copper_available < copper {
+            // we have too few copper coins, and must convert some silver first.
+            // -> we need to convert at least and at most 1 silver coin.
+            self.split_one_silver_coin(item_factory);
+            copper_available += 100;
+        }
+
+        // we try to pay with small coins first
+        // see how much we can cover.
+
+        let n = copper_available - copper;
+        let copper_to_silver = n / 100;
+
+        // we can covert "copper_to_silver" amount of copper coins,
+        // and sill pay the copper demanded. But we might not need as
+        //  many coins, take min from silver demand and what we can convert.
+        let mut copper_to_remove = std::cmp::min(copper_to_silver, silver) * 100 + copper;
+        let mut silver_to_remove = silver - copper_to_remove / 100;
+
+        println!("Paying {} copper and {} silver.", copper_to_remove, silver_to_remove);
+
+        let mut items_to_remove = Vec::new();
+
+        for (_key, item) in &mut self.bag {
+            if item.kind == ItemKind::Currency {
+
+                if "copper_coin" == item.key {
+                    let mut available = item.stack_size;
+
+                    if available > copper_to_remove {
+                        item.stack_size -= copper_to_remove;
+                        copper_to_remove = 0;
+                    }
+                    else {
+                        items_to_remove.push(item.id);
+                        copper_to_remove -= available;
+                    }
+                }
+            }
+
+            if copper_to_remove == 0 { break; }
+        }
+
+        // now, pay the rest in silver
+
+        for (_key, item) in &mut self.bag {
+            if item.kind == ItemKind::Currency {
+
+                if "silver_coin" == item.key {
+                    let mut available = item.stack_size;
+
+                    if available > silver_to_remove {
+                        item.stack_size -= silver_to_remove;
+                        silver_to_remove = 0;
+                    }
+                    else {
+                        items_to_remove.push(item.id);
+                        silver_to_remove -= available;
+                    }
+                }
+            }
+
+            if silver_to_remove == 0 { break; }
+        }
+
+        // clean up empty coin stacks
+        for id in items_to_remove {
+            self.remove_item(id);
+        }        
+    }
+
+
+    fn split_one_silver_coin(&mut self, item_factory: &mut ItemFactory) 
     {
         let mut items_to_remove = Vec::new();
 
         for (_key, item) in &mut self.bag {
             if item.kind == ItemKind::Currency {
-                let mut count = item.stack_size;
 
                 if "silver_coin" == item.key {
-                    if count * 100 > amount {
-                        let reduction = amount / 100;
-                        item.stack_size -= reduction;
-                        amount = amount - reduction * 100;
-                    }
-                    else {
-                        items_to_remove.push(item.id);
-                        amount -= count * 100;
-                    }
-                }
+                    let mut available = item.stack_size;
 
-                if "copper_coin" == item.key {
-                    if count > amount {
-                        item.stack_size -= amount;
-                        amount = 0;
+                    if available > 1 {
+                        item.stack_size -= 1;
                     }
                     else {
                         items_to_remove.push(item.id);
-                        amount -= count;
                     }
                 }
             }
-
-            if amount == 0 { break; }
         }
-
+        
+        // clean up empty coin stacks
         for id in items_to_remove {
             self.remove_item(id);
-        }
+        }        
+
+        // and add the 100 copper coins
+        let mut copper_coins = item_factory.create_base("copper_coin");
+        copper_coins.stack_size = 100;
+        self.put_item(copper_coins, Slot::Bag);
     }
 
 

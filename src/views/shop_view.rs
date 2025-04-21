@@ -6,6 +6,7 @@ use glium::Display;
 
 use crate::shop::Shop;
 use crate::item::Item;
+use crate::ItemFactory;
 use crate::Inventory;
 use crate::Slot;
 use crate::GameWorld;
@@ -90,7 +91,9 @@ impl ShopView
 
         if item_index.is_some() && item_index.unwrap() < shop.items.len() &&
             shop.items[item_index.unwrap()].calc_price() <= world.player_inventory.total_money() {
-            buy_item_from_shop(item_index.unwrap(), shop, &mut self.player_items_view, &mut world.player_inventory);
+            buy_item_from_shop(item_index.unwrap(), shop, 
+                               &mut self.player_items_view, &mut world.player_inventory,
+                               &mut world.map.item_factory);
         }
 
         // forward the event to the player item view
@@ -269,11 +272,12 @@ fn find_item_at(mx: f32, my: f32) -> Option<usize>
 
 
 fn buy_item_from_shop(item_index: usize, shop: &mut Shop, 
-                      piv: &mut PlayerItemsView, inventory: &mut Inventory)
+                      piv: &mut PlayerItemsView, inventory: &mut Inventory,
+                      item_factory: &mut ItemFactory)
 {
     let item = shop.items.remove(item_index);
     piv.hover_item = Some(item.id);
-    inventory.take_money(item.calc_price());
+    inventory.withdraw_money(item.calc_price(), item_factory);
     inventory.put_item(item, Slot::OnCursor);
 }
  
