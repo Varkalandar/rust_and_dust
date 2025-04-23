@@ -7,6 +7,8 @@ use crate::item::Item;
 use crate::Inventory;
 use crate::Slot;
 
+const MAGIC_ITEM_CHANCE: f32 = 0.4;
+const MAGIC_FIND_FACTOR: f32 = 0.8;
 
 pub struct Shop
 {
@@ -34,8 +36,7 @@ impl Shop
         let mut rng = rand::rngs::StdRng::seed_from_u64(12345678901);
 
         for _i in 0 .. 20 {
-            let mod_count = rng.random_range(0..3);
-            let item = item_factory.create_random(&mut rng, 1, mod_count);
+            let item = item_factory.create_random_item(&mut rng, 1, 6, MAGIC_ITEM_CHANCE, MAGIC_FIND_FACTOR);
             self.items.push(item);
         }
     }

@@ -27,6 +27,10 @@ use crate::generate_dungeon;
 use crate::map_pos;
 
 
+const MAGIC_ITEM_CHANCE: f32 = 0.4;
+const MAGIC_FIND_FACTOR: f32 = 0.8;
+
+
 pub struct Game 
 {
     piv: PlayerItemsView,
@@ -307,7 +311,7 @@ fn drop_loot<R: Rng + ?Sized>(map: &mut Map, killed_mob_list: Vec<MapObject>,
 {
     // todo: monster or area levels
     for mob in killed_mob_list {
-        let item = map.item_factory.create_random(rng, 1, 5);
+        let item = map.item_factory.create_random_item(rng, 1, 6, MAGIC_ITEM_CHANCE, MAGIC_FIND_FACTOR);
 
         map.place_item(item, mob.position);
         speaker.play(Sound::Click, 0.2);
