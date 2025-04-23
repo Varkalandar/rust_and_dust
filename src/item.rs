@@ -147,6 +147,18 @@ impl Item
     }
 
 
+    pub fn has_mod_type(&self, attribute: Attribute) -> bool
+    {
+        for modifier in &self.mods {
+            if modifier.attribute == attribute {
+                return true;
+            }
+        }
+
+        false
+    }
+
+
     pub fn print_debug(&self) 
     {
         println!("{}", self.name());
@@ -241,18 +253,15 @@ impl ItemFactory
 
         let mut item = self.create(&matches[index], rng);
 
-        for _i in 0..mod_count {
-            self.add_random_mod(&mut item, rng);
-        }
+        self.add_random_mods(&mut item, rng, mod_count);
 
         item
     }
 
 
-    fn add_random_mod<R: Rng + ?Sized>(&self, item: &mut Item, rng: &mut R)
+    fn add_random_mods<R: Rng + ?Sized>(&self, item: &mut Item, rng: &mut R, mod_count: u32)
     {
-
-        let keys: Vec<&String> = 
+        let mut keys: Vec<&String> = 
             self.proto_mods.keys().filter( |mod_key| -> bool 
                 {
                     if item.kind == ItemKind::Scroll || 
@@ -266,15 +275,26 @@ impl ItemFactory
                 }
             ).collect();
         
-        // Are there suitable mods for this item at all?
-        if keys.len() > 0 {
+
+        for _i in 0 .. mod_count {
+            
+            if keys.len() == 0 {
+                // there are no more suitable mods for this item
+                break;
+            }
+
             let n = rng.random_range(0 .. keys.len());
+            let key = keys.remove(n);
+            let proto_mod = self.proto_mods.get(key).unwrap();
 
-            let proto_mod = self.proto_mods.get(keys[n]).unwrap();
-    
-            let modifier = random_from_range(&proto_mod, rng, ModKind::Echanted);
-
-            item.mods.push(modifier);
+            if item.has_mod_type(proto_mod.attribute.clone()) {
+                // a mod of this type is already on the item, 
+                // we don't ad another one of the same type.
+            }
+            else {
+                let modifier = random_from_range(proto_mod, rng, ModKind::Echanted);
+                item.mods.push(modifier);
+            }
         }
     }
 }
