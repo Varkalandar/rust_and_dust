@@ -181,7 +181,7 @@ impl Inventory {
     /**
      * Reduce the currency in the inventory by the given amount
      */
-    pub fn withdraw_money(&mut self, mut amount: u32, item_factory: &mut ItemFactory)
+    pub fn withdraw_money(&mut self, amount: u32, item_factory: &mut ItemFactory)
     {
         let silver = amount / 100;
         let copper = amount % 100;
@@ -217,7 +217,7 @@ impl Inventory {
             if item.kind == ItemKind::Currency {
 
                 if "copper_coin" == item.key {
-                    let mut available = item.stack_size;
+                    let available = item.stack_size;
 
                     if available > copper_to_remove {
                         item.stack_size -= copper_to_remove;
@@ -239,7 +239,7 @@ impl Inventory {
             if item.kind == ItemKind::Currency {
 
                 if "silver_coin" == item.key {
-                    let mut available = item.stack_size;
+                    let available = item.stack_size;
 
                     if available > silver_to_remove {
                         item.stack_size -= silver_to_remove;
@@ -270,7 +270,7 @@ impl Inventory {
             if item.kind == ItemKind::Currency {
 
                 if "silver_coin" == item.key {
-                    let mut available = item.stack_size;
+                    let available = item.stack_size;
 
                     if available > 1 {
                         item.stack_size -= 1;

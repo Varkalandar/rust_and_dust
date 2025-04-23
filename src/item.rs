@@ -41,7 +41,7 @@ pub struct ItemPrototype
     pub key: String,              // for prototype lookup
     pub singular: String,         // name for stack size == 1
     pub plural: String,           // name for stack size >= 2
-    pub mods: Vec<Mod>,
+    pub mods: Vec<ModPrototype>,
     
     pub inventory_tile_id: usize,
     pub inventory_w: i32,
@@ -159,6 +159,7 @@ pub struct ItemFactory
     next_id: u64,
 
     proto_items: HashMap<String, ItemPrototype>,
+    proto_mods: HashMap<String, ModPrototype>,
 }
 
 
@@ -166,11 +167,13 @@ impl ItemFactory
 {
     pub fn new() -> ItemFactory 
     {
-        let proto_items = read_proto_items();
-        
+        let proto_mods = read_proto_mods();
+        let proto_items = read_proto_items(&proto_mods);
+
         ItemFactory {
             next_id: 0,
             proto_items,
+            proto_mods,
         }
     }
 
@@ -240,7 +243,7 @@ impl ItemFactory
 }
 
 
-fn read_proto_items() -> HashMap<String, ItemPrototype> 
+fn read_proto_items(proto_mods: &HashMap<String, ModPrototype>) -> HashMap<String, ItemPrototype> 
 {
     let lines = read_lines("resources/items/items.csv");
     let mut proto_items: HashMap<String, ItemPrototype> = HashMap::new();
@@ -271,9 +274,36 @@ fn read_proto_items() -> HashMap<String, ItemPrototype>
                     base_price: parts.next().unwrap().parse::<u32>().unwrap(),
 
                     drop_effect: parse_drop_effect(parts.next().unwrap()),
-                    mods: parse_mods(&mut parts),
+                    mods: parse_mods(&mut parts, proto_mods),
                     activation: Activation::None,
                     description: parts.next().unwrap().to_string(),
+                }
+            );
+        }
+    }
+
+    proto_items
+}
+
+
+fn read_proto_mods() -> HashMap<String, ModPrototype> 
+{
+    let lines = read_lines("resources/items/modifiers.csv");
+    let mut proto_items: HashMap<String, ModPrototype> = HashMap::new();
+
+    for i in 1..lines.len() {
+        let mut parts = lines[i].split(",");
+        let key = parts.next().unwrap().to_string();
+        
+        // ignore empty lines, they are just to separate sections
+        if key.len() > 0 {
+            proto_items.insert(
+                key.to_string(),
+                ModPrototype {
+                    attribute: parse_attribute(parts.next().unwrap()),
+                    min_value: parts.next().unwrap().parse::<i32>().unwrap(),
+                    max_value: parts.next().unwrap().parse::<i32>().unwrap(),
+                    unit: parse_unit(parts.next().unwrap()),
                 }
             );
         }
@@ -304,7 +334,7 @@ fn calc_slot(v: i32) -> Slot
 }
 
 
-fn parse_mods(parts: &mut Split<&str>) -> Vec<Mod>
+fn parse_mods(parts: &mut Split<&str>, proto_mods: &HashMap<String, ModPrototype>) -> Vec<ModPrototype>
 {
     let mut result = Vec::new();
 
@@ -314,18 +344,6 @@ fn parse_mods(parts: &mut Split<&str>) -> Vec<Mod>
             let key = key.unwrap();
 
             match key {
-                "spell_dam" => {
-                    result.push(parse_mod(parts.next(), Attribute::SpellDamage, Unit::Integer));
-                }
-                "res_fire" => {
-                    result.push(parse_mod(parts.next(), Attribute::ResFire, Unit::Percent));
-                }
-                "res_light" => {
-                    result.push(parse_mod(parts.next(), Attribute::ResLight, Unit::Percent));
-                }
-                "res_cold" => {
-                    result.push(parse_mod(parts.next(), Attribute::ResCold, Unit::Percent));
-                }
                 "info" => {
                     // info must be the last key and it's not a mod, 
                     // so we stop parsing mods here
@@ -336,7 +354,13 @@ fn parse_mods(parts: &mut Split<&str>) -> Vec<Mod>
                     break;
                 }
                 _ => {
-                    println!("parse_mods: unknown modifier key found: '{}'", key);
+                    let mod_opt = proto_mods.get(key);
+                    if mod_opt.is_some() {
+                        result.push(mod_opt.unwrap().clone());
+                    }
+                    else {
+                        panic!("parse_mods: unknown modifier key found: '{}'", key);
+                    }
                 } 
             }
         }
@@ -359,6 +383,27 @@ fn parse_mod(input: Option<&str>, attribute: Attribute, unit: Unit) -> Mod
         min_value,
         max_value,
         unit,
+    }
+}
+
+
+fn parse_attribute(input: &str) -> Attribute
+{
+    match input {
+        "res_fire" => Attribute::ResFire,
+        "res_light" => Attribute::ResLight,
+        "res_cold" => Attribute::ResCold,
+        "spell_dam" => Attribute::SpellDamage,
+        _ => panic!("parse_attribute: unknown attribute {}", input),
+    }
+}
+
+
+fn parse_unit(input: &str) -> Unit
+{
+    match input {
+        "%" => Unit::Percent,
+        _ => Unit::Integer,
     }
 }
 
@@ -469,12 +514,22 @@ impl std::fmt::Display for Unit {
 
 
 #[derive(Debug, Clone)]
+struct ModPrototype {
+    pub attribute: Attribute,
+    pub min_value: i32,
+    pub max_value: i32,
+    pub unit: Unit,
+}
+
+
+#[derive(Debug, Clone)]
 pub struct Mod {
     pub attribute: Attribute,
     pub min_value: i32,
     pub max_value: i32,
     pub unit: Unit,
 }
+
 
 impl Mod 
 {
@@ -504,7 +559,7 @@ impl Mod
 }
 
 
-fn process_proto_mods<R: Rng + ?Sized>(mods: &Vec<Mod>, rng: &mut R) -> Vec<Mod>
+fn process_proto_mods<R: Rng + ?Sized>(mods: &Vec<ModPrototype>, rng: &mut R) -> Vec<Mod>
 {
     let mut result = Vec::with_capacity(mods.len());
 
@@ -518,21 +573,21 @@ fn process_proto_mods<R: Rng + ?Sized>(mods: &Vec<Mod>, rng: &mut R) -> Vec<Mod>
             result.push(random_from_range(modifier, rng));
         }
         else {
-            result.push(modifier.clone());
+            result.push(random_from_range(modifier, rng));
         }
     }
-
 
     result
 }
 
 
-fn random_from_range<R: Rng + ?Sized>(modifier: &Mod, rng: &mut R) -> Mod 
+fn random_from_range<R: Rng + ?Sized>(modifier: &ModPrototype, rng: &mut R) -> Mod 
 {
-    let mut new = modifier.clone();
     let actual_value = rng.random_range(modifier.min_value .. modifier.max_value);
-    new.min_value = actual_value;
-    new.max_value = actual_value;
-
-    new
+    Mod {
+        attribute: modifier.attribute.clone(),
+        min_value: actual_value,
+        max_value: actual_value,
+        unit: modifier.unit.clone(),
+    }
 }
