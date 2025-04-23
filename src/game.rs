@@ -307,7 +307,7 @@ fn drop_loot<R: Rng + ?Sized>(map: &mut Map, killed_mob_list: Vec<MapObject>,
 {
     // todo: monster or area levels
     for mob in killed_mob_list {
-        let item = map.item_factory.create_random(rng, 1);
+        let item = map.item_factory.create_random(rng, 1, 5);
 
         map.place_item(item, mob.position);
         speaker.play(Sound::Click, 0.2);

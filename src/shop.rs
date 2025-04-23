@@ -1,5 +1,6 @@
 use std::vec::Vec;
 use rand::SeedableRng;
+use rand::Rng;
 
 use crate::ItemFactory;
 use crate::item::Item;
@@ -33,7 +34,8 @@ impl Shop
         let mut rng = rand::rngs::StdRng::seed_from_u64(12345678901);
 
         for _i in 0 .. 20 {
-            let item = item_factory.create_random(&mut rng, 1);
+            let mod_count = rng.random_range(0..3);
+            let item = item_factory.create_random(&mut rng, 1, mod_count);
             self.items.push(item);
         }
     }

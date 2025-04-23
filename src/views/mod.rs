@@ -11,6 +11,7 @@ use crate::UI;
 use crate::BlendMode;
 use crate::draw_texture_wb;
 use crate::TileSet;
+use crate::item::ModKind;
 
 
 pub fn show_item_popup(ui: &UI, target: &mut Frame,
@@ -62,7 +63,10 @@ pub fn show_item_popup(ui: &UI, target: &mut Frame,
 
     for modifier in &item.mods {
         let text = modifier.assemble_mod_line_text();
-        font.draw(&ui.display, target, &ui.program, left, line, &text, &[0.8, 0.8, 0.8, 1.0]);
+
+        let color = if modifier.kind == ModKind::Implicit {&[0.8, 0.8, 0.8, 1.0]} else {&[0.6, 0.8, 1.0, 1.0]};
+
+        font.draw(&ui.display, target, &ui.program, left, line, &text, color);
         line += line_space;
     }
 

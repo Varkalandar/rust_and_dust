@@ -223,7 +223,8 @@ impl ItemFactory
     }
 
 
-    pub fn create_random<R: Rng + ?Sized>(&mut self, rng: &mut R, area_level: u32) -> Item
+    pub fn create_random<R: Rng + ?Sized>(&mut self, rng: &mut R, 
+                                          area_level: u32, mod_count: u32) -> Item
     {
         let mut matches = Vec::with_capacity(self.proto_items.len());
 
@@ -238,7 +239,43 @@ impl ItemFactory
         // pick a random one
         let index = rng.random_range(0 .. matches.len());
 
-        self.create(&matches[index], rng)
+        let mut item = self.create(&matches[index], rng);
+
+        for _i in 0..mod_count {
+            self.add_random_mod(&mut item, rng);
+        }
+
+        item
+    }
+
+
+    fn add_random_mod<R: Rng + ?Sized>(&self, item: &mut Item, rng: &mut R)
+    {
+
+        let keys: Vec<&String> = 
+            self.proto_mods.keys().filter( |mod_key| -> bool 
+                {
+                    if item.kind == ItemKind::Scroll || 
+                       item.kind == ItemKind::Currency {
+                        return false
+                    }
+                    else {
+                        // we allow all mods for testing
+                        true
+                    }
+                }
+            ).collect();
+        
+        // Are there suitable mods for this item at all?
+        if keys.len() > 0 {
+            let n = rng.random_range(0 .. keys.len());
+
+            let proto_mod = self.proto_mods.get(keys[n]).unwrap();
+    
+            let modifier = random_from_range(&proto_mod, rng, ModKind::Echanted);
+
+            item.mods.push(modifier);
+        }
     }
 }
 
@@ -374,19 +411,6 @@ fn parse_mods(parts: &mut Split<&str>, proto_mods: &HashMap<String, ModPrototype
 }
 
 
-fn parse_mod(input: Option<&str>, attribute: Attribute, unit: Unit) -> Mod 
-{
-    let (min_value, max_value) = parse_range(input.unwrap());
-
-    Mod { 
-        attribute,
-        min_value,
-        max_value,
-        unit,
-    }
-}
-
-
 fn parse_attribute(input: &str) -> Attribute
 {
     match input {
@@ -513,6 +537,13 @@ impl std::fmt::Display for Unit {
 }
 
 
+#[derive(Clone, Debug, PartialEq)]
+pub enum ModKind {
+    Implicit,      // part of the item itself
+    Echanted,      // These can be added/removed/modified 
+}
+
+
 #[derive(Debug, Clone)]
 struct ModPrototype {
     pub attribute: Attribute,
@@ -528,6 +559,7 @@ pub struct Mod {
     pub min_value: i32,
     pub max_value: i32,
     pub unit: Unit,
+    pub kind: ModKind,
 }
 
 
@@ -570,10 +602,10 @@ fn process_proto_mods<R: Rng + ?Sized>(mods: &Vec<ModPrototype>, rng: &mut R) ->
            modifier.attribute == Attribute::ResCold {
             // the proto mod is a range, we need to pick one value
             // from that range to produce a concrete mod for our item
-            result.push(random_from_range(modifier, rng));
+            result.push(random_from_range(modifier, rng, ModKind::Implicit));
         }
         else {
-            result.push(random_from_range(modifier, rng));
+            result.push(random_from_range(modifier, rng, ModKind::Implicit));
         }
     }
 
@@ -581,7 +613,7 @@ fn process_proto_mods<R: Rng + ?Sized>(mods: &Vec<ModPrototype>, rng: &mut R) ->
 }
 
 
-fn random_from_range<R: Rng + ?Sized>(modifier: &ModPrototype, rng: &mut R) -> Mod 
+fn random_from_range<R: Rng + ?Sized>(modifier: &ModPrototype, rng: &mut R, kind: ModKind) -> Mod 
 {
     let actual_value = rng.random_range(modifier.min_value .. modifier.max_value);
     Mod {
@@ -589,5 +621,6 @@ fn random_from_range<R: Rng + ?Sized>(modifier: &ModPrototype, rng: &mut R) -> M
         min_value: actual_value,
         max_value: actual_value,
         unit: modifier.unit.clone(),
+        kind,
     }
 }
