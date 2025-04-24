@@ -5,7 +5,7 @@ use glium::winit::keyboard::Key;
 use glium::winit::keyboard::NamedKey;
 use glium::Frame;
 
-use crate::ui::{UI, UiController, UiComponent, TileSet, MouseButton, Button, ButtonState, ButtonEvent, MouseMoveEvent, ScrollEvent};
+use crate::ui::*;
 use crate::map::{MAP_GROUND_LAYER, MAP_OBJECT_LAYER, MAP_CLOUD_LAYER};
 use crate::Map;
 use crate::GameWorld;
@@ -331,18 +331,18 @@ impl UiController for MapEditor {
 
         let font = &ui.context.font_14;
         
-        font.draw(&ui.display, target, &ui.program, 10, 20, "Press F1 to see editor hotkeys", &[1.0, 1.0, 1.0, 1.0]);
-        font.draw(&ui.display, target, &ui.program, 10, 40, "Press g to enter game mode", &[1.0, 1.0, 1.0, 1.0]);
+        font.draw(&ui.display, target, &ui.program, 10, 20, "Press F1 to see editor hotkeys", &WHITE);
+        font.draw(&ui.display, target, &ui.program, 10, 40, "Press g to enter game mode", &WHITE);
 
         let layer_msg = 
             "Selected layer: ".to_string() + &(layer_id + 1).to_string() + 
             "  Selected tile: " + &self.selected_tile_id.to_string();
 
-        font.draw(&ui.display, target, &ui.program, 10, (ui.context.window_size[1] - 24) as i32, &layer_msg, &[1.0, 1.0, 1.0, 1.0]);
+        font.draw(&ui.display, target, &ui.program, 10, (ui.context.window_size[1] - 24) as i32, &layer_msg, &WHITE);
 
 
         if self.show_editor_keys {
-            let color = [1.0, 1.0, 1.0, 1.0];
+            let color = WHITE;
             let line_space = 20;
             let left = 100;
             let mut top = 100;

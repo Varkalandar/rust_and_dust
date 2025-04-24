@@ -22,7 +22,7 @@ use geo::Coord;
 use geo::Polygon;
 use geo::CoordsIter;
 
-use crate::ui::UiArea;
+use crate::ui::*;
 
 #[derive(Copy, Clone)]
 pub struct Vertex {

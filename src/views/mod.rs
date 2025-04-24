@@ -7,7 +7,7 @@ use glium::Program;
 
 use crate::Activation;
 use crate::item::Item;
-use crate::UI;
+use crate::ui::*;
 use crate::BlendMode;
 use crate::draw_texture_wb;
 use crate::TileSet;
@@ -38,33 +38,33 @@ pub fn show_item_popup(ui: &UI, target: &mut Frame,
         line_count += 
         ui.context.font_10.draw_multiline(&ui.display, target, &ui.program, 
                                           0, 0, box_width,
-                                          &item.description, &[0.8, 0.8, 0.8, 1.0], false);
+                                          &item.description, &OFF_WHITE, false);
     }
 
     let mut line = y - line_count * line_space;
     let bottom_margin = if line_count > 1 {8} else {4};
 
     ui.fill_box(target, x, line, box_width, (line_count * line_space) + bottom_margin, &[0.1, 0.1, 0.1, 0.9]);
-    ui.draw_box(target, x, line, box_width, (line_count * line_space) + bottom_margin, &[0.6, 0.6, 0.6, 1.0]);
+    ui.draw_box(target, x, line, box_width, (line_count * line_space) + bottom_margin, &LIGHT_GREY);
 
     line += 5;
 
     let headline_width = font.calc_string_width(&item.name()) as i32;
-    font.draw(&ui.display, target, &ui.program, x + (box_width - headline_width) / 2, line, &item.name(), &[1.0, 1.0, 1.0, 1.0]);
+    font.draw(&ui.display, target, &ui.program, x + (box_width - headline_width) / 2, line, &item.name(), &WHITE);
 
     line += 2;
     line += line_space;
 
     if item.activation != Activation::None {
         font.draw(&ui.display, target, &ui.program, left, line, 
-                  "Activation: Fireball", &[0.8, 0.8, 0.8, 1.0]);
+                  "Activation: Fireball", &OFF_WHITE);
                   line += line_space;
     }
 
     for modifier in &item.mods {
         let text = modifier.assemble_mod_line_text();
 
-        let color = if modifier.kind == ModKind::Implicit {&[0.8, 0.8, 0.8, 1.0]} else {&[0.6, 0.8, 1.0, 1.0]};
+        let color = if modifier.kind == ModKind::Implicit {&OFF_WHITE} else {&[0.6, 0.8, 1.0, 1.0]};
 
         font.draw(&ui.display, target, &ui.program, left, line, &text, color);
         line += line_space;
@@ -73,7 +73,7 @@ pub fn show_item_popup(ui: &UI, target: &mut Frame,
     if item.description.len() > 0 {
         ui.context.font_10.draw_multiline(&ui.display, target, &ui.program, 
                                           left, line, box_width,
-                                          &item.description, &[0.8, 0.8, 0.8, 1.0], true);
+                                          &item.description, &OFF_WHITE, true);
         // line += line_space;
     }
 }

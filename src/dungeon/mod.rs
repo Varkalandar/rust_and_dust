@@ -17,6 +17,7 @@ use crate::map::MapTransition;
 use crate::map::TransitionDestination;
 use crate::ItemFactory;
 use crate::item::Item;
+use crate::WHITE;
 
 
 pub struct Room {
@@ -203,7 +204,7 @@ fn furnish_dungeon<R: Rng + ?Sized>(dungeon: &Dungeon, map: &mut Map, rng: &mut 
 
     // place entrance stairs
     place_wall_tile(map, dungeon.rooms[0].x2, dungeon.rooms[0].y1, 
-                    0, 248, [1.0, 1.0, 1.0, 1.0]);
+                    0, 248, WHITE);
 
     let destination = TransitionDestination::Map {to_map: 0, to_location: [720.0, 1802.0]};
 
@@ -223,7 +224,7 @@ fn build_room<R: Rng + ?Sized>(map: &mut Map, rng: &mut R,
                                sx: i32, sy: i32, dx: i32, dy: i32,
                                entrances: &[i32]) {
 
-    let wall_color = [1.0, 1.0, 1.0, 1.0];
+    let wall_color = WHITE;
 
     for y in sy .. dy + 1 {
         for x in sx .. dx + 1 {
@@ -452,7 +453,7 @@ fn build_tunnel_from_coordinates(map: &mut Map, floors: &HashMap<i32, [i32; 2]>)
         // if end_piece { println!("End piece detected at {}, {}", x, y); }
 
         // placement helper
-        // place_wall_tile(map, x, y+1, 0, 692, [1.0, 1.0, 1.0, 1.0]);
+        // place_wall_tile(map, x, y+1, 0, 692, WHITE);
 
         // place walls if there is no connection
 

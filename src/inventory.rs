@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use crate::item::Item;
 use crate::item::ItemKind;
 use crate::ItemFactory;
-use crate::ui::UiArea;
+use crate::ui::*;
 
 #[derive(PartialEq, Eq, Debug, Hash, Clone, Copy)]
 pub enum Slot {

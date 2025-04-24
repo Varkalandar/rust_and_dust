@@ -12,9 +12,9 @@ use crate::Slot;
 use crate::GameWorld;
 use crate::ButtonEvent;
 use crate::MouseMoveEvent;
-use crate::ui::UI;
-use crate::ui::MouseState;
-use crate::ui::UiFont;
+use crate::ui::*;
+use crate::ui::*;
+use crate::ui::*;
 use crate::views::player_items_view::PlayerItemsView;
 use crate::views::draw_item;
 use crate::views::show_item_popup;
@@ -66,20 +66,20 @@ impl ShopView
         let height = (size[1] as i32) - top * 2;
 
         ui.draw_box(target, left, top, width, height, &[0.6, 0.6, 0.6, 1.0]);
-        ui.fill_box(target, left + 1, top + 1, width - 2, height -2 , &[0.08, 0.06, 0.03, 1.0]);
+        ui.fill_box(target, left + 1, top + 1, width - 2, height - 2 , &[0.08, 0.06, 0.03, 1.0]);
 
         self.player_items_view.draw(ui, target, 0, 0, player_inventory, item_tiles);
 
         let font = &ui.context.font_24;
 
         font.draw(&ui.display, target, &ui.program, 
-                  left + 10, top + 20, &shop.name, &[1.0, 1.0, 1.0, 1.0]);
+                  left + 10, top + 20, &shop.name, &WHITE);
 
         self.draw_shop_inventory(ui, target, shop, item_tiles, player_inventory.total_money());
 
         let text = "Drop items here to sell.";
         font.draw(&ui.display, target, &ui.program, 
-                  left + 130, top + 570, text, &[1.0, 0.8, 0.2, 1.0]);
+                  left + 130, top + 570, text, &ORANGE);
     }
 
 

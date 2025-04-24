@@ -6,7 +6,7 @@ use glium::Frame;
 
 use rand::Rng;
 
-use crate::ui::{UI, UiController, MouseButton, Button, ButtonState, ButtonEvent, MouseMoveEvent, ScrollEvent};
+use crate::ui::*;
 use crate::GameWorld;
 use crate::move_player;
 use crate::screen_to_world_pos;
@@ -172,7 +172,7 @@ impl UiController for Game
 
     fn draw_overlay(&mut self, target: &mut Frame, ui: &mut UI, _world: &mut Self::Appdata) 
     {
-        ui.context.font_14.draw(&ui.display, target, &ui.program, 10, 20, "Game testing mode", &[1.0, 1.0, 1.0, 1.0]);
+        ui.context.font_14.draw(&ui.display, target, &ui.program, 10, 20, "Game testing mode", &WHITE);
     }
 
 

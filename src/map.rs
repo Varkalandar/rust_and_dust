@@ -33,6 +33,7 @@ use crate::parse_rgba;
 use crate::gl_support::BlendMode;
 use crate::Slot;
 use crate::generate_dungeon;
+use crate::WHITE;
 
 
 pub const MAP_GROUND_LAYER:usize = 0;
@@ -85,8 +86,8 @@ impl Map {
             phases: 1, 
             height: 24.0,
             scale: 0.75,
-            color: [1.0, 1.0, 1.0, 1.0],
-            glow: [1.0, 1.0, 1.0, 1.0],
+            color: WHITE,
+            glow: WHITE,
             blend: BlendMode::Blend,
             particles: ParticleDriver::new(),       
         };
@@ -99,8 +100,8 @@ impl Map {
             phases: 1, 
             height: 24.0,
             scale: 1.5,
-            color: [1.0, 1.0, 1.0, 1.0],
-            glow: [1.0, 1.0, 1.0, 1.0],
+            color: WHITE,
+            glow: WHITE,
             blend: BlendMode::Blend,
             particles: ParticleDriver::new(),       
         };
@@ -957,8 +958,8 @@ impl MapObjectFactory {
             tileset_id,
             height,
             scale,
-            color: [1.0, 1.0, 1.0, 1.0],
-            glow: [1.0, 1.0, 1.0, 1.0],
+            color: WHITE,
+            glow: WHITE,
             blend: BlendMode::Blend,
             particles: ParticleDriver::new(),
         };

@@ -55,7 +55,7 @@ mod gl_support;
 
 use dungeon::*;
 use map::{Map, MAP_GROUND_LAYER, MAP_OBJECT_LAYER, MAP_CLOUD_LAYER, MoveEndAction};
-use ui::{UI, UiController, TileSet, Button, ButtonState, ButtonArgs, MouseButton, ButtonEvent, MouseMoveEvent, ScrollEvent};
+use ui::*;
 use editor::MapEditor;
 use game::Game;
 use item::ItemFactory;
@@ -241,7 +241,6 @@ impl App {
      * @return true if the display must be updated too, false otherwise.
      */
     fn update(&mut self) -> bool {
-        let world = &mut self.world;
 
         let now = SystemTime::now();
         let difference = now.duration_since(self.update_time);
@@ -251,7 +250,8 @@ impl App {
 
             // try to limit to 100 updates per second
             if secs < 0.01 {
-                // too early
+                // too early, sleep a bit
+                sleep(Duration::from_millis(5));
                 return false;
             }
 
@@ -259,6 +259,7 @@ impl App {
 
             // println!("seconds: {}", secs);
 
+            let world = &mut self.world;
             let reload = self.controllers.current().update(world, secs);
 
             if reload {
@@ -315,7 +316,7 @@ impl App {
         match &self.world.map_backdrop {
             None => {
                 draw_texture(&self.ui.display, &mut target, &self.ui.program, BlendMode::Blend, &self.world.black_texture, 
-                    0.0, 0.0, 1000.0, 1000.0, &[1.0, 1.0, 1.0, 1.0]);
+                    0.0, 0.0, 1000.0, 1000.0, &WHITE);
             },
             Some(map_backdrop) => {
                 draw_texture(&self.ui.display, &mut target, &self.ui.program, BlendMode::Blend, 
@@ -366,7 +367,7 @@ impl App {
             let s = format!("Time: {}s", secs);
             let font = &self.ui.context.font_14;
         
-            font.draw(&self.ui.display, &mut target, &self.ui.program, 10, 600, &s, &[1.0, 1.0, 1.0, 1.0]);
+            font.draw(&self.ui.display, &mut target, &self.ui.program, 10, 600, &s, &WHITE);
         }
         
 
@@ -539,7 +540,7 @@ impl App {
                 BlendMode::Blend,
                 tex_white,
                 &area,
-                &[1.0, 1.0, 1.0, 1.0]);
+                &WHITE);
         }
     }
 

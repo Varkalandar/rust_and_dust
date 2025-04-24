@@ -2,6 +2,7 @@ use vecmath::Vector2;
 
 mod tileset;
 mod font;
+mod color;
 
 use std::rc::Rc;
 use std::cmp::{min, max};
@@ -18,6 +19,8 @@ use glium::VertexBuffer;
 
 pub use tileset::*;
 pub use font::UiFont;
+pub use color::*;
+
 use crate::BlendMode;
 use crate::gl_support::texture_from_data;
 use crate::gl_support::draw_texture_wb;
@@ -624,7 +627,7 @@ impl UiHead for UiButton {
         let label_x = x + (area.w - label_width) / 2;
         let label_y = y + (area.h - self.font.lineheight) / 2;
 
-        self.font.draw(display, target, program, label_x, label_y, &self.label, &[1.0, 1.0, 1.0, 1.0]);
+        self.font.draw(display, target, program, label_x, label_y, &self.label, &WHITE);
     } 
 }
 
@@ -678,7 +681,7 @@ impl UiHead for UiIcon
             image_y, 
             0.25, 
             0.25,
-            &[1.0, 1.0, 1.0, 1.0], 
+            &WHITE, 
             &context.scissors);    
 
         let label_width = self.font.calc_string_width(&self.label) as i32;
@@ -939,7 +942,7 @@ impl UiHead for UiColorchoice
             yp as f32, 
             (bw - 4) as f32 / 16.0, 
             (bw - 4) as f32 / 16.0, 
-            &[1.0, 1.0, 1.0, 1.0], 
+            &WHITE, 
             &context.scissors);    
 
         // lightness
@@ -951,7 +954,7 @@ impl UiHead for UiColorchoice
             yp as f32, 
             1.0, 
             1.0, 
-            &[1.0, 1.0, 1.0, 1.0], 
+            &WHITE, 
             &context.scissors);
             
         // transparency
@@ -963,7 +966,7 @@ impl UiHead for UiColorchoice
             (yp + bw) as f32, 
             1.0, 
             1.0, 
-            &[1.0, 1.0, 1.0, 1.0], 
+            &WHITE, 
             &context.scissors);
 
         // color
@@ -975,35 +978,35 @@ impl UiHead for UiColorchoice
             (yp + bw) as f32, 
             1.0, 
             1.0, 
-            &[1.0, 1.0, 1.0, 1.0], 
+            &WHITE, 
             &context.scissors);
 
         /*
         gl.draw(viewport, |c, gl| {
             
             // white "reset" area
-            let rect = Rectangle::new([1.0, 1.0, 1.0, 1.0]); 
+            let rect = Rectangle::new(WHITE); 
             rect.draw([(xp + area.w - bw + 4) as f64, yp as f64, (bw - 4) as f64, (bw - 4) as f64], draw_state, c.transform, gl);
             
 
             let image_l = 
                 Image::new()
                     .rect([xp as f64, yp as f64, (area.w - bw) as f64, (bw - 4) as f64])
-                    .color([1.0, 1.0, 1.0, 1.0]);
+                    .color(WHITE);
             image_l.draw(&self.light, draw_state, c.transform, gl);
 
 
             let image_t = 
                 Image::new()
                     .rect([(xp + area.w - bw + 4) as f64, (yp + bw) as f64, (bw - 4) as f64, (area.h - bw) as f64])
-                    .color([1.0, 1.0, 1.0, 1.0]);
+                    .color(WHITE);
             image_t.draw(&self.trans, draw_state, c.transform, gl);
 
 
             let image   = 
                 Image::new()
                     .rect([xp as f64, (yp + bw) as f64, (area.w - bw) as f64, (area.h - bw) as f64])
-                    .color([1.0, 1.0, 1.0, 1.0]);
+                    .color(WHITE);
             image.draw(&self.tex, draw_state, c.transform, gl);
         });
         */

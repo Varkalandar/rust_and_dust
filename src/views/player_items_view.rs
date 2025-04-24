@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use glium::Texture2d;
 use glium::Frame;
 
-use crate::ui::{UiArea, MouseButton, MouseMoveEvent, MouseState, ButtonEvent};
+use crate::ui::*;
 use crate::Inventory;
 use crate::inventory::Slot;
 use crate::inventory::Entry;
@@ -14,9 +14,9 @@ use crate::item::DropEffect;
 
 use crate::GameWorld;
 use crate::sound::Sound;
-use crate::ui::UI;
-use crate::ui::Button;
-use crate::ui::ButtonState;
+use crate::ui::*;
+use crate::ui::*;
+use crate::ui::*;
 use crate::views::inventory_view::InventoryView;
 use crate::views::draw_item;
 use crate::views::show_item_popup;
