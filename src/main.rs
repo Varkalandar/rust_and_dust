@@ -356,21 +356,18 @@ impl App {
             self.controllers.current().draw(&mut target, ui, world);    
             self.controllers.current().draw_overlay(&mut target, ui, world);    
         }
-
         
         let now = SystemTime::now();
         let difference = now.duration_since(t0);
 
         if difference.is_ok() {
             self.update_time = now;
-            let secs = difference.unwrap().as_secs_f64();
-            let s = format!("Time: {}s", secs);
+            let secs = difference.unwrap().as_secs_f32();
+            let s = format!("Time: {:.4}s", secs);
             let font = &self.ui.context.font_14;
         
             font.draw(&self.ui.display, &mut target, &self.ui.program, 10, 600, &s, &WHITE);
         }
-        
-
 
         target.finish().unwrap();
     }
