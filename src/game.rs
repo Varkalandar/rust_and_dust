@@ -202,7 +202,9 @@ impl UiController for Game
                         let dungeon = generate_dungeon(&mut world.map);
                 
                         // stop player movement
+                        player.move_time_total = 0.0;
                         player.move_time_left = 0.0;
+                        player.visual.z_off = 0.0;
                         world.map.layers[MAP_OBJECT_LAYER].insert(world.map.player_id, player);
                 
                         world.map.set_player_position(dungeon.start_position);
@@ -298,6 +300,8 @@ pub fn launch_projectile(shooter_position: Vector2<f32>, fire_at: Vector2<f32>,
 
     let mut projectile = factory.create_mob(1, PROJECTILE_TILESET, start_pos, 12.0, 0.5);
     projectile.velocity = dir;
+    
+    projectile.move_time_total = 2.0;
     projectile.move_time_left = 2.0;
     projectile.move_end_action = MoveEndAction::RemoveFromMap;
     projectile.mob_type = projectile_type;

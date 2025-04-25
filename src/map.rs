@@ -98,7 +98,7 @@ impl Map {
             current_image_id: 1,
             directions: 8,
             phases: 1, 
-            height: 24.0,
+            z_off: 0.0,
             scale: 1.5,
             color: WHITE,
             glow: WHITE,
@@ -264,6 +264,7 @@ impl Map {
             // did the move just end?
             if before > 0.0 && after <= 0.0 {
                 mob.visual.particles.clear();
+                mob.visual.z_off = 0.0;
 
                 if mob.move_end_action == MoveEndAction::PickItemsUp {
                     pickup_position = Some(mob.position);
@@ -447,7 +448,7 @@ impl Map {
         println!("Handle projectile hit on {}", target.uid);
         let sparks = [403, 404, 1993, 1994, 1995, 1996, 1997];
 
-        let z_off = target.visual.height * target.visual.scale * 0.5;
+        let z_off = target.visual.z_off * target.visual.scale * 0.5;
         let creature_opt = &mut target.creature;
 
         if creature_opt.is_some() {
@@ -563,7 +564,8 @@ impl Map {
         println!("player_id={}", self.player_id);
 
         // stop player movement
-        player.move_time_left = 0.0;
+        player.stop_moving();
+
         self.layers[MAP_OBJECT_LAYER].insert(self.player_id, player);
 
         // store walkable area
@@ -700,7 +702,7 @@ impl Map {
                 &object.visual.directions.to_string() + "," +
                 &object.position[0].to_string() + "," +
                 &object.position[1].to_string() + "," +
-                &object.visual.height.to_string() + "," +
+                &object.visual.z_off.to_string() + "," +
                 &object.visual.scale.to_string() + "," +
                 &color[0].to_string() + " " +
                 &color[1].to_string() + " " +
@@ -921,6 +923,8 @@ pub struct MapObject {
     // world coordinates of this object. Note that screen coordinates are different
     pub position: Vector2<f32>,
     pub velocity: Vector2<f32>,
+
+    pub move_time_total: f32,
     pub move_time_left: f32,
 
     pub move_end_action: MoveEndAction,
@@ -929,14 +933,37 @@ pub struct MapObject {
 }
 
 
-impl MapObject {
-    
-    pub fn move_dt(&mut self, dt: f32) {
+fn bounce(p: f32) -> f32
+{
+    let t = ((p * 15.0) % 2.0) - 1.0;
+
+    let z = 1.0 - (t * t);
+
+    z * 10.0
+}
+
+
+impl MapObject 
+{   
+    pub fn move_dt(&mut self, dt: f32) 
+    {
         if self.move_time_left > 0.0 {
             let distance = vec2_scale(self.velocity, dt);
+            let z_off = bounce(self.move_time_total - self.move_time_left);
             self.position = vec2_add(self.position, distance);
             self.move_time_left -= dt;
+            self.visual.z_off = z_off;
+
+            // println!("z_off={}", self.visual.z_off);
         }
+    }
+
+
+    pub fn stop_moving(&mut self)
+    {
+        self.move_time_total = 0.0;
+        self.move_time_left = 0.0;
+        self.visual.z_off = 0.0;
     }
 }
 
@@ -946,17 +973,17 @@ pub struct MapObjectFactory {
 }
 
 
-impl MapObjectFactory {
-
-    pub fn create_mob(&mut self, tile_id: usize, tileset_id: usize, position: Vector2<f32>, height: f32, scale: f32) -> MapObject {
-
+impl MapObjectFactory 
+{
+    pub fn create_mob(&mut self, tile_id: usize, tileset_id: usize, position: Vector2<f32>, z_off: f32, scale: f32) -> MapObject 
+    {
         let visual = Visual {
             base_image_id: tile_id,
             current_image_id: tile_id,
             directions: 8,
             phases: 1,
             tileset_id,
-            height,
+            z_off,
             scale,
             color: WHITE,
             glow: WHITE,
@@ -978,6 +1005,7 @@ impl MapObjectFactory {
 
             position, 
             velocity: [0.0, 0.0],
+            move_time_total: 0.0,
             move_time_left: 0.0,
 
             move_end_action: MoveEndAction::None,
@@ -1010,7 +1038,7 @@ pub struct Visual {
     pub directions: usize,
     pub phases: usize, // animation phases per direction 
     pub tileset_id: usize,
-    pub height: f32,
+    pub z_off: f32,
     pub scale: f32,
     pub color: [f32; 4],
     pub glow: [f32; 4], // ground illumination color

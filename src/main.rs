@@ -436,7 +436,7 @@ impl App {
                 display_height,
                 &tile.tex,
                 tpos[0],
-                tpos[1], 
+                tpos[1] - mob.visual.z_off * mob.visual.scale * 0.5, 
                 mob.visual.scale as f32, 
                 mob.visual.scale as f32,
                 &mob.visual.color);
@@ -618,6 +618,7 @@ fn move_player(map: &mut Map, screen_direction: Vector2<f32>)
     if map.is_walkable(dest) {
         let player = map.layers[MAP_OBJECT_LAYER].get_mut(&map.player_id).unwrap();
 
+        player.move_time_total = time;
         player.move_time_left = time;
         player.velocity = vec2_scale(direction, 1.0/time);
 
