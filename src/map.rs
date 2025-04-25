@@ -264,7 +264,7 @@ impl Map {
             // did the move just end?
             if before > 0.0 && after <= 0.0 {
                 mob.visual.particles.clear();
-                mob.visual.z_off = 0.0;
+                mob.stop_moving();
 
                 if mob.move_end_action == MoveEndAction::PickItemsUp {
                     pickup_position = Some(mob.position);
