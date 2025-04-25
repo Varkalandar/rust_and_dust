@@ -80,6 +80,10 @@ impl ShopView
         let text = "Drop items here to sell.";
         font.draw(&ui.display, target, &ui.program, 
                   left + 130, top + 570, text, &ORANGE);
+
+        let text = "Click here to leave the shop.";
+        font.draw(&ui.display, target, &ui.program, 
+                  left + 110, top + 640, text, &OFF_WHITE);
     }
 
 
@@ -146,7 +150,7 @@ impl ShopView
             draw_multiline_centered(&ui.display, target, &ui.program, &name, entry_x, entry_y, w, limit, font);
 
             // display the price at the bottom
-            let text_line = calculate_price_string(item); // "100c";
+            let text_line = calculate_price_string(item);
             let text_width = font.calc_string_width(&text_line) as i32;
             font.draw(&ui.display, target, &ui.program, 
                       entry_x + (w - text_width) / 2, entry_y + h - 18, &text_line, &[1.0, 0.9, 0.5, 1.0]);
