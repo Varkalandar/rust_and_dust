@@ -35,7 +35,7 @@ impl VoxelDisplayTest
             let ir = p.sqrt() * rad;
 
             for n in 0 .. 24 {
-                let p = PI * 2.0 * n as f32 / 24.0;
+                let p = PI * 2.0 * n as f32 / 24.0 + 0.1;
     
                 let x = p.cos() * ir;
                 let z = p.sin() * ir;
@@ -48,7 +48,8 @@ impl VoxelDisplayTest
         for voxel in voxels.voxels {
             let xp = voxel.x as i32;
             let yp = (voxel.y + voxel.z * 0.5) as i32;
-            fb.fill_box(xp, yp, 2, 2, [255, 255, 0, 255]);
+            let size = std::cmp::min((voxel.z * 0.022) as i32 + 1, 7); 
+            fb.vball(xp, yp, size, [255, 255, 0, 255]);
         }
 
         VoxelDisplayTest {
@@ -56,3 +57,4 @@ impl VoxelDisplayTest
         }
     }
 }
+
