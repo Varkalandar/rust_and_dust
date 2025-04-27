@@ -1,9 +1,15 @@
 use std::collections::HashSet;
+use std::cmp::Ordering;
+
+use glutin::surface::ResizeableSurface;
+use glutin::surface::SurfaceTypeTrait;
+use glium::Display;
+use glium::Texture2d;
 
 mod gl_support;
 pub use gl_support::*;
 
-struct Framebuffer 
+pub struct Framebuffer 
 {
     width: i32,
     height: i32,
@@ -18,12 +24,12 @@ impl Framebuffer
         Framebuffer {
             width,
             height,
-            buffer: Vec::with_capacity((width * height * 4) as usize),   // rgba
+            buffer: vec![0_u8; (width * height * 4) as usize],   // rgba
         }
     }
 
 
-    pub fn fillbox(&mut self, x: i32, y: i32, w: i32, h: i32, color: [u8; 4])
+    pub fn fill_box(&mut self, x: i32, y: i32, w: i32, h: i32, color: [u8; 4])
     {
         for yy in y .. y + h {
             for xx in x .. x + w {
@@ -49,7 +55,7 @@ impl Framebuffer
     }
 
 
-    pub fn fillcircle(&mut self, xc: i32, yc: i32, radius: i32, color: [u8; 4])
+    pub fn fill_circle(&mut self, xc: i32, yc: i32, radius: i32, color: [u8; 4])
     {
         let mut f = 1 - radius;
         let mut ddf_x = 1;
@@ -94,5 +100,50 @@ impl Framebuffer
         self.buffer[dpos+1] = color[1];
         self.buffer[dpos+2] = color[2];
         self.buffer[dpos+3] = color[3];
+    }
+
+    pub fn to_texture<T: SurfaceTypeTrait + ResizeableSurface>(self, display: &Display<T>) -> Texture2d
+    {
+        texture_from_data(display, self.buffer, self.width as u32, self.height as u32)
+    }
+}
+
+pub struct Voxel
+{
+    pub x: f32,
+    pub y: f32,
+    pub z: f32,
+}
+
+pub struct Voxelstack 
+{
+    pub voxels: Vec<Voxel>,
+}
+
+impl Voxelstack
+{
+    pub fn new() -> Voxelstack
+    {
+        Voxelstack {
+            voxels: Vec::new(),
+        }
+    }
+
+    pub fn add(&mut self, voxel: Voxel)
+    {
+        self.voxels.push(voxel);
+    }
+
+    pub fn sort_depth_first(&mut self)
+    {
+        self.voxels.sort_unstable_by(|a, b| -> Ordering {
+            if a.z > b.z {
+                Ordering::Greater
+            } else if a.z < b.z {
+                Ordering::Less
+            } else {
+                Ordering::Equal
+            }
+        });
     }
 }

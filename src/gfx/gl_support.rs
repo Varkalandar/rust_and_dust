@@ -336,8 +336,6 @@ pub fn draw_shape<T: SurfaceTypeTrait + ResizeableSurface>(
 }
 
 
-
-
 pub fn draw_texture_wb(
     target: &mut Frame,   
     program: &Program,

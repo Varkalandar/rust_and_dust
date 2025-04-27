@@ -1,6 +1,7 @@
 pub mod inventory_view;
 pub mod player_items_view;
 pub mod shop_view;
+pub mod voxel_display_test;
 
 use glium::Frame;
 use glium::Program;

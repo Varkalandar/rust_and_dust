@@ -63,6 +63,8 @@ use item::Activation;
 use inventory::{Inventory, Slot};
 use sound::SoundPlayer;
 
+use crate::views::voxel_display_test::VoxelDisplayTest;
+
 use gfx::*;
 
 const MAP_RESOURCE_PATH: &str = "resources/gfx/map/";
@@ -112,6 +114,8 @@ pub struct App {
 
     world: GameWorld,
     controllers: GameControllers,
+
+    voxel_display_test: VoxelDisplayTest,
 
     update_time: SystemTime,
     need_focus: bool,
@@ -212,6 +216,8 @@ impl App {
         let scroll = world.map.item_factory.create("identify_scroll", &mut world.rng);
         world.player_inventory.put_item(scroll, Slot::Bag);
 
+        let voxel_display_test = VoxelDisplayTest::new(&ui.display); 
+
         App {        
             ui,
             world,
@@ -221,6 +227,8 @@ impl App {
                 game,
                 edit: false,
             },
+
+            voxel_display_test,
 
             update_time: SystemTime::now(),
             need_focus: true,
@@ -344,9 +352,26 @@ impl App {
         // Debug: show walkable areas
         // self.show_walkable_areas(&self.ui.display, &mut target, &self.ui.program, tex_white, &world.map);
 
+
+        {
+            // voxel testing
+            let (display_width, display_height) = self.ui.display.get_framebuffer_dimensions();
+            draw_texture_wb(&mut target, &self.ui.program, &buffer,
+                BlendMode::Blend,
+                display_width,
+                display_height,
+                &self.voxel_display_test.result,
+                0.0,
+                0.0, 
+                1.0, 
+                1.0,
+                &WHITE);
+        }
+
         {
             let world = &mut self.world;
             let ui = &mut self.ui;
+
             self.controllers.current().draw(&mut target, ui, world);    
             self.controllers.current().draw_overlay(&mut target, ui, world);    
         }
@@ -402,7 +427,7 @@ impl App {
             } else {
                 Ordering::Equal
             }
-        });        
+        });
 
 
         for mob in objects {
