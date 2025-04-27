@@ -6,7 +6,7 @@ use crate::read_lines;
 use crate::parse_rgba;
 use crate::map::Visual;
 use crate::SoundPlayer;
-use crate::gl_support::BlendMode;
+use crate::gfx::BlendMode;
 
 
 pub struct ProjectileBuilder {

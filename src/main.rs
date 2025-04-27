@@ -51,7 +51,7 @@ mod sound;
 mod particle_driver;
 mod animation;
 mod mob_group;
-mod gl_support;
+mod gfx;
 
 use dungeon::*;
 use map::{Map, MAP_GROUND_LAYER, MAP_OBJECT_LAYER, MAP_CLOUD_LAYER, MoveEndAction};
@@ -63,13 +63,7 @@ use item::Activation;
 use inventory::{Inventory, Slot};
 use sound::SoundPlayer;
 
-pub use gl_support::Vertex;
-use gl_support::BlendMode;
-use gl_support::load_texture;
-use gl_support::build_program;
-use gl_support::draw_texture;
-use gl_support::draw_texture_wb;
-use gl_support::draw_polygon;
+use gfx::*;
 
 const MAP_RESOURCE_PATH: &str = "resources/gfx/map/";
 const CREATURE_TILESET: usize = 3;

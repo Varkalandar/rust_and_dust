@@ -14,15 +14,12 @@ use crate::item::DropEffect;
 
 use crate::GameWorld;
 use crate::sound::Sound;
-use crate::ui::*;
-use crate::ui::*;
-use crate::ui::*;
 use crate::views::inventory_view::InventoryView;
 use crate::views::draw_item;
 use crate::views::show_item_popup;
 
-use crate::gl_support::BlendMode;
-use crate::gl_support::draw_texture;
+use crate::gfx::BlendMode;
+use crate::gfx::draw_texture;
 
 
 pub struct PlayerItemsView 

@@ -22,13 +22,13 @@ pub use font::UiFont;
 pub use color::*;
 
 use crate::BlendMode;
-use crate::gl_support::texture_from_data;
-use crate::gl_support::draw_texture_wb;
-use crate::gl_support::draw_tex_area_wb;
-use crate::gl_support::draw_texture_clip_wb;
-use crate::gl_support::build_dynamic_quad_buffer;
-use crate::gl_support::Vertex;
-use crate::gl_support::RectF32;
+use crate::gfx::texture_from_data;
+use crate::gfx::draw_texture_wb;
+use crate::gfx::draw_tex_area_wb;
+use crate::gfx::draw_texture_clip_wb;
+use crate::gfx::build_dynamic_quad_buffer;
+use crate::gfx::Vertex;
+use crate::gfx::RectF32;
 
 
 #[derive(PartialEq, Clone, Debug)]
