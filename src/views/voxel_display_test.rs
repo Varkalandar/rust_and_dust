@@ -44,12 +44,14 @@ impl VoxelDisplayTest
             }
         }
 
+        voxels.sort_depth_first();
 
         for voxel in voxels.voxels {
             let xp = voxel.x as i32;
             let yp = (voxel.y + voxel.z * 0.5) as i32;
             let size = std::cmp::min((voxel.z * 0.022) as i32 + 1, 7); 
             fb.vball(xp, yp, size, [255, 255, 0, 255]);
+            println!("z = {}", voxel.z)
         }
 
         VoxelDisplayTest {

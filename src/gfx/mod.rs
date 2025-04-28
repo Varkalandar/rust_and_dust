@@ -211,9 +211,9 @@ impl Voxelstack
     pub fn sort_depth_first(&mut self)
     {
         self.voxels.sort_unstable_by(|a, b| -> Ordering {
-            if a.z > b.z {
+            if b.z > a.z {
                 Ordering::Greater
-            } else if a.z < b.z {
+            } else if b.z < a.z {
                 Ordering::Less
             } else {
                 Ordering::Equal
