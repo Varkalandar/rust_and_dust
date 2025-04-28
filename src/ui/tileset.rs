@@ -79,9 +79,20 @@ impl TileSet {
 
         tileset        
     }
+
     
+    pub fn add_tile(&mut self, tile: Tile) 
+    {
+        let id = tile.id;
+        let ordinal = self.tiles_by_id.len();
+        
+        self.tiles_by_id.insert(id, Rc::new(tile));
+        self.tiles_order_to_id.insert(ordinal, id);
+    }
+
     
-    pub fn shallow_copy(&self) -> TileSet {
+    pub fn shallow_copy(&self) -> TileSet 
+    {
         let mut result = TileSet {
             tiles_by_id: HashMap::new(),
             tiles_order_to_id: HashMap::new(),
@@ -96,6 +107,24 @@ impl TileSet {
         }
         
         result
+    }
+
+
+    /**
+     * Find max current id, so that after one call new ids can
+     * be generated efficiently by just counting onwards.
+     */
+    pub fn get_new_id(&self) -> usize
+    {
+        let mut last_id: usize = 0;
+        for key in &self.tiles_by_id {
+            let id = *key.0;
+            if id > last_id { 
+                last_id = id;
+            }
+        }
+
+        last_id + 1
     }
 }
 
