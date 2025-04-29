@@ -36,7 +36,7 @@ impl Animated for SpinAnimation {
         mob.animation_timer += dt;
 
         let frame = (mob.animation_timer * self.speed) as usize;
-        mob.visual.current_image_id = mob.visual.base_image_id + (frame % 8);
+        mob.visual.current_image_id = mob.visual.base_image_id + (frame % mob.visual.directions);
     }
 }
 

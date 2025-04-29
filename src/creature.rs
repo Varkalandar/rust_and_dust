@@ -7,7 +7,7 @@ pub struct CreatureFactory {
 }
 
 
-struct CreaturePrototype {
+pub struct CreaturePrototype {
     pub base_tile_id: usize,
     pub frames: usize,
     pub speed: f32,
@@ -50,6 +50,12 @@ impl CreatureFactory {
             hit_points: (proto.max_hp + proto.min_hp) / 2,
             projectile_spawn_distance: proto.projectile_spawn_distance,
         }
+    }
+    
+
+    pub fn add(&mut self, name: &str, creature: CreaturePrototype)
+    {
+        self.prototypes.insert(name.to_string(), creature);
     }
 }
 

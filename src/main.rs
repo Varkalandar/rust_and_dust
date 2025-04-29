@@ -64,6 +64,7 @@ use inventory::{Inventory, Slot};
 use sound::SoundPlayer;
 
 use crate::views::voxel_display_test::VoxelDisplayTest;
+use crate::views::voxel_display_test::generate_creature;
 
 use gfx::*;
 
@@ -145,7 +146,7 @@ impl App {
         let projectile_tiles = TileSet::load(&display, "resources/gfx/projectiles", "projectiles.tica");
         let animation_tiles = TileSet::load(&display, "resources/gfx/animations", "animations.tica");
 
-        let layer_tileset = [
+        let mut layer_tileset = [
             ground_tiles,
             decoration_tiles,
             cloud_tiles,
@@ -169,6 +170,9 @@ impl App {
         let x = (dungeon.rooms[5].x1 + dungeon.rooms[5].x2) / 2;
         let y = (dungeon.rooms[5].y1 + dungeon.rooms[5].y2) / 2;
 
+
+        let creature = generate_creature(&display, &mut layer_tileset[CREATURE_TILESET]);
+        map.creature_factory.add("generated_creature", creature);
         map.populate("dungeon.csv", &mut rng, map_pos(x, y, 0));
 
 
@@ -352,7 +356,7 @@ impl App {
         // Debug: show walkable areas
         // self.show_walkable_areas(&self.ui.display, &mut target, &self.ui.program, tex_white, &world.map);
 
-
+/*
         {
             // voxel testing
             let (display_width, display_height) = self.ui.display.get_framebuffer_dimensions();
@@ -367,7 +371,7 @@ impl App {
                 1.0,
                 &WHITE);
         }
-
+*/
         {
             let world = &mut self.world;
             let ui = &mut self.ui;

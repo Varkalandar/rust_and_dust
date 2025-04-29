@@ -511,7 +511,8 @@ impl Map {
 
     pub fn populate(&mut self, _filename: &str, rng: &mut StdRng, position: Vector2<f32>) {
 
-        let group = self.make_creature_group("Targetting Drone", 5, 9, position, 40.0, rng);
+        // let group = self.make_creature_group("Targetting Drone", 5, 9, position, 40.0, rng);
+        let group = self.make_creature_group("generated_creature", 5, 9, position, 40.0, rng);
         self.mob_groups.push(group);
     }
 
@@ -803,6 +804,7 @@ impl Map {
 
                 if ok {
                     let mut mob = self.factory.create_mob(creature.base_tile_id, CREATURE_TILESET, [x, y], 32.0, scale);
+                    mob.visual.directions = creature.frames;
                     mob.mob_type = MobType::Creature;
                     mob.creature = Some(creature);
                     mob.animation_timer = rng.random::<f32>(); // otherwise all start with the very same frame
@@ -881,8 +883,9 @@ pub fn move_mob(mob: &mut MapObject, destination: Vector2<f32>, base_speed: f32)
     mob.move_time_left = time;
     mob.velocity = vec2_scale(direction, 1.0 / time);
 
-    let d = mob.visual.orient(direction);
-    mob.visual.current_image_id = mob.visual.base_image_id + d;
+    // let d = mob.visual.orient(direction);
+    // mob.visual.current_image_id = mob.visual.base_image_id + d;
+    mob.visual.orient_in_direction(direction);
 }
 
 
@@ -1085,7 +1088,7 @@ impl Visual {
         let offset = self.orient(direction);
         self.current_image_id = self.base_image_id + offset;
 
-        println!("dx={} dy={} base={} offset={} directions={}", direction[0], direction[1], self.base_image_id, offset, self.directions);
+        println!("orient_in_direction(): dx={} dy={} base={} current={} offset={} directions={}", direction[0], direction[1], self.base_image_id, self.current_image_id, offset, self.directions);
     }
 }
 
