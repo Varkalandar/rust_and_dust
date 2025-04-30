@@ -67,18 +67,19 @@ impl VoxelDisplayTest
 pub fn generate_creature<T: SurfaceTypeTrait + ResizeableSurface>(display: &Display<T>, 
                                                                   tileset: &mut TileSet) -> CreaturePrototype
 {
-    let mut fb = Framebuffer::new(256, 256);
+    let fb_size = 128;
+    let mut fb = Framebuffer::new(fb_size, fb_size);
 
     // fb.fill_box(0, 0, 256, 256, [255, 255, 255, 255]);
     // fb.fill_box(10, 10, 236, 236, [0, 0, 0, 255]);
 
     let mut voxels = Voxelstack::new();
-    let steps = 192;
+    let steps = 96;
 
     for i in -steps/2 .. steps/2 {
 
-        let rad = 75.0;
-        let fi = i as f32 / 12.0;
+        let rad = 38.0;
+        let fi = (i * 2) as f32 / steps as f32;
         let p = 1.0 - fi * fi;
         let ir = p.sqrt() * rad;
 
@@ -87,8 +88,13 @@ pub fn generate_creature<T: SurfaceTypeTrait + ResizeableSurface>(display: &Disp
 
             let x = p.cos() * ir;
             let z = p.sin() * ir;
+            let fb_center = fb_size as f32 * 0.5;
 
-            voxels.add(Voxel {x: x + 128.0, y: 128.0 + fi * rad, z: z + rad});
+            voxels.add(Voxel {
+                x: x + fb_center, 
+                y: fb_center + fi * rad, 
+                z: z + rad}
+            );
         }
     }
 
@@ -107,8 +113,8 @@ pub fn generate_creature<T: SurfaceTypeTrait + ResizeableSurface>(display: &Disp
 
     let tile = Tile {
         id: tile_id,
-        size: [256.0, 256.0],
-        foot: [128.0, 256.0],
+        size: [fb_size as f32, fb_size as f32],
+        foot: [fb_size as f32 * 0.5, fb_size as f32],
         tex: texture,
         name: "generated_creature".to_string(),
     };
