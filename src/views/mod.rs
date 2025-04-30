@@ -9,10 +9,9 @@ use glium::Program;
 use crate::Activation;
 use crate::item::Item;
 use crate::ui::*;
-use crate::BlendMode;
-use crate::draw_texture_wb;
 use crate::TileSet;
 use crate::item::ModKind;
+use crate::gfx::gl_support::*;
 
 
 pub fn show_item_popup(ui: &UI, target: &mut Frame,

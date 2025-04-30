@@ -1,7 +1,7 @@
 use crate::map::MapObject;
 use crate::map::UpdateAction;
 use crate::ANIMATION_TILESET;
-use crate::gfx::BlendMode;
+use crate::gfx::gl_support::BlendMode;
 use crate::ui::*;
 
 pub trait Animated {

@@ -62,11 +62,11 @@ use item::ItemFactory;
 use item::Activation;
 use inventory::{Inventory, Slot};
 use sound::SoundPlayer;
+use crate::gfx::gl_support::*;
 
 use crate::views::voxel_display_test::VoxelDisplayTest;
 use crate::views::voxel_display_test::generate_creature;
 
-use gfx::*;
 
 const MAP_RESOURCE_PATH: &str = "resources/gfx/map/";
 const CREATURE_TILESET: usize = 3;

@@ -30,7 +30,7 @@ use crate::SoundPlayer;
 use crate::mob_group::MobGroup;
 use crate::CREATURE_TILESET;
 use crate::parse_rgba;
-use crate::gfx::BlendMode;
+use crate::gfx::gl_support::BlendMode;
 use crate::Slot;
 use crate::generate_dungeon;
 use crate::WHITE;

@@ -1,13 +1,14 @@
+pub mod gl_support;
+pub mod voxel;
+
 use std::collections::HashSet;
-use std::cmp::Ordering;
 
 use glutin::surface::ResizeableSurface;
 use glutin::surface::SurfaceTypeTrait;
 use glium::Display;
 use glium::Texture2d;
+use gl_support::texture_from_data;
 
-mod gl_support;
-pub use gl_support::*;
 
 pub struct Framebuffer 
 {
@@ -182,45 +183,6 @@ impl Framebuffer
     }
 }
 
-pub struct Voxel
-{
-    pub x: f32,
-    pub y: f32,
-    pub z: f32,
-}
-
-pub struct Voxelstack 
-{
-    pub voxels: Vec<Voxel>,
-}
-
-impl Voxelstack
-{
-    pub fn new() -> Voxelstack
-    {
-        Voxelstack {
-            voxels: Vec::new(),
-        }
-    }
-
-    pub fn add(&mut self, voxel: Voxel)
-    {
-        self.voxels.push(voxel);
-    }
-
-    pub fn sort_depth_first(&mut self)
-    {
-        self.voxels.sort_unstable_by(|a, b| -> Ordering {
-            if b.z > a.z {
-                Ordering::Greater
-            } else if b.z < a.z {
-                Ordering::Less
-            } else {
-                Ordering::Equal
-            }
-        });
-    }
-}
 
 pub fn shade(color: [u8; 4], shade: i32) -> [u8; 4]
 {

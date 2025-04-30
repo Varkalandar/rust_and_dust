@@ -5,9 +5,9 @@ use glutin::surface::SurfaceTypeTrait;
 use glium::Display;
 
 use crate::Texture2d;
-use crate::Framebuffer;
-use crate::Voxel;
-use crate::Voxelstack;
+use crate::gfx::Framebuffer;
+use crate::gfx::voxel::Voxel;
+use crate::gfx::voxel::Voxelstack;
 use crate::creature::CreaturePrototype;
 use crate::TileSet;
 use crate::Tile;
@@ -43,7 +43,9 @@ impl VoxelDisplayTest
                 let x = p.cos() * ir;
                 let z = p.sin() * ir;
     
-                voxels.add(Voxel {x: x + 400.0, y: 200.0 + fi * rad, z: z + rad});
+                voxels.add(Voxel::new(
+                    x + 400.0, 200.0 + fi * rad, z + rad, [255, 255, 0, 255]
+                ));
             }
         }
 
@@ -53,7 +55,7 @@ impl VoxelDisplayTest
             let xp = voxel.x as i32;
             let yp = (voxel.y + voxel.z * 0.5) as i32;
             let size = std::cmp::min((voxel.z * 0.022) as i32 + 1, 7); 
-            fb.vball(xp, yp, size, [255, 255, 0, 255]);
+            fb.vball(xp, yp, size, voxel.color);
             // println!("z = {}", voxel.z)
         }
 
@@ -90,11 +92,12 @@ pub fn generate_creature<T: SurfaceTypeTrait + ResizeableSurface>(display: &Disp
             let z = p.sin() * ir;
             let fb_center = fb_size as f32 * 0.5;
 
-            voxels.add(Voxel {
-                x: x + fb_center, 
-                y: fb_center + fi * rad, 
-                z: z + rad}
-            );
+            voxels.add(Voxel::new(
+                x + fb_center, 
+                fb_center + fi * rad, 
+                z + rad,
+                [255, 255, 128, 255]
+            ));
         }
     }
 
@@ -104,7 +107,7 @@ pub fn generate_creature<T: SurfaceTypeTrait + ResizeableSurface>(display: &Disp
         let xp = voxel.x as i32;
         let yp = (voxel.y + voxel.z * 0.5) as i32;
         let size = std::cmp::min((voxel.z * 0.022) as i32 + 1, 7); 
-        fb.vball(xp, yp, size, [255, 255, 128, 255]);
+        fb.vball(xp, yp, size, voxel.color);
         // println!("z = {}", voxel.z)
     }
 

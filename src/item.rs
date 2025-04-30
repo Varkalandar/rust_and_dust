@@ -595,7 +595,7 @@ pub enum ModKind {
 
 
 #[derive(Debug, Clone)]
-struct ModPrototype {
+pub struct ModPrototype {
     pub attribute: Attribute,
     pub min_value: i32,
     pub max_value: i32,

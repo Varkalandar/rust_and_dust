@@ -18,8 +18,8 @@ use crate::views::inventory_view::InventoryView;
 use crate::views::draw_item;
 use crate::views::show_item_popup;
 
-use crate::gfx::BlendMode;
-use crate::gfx::draw_texture;
+use crate::gfx::gl_support::BlendMode;
+use crate::gfx::gl_support::draw_texture;
 
 
 pub struct PlayerItemsView 

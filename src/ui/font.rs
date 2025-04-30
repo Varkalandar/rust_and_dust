@@ -7,12 +7,12 @@ use glium::Program;
 use glium::Frame;
 use glium::VertexBuffer;
 
-use crate::gfx::Vertex;
-use crate::gfx::BlendMode;
-use crate::gfx::RectF32;
-use crate::gfx::texture_from_data;
-use crate::gfx::build_dynamic_quad_buffer;
-use crate::gfx::draw_tex_area_wb;
+use crate::gfx::gl_support::Vertex;
+use crate::gfx::gl_support::BlendMode;
+use crate::gfx::gl_support::RectF32;
+use crate::gfx::gl_support::texture_from_data;
+use crate::gfx::gl_support::build_dynamic_quad_buffer;
+use crate::gfx::gl_support::draw_tex_area_wb;
 
 const PITCH: u32 = 1024;
 

@@ -21,15 +21,9 @@ pub use tileset::*;
 pub use font::UiFont;
 pub use color::*;
 
-use crate::BlendMode;
-use crate::gfx::texture_from_data;
-use crate::gfx::draw_texture_wb;
-use crate::gfx::draw_tex_area_wb;
-use crate::gfx::draw_texture_clip_wb;
-use crate::gfx::build_dynamic_quad_buffer;
-use crate::gfx::Vertex;
-use crate::gfx::RectF32;
-
+use crate::gfx::gl_support::Vertex;
+use crate::gfx::gl_support::RectF32;
+use crate::gfx::gl_support::*;
 
 #[derive(PartialEq, Clone, Debug)]
 pub enum MouseButton {

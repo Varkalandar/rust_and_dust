@@ -1,20 +1,21 @@
 use vecmath::Vector2;
 use std::collections::HashMap;
 
-
 use crate::read_lines;
 use crate::parse_rgba;
 use crate::map::Visual;
 use crate::SoundPlayer;
-use crate::gfx::BlendMode;
+use crate::gfx::gl_support::BlendMode;
 
 
-pub struct ProjectileBuilder {
+pub struct ProjectileBuilder 
+{
     projectile_data: HashMap <String, ProjectileConfig>
 }
 
 
-pub struct ProjectileConfig {
+pub struct ProjectileConfig 
+{
     speed: f32, // movement speed
     base_tile_id: usize,
     directions: usize,
@@ -25,9 +26,10 @@ pub struct ProjectileConfig {
 }
 
 
-impl ProjectileBuilder {
-
-    pub fn new() -> ProjectileBuilder {
+impl ProjectileBuilder 
+{
+    pub fn new() -> ProjectileBuilder 
+    {
         let projectile_data = read_projectile_config();
 
         ProjectileBuilder {
@@ -35,7 +37,8 @@ impl ProjectileBuilder {
         }
     }
 
-    pub fn configure_projectile(&self, key: &str, visual: &mut Visual, velocity: &mut Vector2<f32>, speaker: &mut SoundPlayer) {
+    pub fn configure_projectile(&self, key: &str, visual: &mut Visual, velocity: &mut Vector2<f32>, speaker: &mut SoundPlayer) 
+    {
         let pd = self.projectile_data.get(&key.to_string()).unwrap();
 
         speaker.play_sound(pd.sound, pd.volume);
@@ -53,8 +56,8 @@ impl ProjectileBuilder {
 }
 
 
-fn read_projectile_config() -> HashMap <String, ProjectileConfig> {
-
+fn read_projectile_config() -> HashMap <String, ProjectileConfig> 
+{
     let lines = read_lines("resources/creatures/projectiles.csv");
     let mut projectiles = HashMap::new();
 
