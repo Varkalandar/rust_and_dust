@@ -12,8 +12,8 @@ use gl_support::texture_from_data;
 
 pub struct Framebuffer 
 {
-    width: i32,
-    height: i32,
+    pub width: i32,
+    pub height: i32,
     buffer: Vec<u8>,
 }
 

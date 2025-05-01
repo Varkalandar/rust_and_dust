@@ -47,6 +47,14 @@ impl Voxelstack
     }
 
 
+    pub fn merge(&mut self, voxels: Voxelstack)
+    {
+        for voxel in voxels.voxels {
+            self.add(voxel);
+        }
+    }
+
+
     pub fn sort_depth_first(&mut self)
     {
         self.voxels.sort_unstable_by(|a, b| -> Ordering {
@@ -68,11 +76,11 @@ impl Voxelstack
 
         for voxel in &mut self.voxels {
 
-            let x = voxel.x * cos - voxel.y * sin;
-            let y = voxel.x * sin + voxel.y * cos;
+            let x = voxel.x * cos - voxel.z * sin;
+            let z = voxel.x * sin + voxel.z * cos;
 
             voxel.x = x;
-            voxel.y = y;
+            voxel.z = z;
         } 
     }
 }

@@ -356,7 +356,7 @@ impl App {
         // Debug: show walkable areas
         // self.show_walkable_areas(&self.ui.display, &mut target, &self.ui.program, tex_white, &world.map);
 
-/*
+
         {
             // voxel testing
             let (display_width, display_height) = self.ui.display.get_framebuffer_dimensions();
@@ -371,7 +371,7 @@ impl App {
                 1.0,
                 &WHITE);
         }
-*/
+
         {
             let world = &mut self.world;
             let ui = &mut self.ui;

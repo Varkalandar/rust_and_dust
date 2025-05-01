@@ -1,5 +1,7 @@
 use std::f32::consts::PI;
 
+use rand::Rng;
+
 use glutin::surface::ResizeableSurface;
 use glutin::surface::SurfaceTypeTrait;
 use glium::Display;
@@ -23,102 +25,26 @@ impl VoxelDisplayTest
 {
     pub fn new<T: SurfaceTypeTrait + ResizeableSurface>(display: &Display<T>) -> VoxelDisplayTest
     {
-        let mut fb = Framebuffer::new(800, 600);
-
-        fb.fill_box(0, 0, 800, 600, [255, 255, 255, 255]);
-        fb.fill_box(10, 10, 780, 580, [0, 0, 0, 255]);
+        let fb = generate_fb_image();
     
-        let mut voxels = Voxelstack::new();
-
-        for i in -12 .. 12 {
-
-            let rad = 150.0;
-            let fi = i as f32 / 12.0;
-            let p = 1.0 - fi * fi;
-            let ir = p.sqrt() * rad;
-
-            for n in 0 .. 24 {
-                let p = PI * 2.0 * n as f32 / 24.0 + 0.1;
-    
-                let x = p.cos() * ir;
-                let z = p.sin() * ir;
-    
-                voxels.add(Voxel::new(
-                    x + 400.0, 200.0 + fi * rad, z + rad, [255, 255, 0, 255]
-                ));
-            }
-        }
-
-        voxels.sort_depth_first();
-
-        for voxel in voxels.voxels {
-            let xp = voxel.x as i32;
-            let yp = (voxel.y + voxel.z * 0.5) as i32;
-            let size = std::cmp::min((voxel.z * 0.022) as i32 + 1, 7); 
-            fb.vball(xp, yp, size, voxel.color);
-            // println!("z = {}", voxel.z)
-        }
-
         VoxelDisplayTest {
             result: fb.to_texture(display),
         }
     }
-
 }
+
 
 pub fn generate_creature<T: SurfaceTypeTrait + ResizeableSurface>(display: &Display<T>, 
                                                                   tileset: &mut TileSet) -> CreaturePrototype
 {
-    let fb_size = 128;
-    let mut fb = Framebuffer::new(fb_size, fb_size);
-
-    // fb.fill_box(0, 0, 256, 256, [255, 255, 255, 255]);
-    // fb.fill_box(10, 10, 236, 236, [0, 0, 0, 255]);
-
-    let mut voxels = Voxelstack::new();
-    let steps = 96;
-
-    for i in -steps/2 .. steps/2 {
-
-        let rad = 38.0;
-        let fi = (i * 2) as f32 / steps as f32;
-        let p = 1.0 - fi * fi;
-        let ir = p.sqrt() * rad;
-
-        for n in 0 .. steps {
-            let p = PI * 2.0 * n as f32 / steps as f32 + 0.1;
-
-            let x = p.cos() * ir;
-            let z = p.sin() * ir;
-            let fb_center = fb_size as f32 * 0.5;
-
-            voxels.add(Voxel::new(
-                x + fb_center, 
-                fb_center + fi * rad, 
-                z + rad,
-                [255, 255, 128, 255]
-            ));
-        }
-    }
-
-    voxels.sort_depth_first();
-
-    for voxel in voxels.voxels {
-        let xp = voxel.x as i32;
-        let yp = (voxel.y + voxel.z * 0.5) as i32;
-        let size = std::cmp::min((voxel.z * 0.022) as i32 + 1, 7); 
-        fb.vball(xp, yp, size, voxel.color);
-        // println!("z = {}", voxel.z)
-    }
-
-    let texture = fb.to_texture(display);
+    let fb = generate_fb_image();
     let tile_id = tileset.get_new_id();
 
     let tile = Tile {
         id: tile_id,
-        size: [fb_size as f32, fb_size as f32],
-        foot: [fb_size as f32 * 0.5, fb_size as f32],
-        tex: texture,
+        size: [fb.width as f32, fb.height as f32],
+        foot: [fb.width as f32 * 0.5, fb.height as f32 * 0.75],
+        tex: fb.to_texture(display),
         name: "generated_creature".to_string(),
     };
 
@@ -131,5 +57,162 @@ pub fn generate_creature<T: SurfaceTypeTrait + ResizeableSurface>(display: &Disp
         min_hp: 1,
         max_hp: 2,
         projectile_spawn_distance: 25.0,
+    }
+}
+
+
+pub fn generate_fb_image() -> Framebuffer
+{
+    let fb_size = 128;
+    let mut fb = Framebuffer::new(fb_size, fb_size);
+
+    // fb.fill_box(0, 0, 256, 256, [255, 255, 255, 255]);
+    // fb.fill_box(10, 10, 236, 236, [0, 0, 0, 255]);
+
+    // let mut voxels = generate_sphere(fb_size);
+    let mut voxels = generate_tendrils(fb_size, 0.5, 0.7, 7..9, 23, [128, 160, 64], [2, 10, 1]);
+    voxels.merge(generate_tendrils(fb_size, 1.0, 0.1, 15..17, 9, [192, 192, 128], [3, 3, 2]));
+
+    voxels.sort_depth_first();
+
+    // scan for max and min depth
+    let mut max_depth = 0.0;
+    let mut min_depth = 100.0;
+
+    for voxel in &voxels.voxels {
+        if voxel.z < min_depth {min_depth = voxel.z;}
+        if voxel.z > max_depth {max_depth = voxel.z;}
+    }
+
+    // for the dot sizes, norm the depth to 0..1
+    let z_scale = 1.0 / (max_depth - min_depth);
+
+    println!("min_z={} max_z={} z_scale={}", min_depth, max_depth, z_scale);
+
+    for voxel in &voxels.voxels {
+
+        // voxels are around x=0 and z=0, we need to shift them to half the framebuffer width
+        let xp = voxel.x as i32 + fb.width / 2;
+        let yp = (voxel.y - voxel.z * 0.5) as i32;
+        let size = std::cmp::min(((voxel.z - min_depth) * z_scale) as i32 + 1, 7);
+        
+        // vballs have some size, do some bounds checking here
+        if xp > 2 && yp > 2 && xp < fb.width - 2 && yp < fb.height - 2 {
+            fb.vball(xp, yp, size, voxel.color);
+        }
+        else {
+            println!("vball out of bounds: xp={} yp={} size={}", xp, yp, size);
+        }
+    }
+
+    fb
+}
+
+
+fn generate_sphere(xc: f32, yc: f32, zc: f32, rad: f32, steps: i32, color: [u8; 4]) -> Voxelstack
+{
+    let mut voxels = Voxelstack::new();
+
+    for i in -steps/2 .. steps/2 {
+
+        let fi = (i * 2) as f32 / steps as f32;
+        let p = 1.0 - fi * fi;
+        let ir = p.sqrt() * rad;
+
+        for n in 0 .. steps {
+            let p = PI * 2.0 * n as f32 / steps as f32 + 0.1;
+
+            let x = p.cos() * ir;
+            let z = p.sin() * ir;
+
+            voxels.add(Voxel::new(
+                xc + x, 
+                yc + fi * rad, 
+                zc + z + rad,
+                color
+            ));
+        }
+    }
+
+    voxels
+}
+
+
+fn generate_tendrils(fb_size: i32, dy: f32, dx: f32, steps_range: std::ops::Range<u32>, tendrils: i32,
+                     start_color: [u8; 3], cv_range_max: [u8; 3]) -> Voxelstack
+{
+    let mut rng = rand::rng();
+    let mut voxels = Voxelstack::new();
+
+    let steps = rng.random_range(steps_range);
+    
+    let size = fb_size as f32;
+
+    for rotation in 0 .. tendrils {
+
+        let mut x = 0.0;
+        let mut y = size * 0.75;
+        let mut z = 0.0;
+        let mut color = [start_color[0], start_color[1], start_color[2], 255];
+        let cv = [rng.random_range(0 .. cv_range_max[0]), rng.random_range(0 .. cv_range_max[1]), rng.random_range(0 .. cv_range_max[2]), 255];
+
+        for _i in 0 .. steps {
+
+            let xv = rng.random::<f32>() * dx;
+            let yv = -rng.random::<f32>() * dy;
+            let zv = rng.random::<f32>() * dx;
+            let steps = rng.random_range(4 .. 16);
+            // let color = [128, 160 + rng.random_range(0..96), 96, 255];
+
+            println!("x={} y={} z={}, steps={}", x, y, z, steps);
+            
+            // try to generate fat tendrils by grouping lines
+            line(&mut voxels, x, y+1.0, z, xv, yv, zv, steps, color, cv);
+            line(&mut voxels, x+1.0, y, z+1.0, xv, yv, zv, steps, color, cv);
+
+            (x, y, z, color) = line(&mut voxels, x, y, z, xv, yv, zv, steps, color, cv);
+        }
+        
+        // voxels.merge(generate_sphere(x, y, z, 3.0, 12, color));
+        voxels.merge(generate_sphere(x, y, z, 3.0, 12, [rng.random_range(color[0]..=255), rng.random_range(color[1]..=255), rng.random_range(color[2]..=255), 255]));
+
+        voxels.rotate_y(PI * 2.0 / tendrils as f32);
+    }
+
+    voxels
+}
+
+
+fn line(voxels: &mut Voxelstack,
+        x: f32, y: f32, z: f32, xv: f32, yv: f32, zv: f32, steps: i32,
+        mut color: [u8; 4], cv: [u8; 4]) -> (f32, f32, f32, [u8; 4])
+{
+    let mut xp = x;
+    let mut yp = y;
+    let mut zp = z;
+
+    for _i in 0 .. steps {
+        xp += xv;
+        yp += yv;
+        zp += zv;
+
+        color[0] = c_add(color[0], cv[0]);
+        color[1] = c_add(color[1], cv[1]);
+        color[2] = c_add(color[2], cv[2]);
+
+        voxels.add(Voxel::new(xp, yp, zp, color));
+    }
+
+    (xp, yp, zp, color)
+}
+
+
+fn c_add(a: u8, b: u8) -> u8
+{
+    if b > 255 - a {
+        255
+    } 
+    else {
+        a + b
     }
 }

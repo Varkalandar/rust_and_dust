@@ -805,6 +805,7 @@ impl Map {
                 if ok {
                     let mut mob = self.factory.create_mob(creature.base_tile_id, CREATURE_TILESET, [x, y], 32.0, scale);
                     mob.visual.directions = creature.frames;
+                    mob.visual.blend = BlendMode::Add;
                     mob.mob_type = MobType::Creature;
                     mob.creature = Some(creature);
                     mob.animation_timer = rng.random::<f32>(); // otherwise all start with the very same frame
