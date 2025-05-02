@@ -273,7 +273,7 @@ fn convert_bitmap(buffer: &mut Vec<u8>, bitmap: &freetype::Bitmap,cursor: (u32, 
         for x in 0..bw {
             let idx = (y * bp + x) as usize;
             let alpha = (bb[idx] as f64 / 255.0).powf(0.75) * 255.0;
-            buffer_setpix(buffer, xp + x, yp + y, alpha as u8)                
+            buffer_set_pix(buffer, xp + x, yp + y, alpha as u8)                
         }
     }
 
@@ -302,7 +302,7 @@ fn convert_bitmap(buffer: &mut Vec<u8>, bitmap: &freetype::Bitmap,cursor: (u32, 
 }
 
 
-fn buffer_setpix(buffer: &mut Vec<u8>, x: u32, y: u32, alpha: u8) {
+fn buffer_set_pix(buffer: &mut Vec<u8>, x: u32, y: u32, alpha: u8) {
     let dpos = ((y * PITCH + x) * 4) as usize;
     buffer[dpos] = 255;
     buffer[dpos+1] = 255;

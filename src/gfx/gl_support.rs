@@ -1,6 +1,10 @@
 use std::io::BufReader;
 use std::fs::File;
 
+use image::DynamicImage;
+use image::ImageResult;
+use image::GenericImageView;
+
 use glutin::surface::SurfaceTypeTrait;
 use glutin::surface::ResizeableSurface;
 use glutin::surface::WindowSurface;
@@ -51,8 +55,9 @@ impl RectF32 {
     }
 }
 
-pub fn load_texture<T: SurfaceTypeTrait + ResizeableSurface>(display: &Display<T>, filename: &str) -> glium::Texture2d {
 
+pub fn load_image(filename: &str) -> DynamicImage
+{
     let file_try = File::open(filename);
 
     if !file_try.is_ok() {
@@ -62,9 +67,16 @@ pub fn load_texture<T: SurfaceTypeTrait + ResizeableSurface>(display: &Display<T
 
     let reader = BufReader::new(file);
 
-    let image = image::load(reader, image::ImageFormat::Png).unwrap().to_rgba8();
+    image::load(reader, image::ImageFormat::Png).unwrap()
+}
+
+
+pub fn load_texture<T: SurfaceTypeTrait + ResizeableSurface>(display: &Display<T>, filename: &str) -> glium::Texture2d 
+{
+    let image = load_image(filename);
+
     let image_dimensions = image.dimensions();
-    let image = glium::texture::RawImage2d::from_raw_rgba(image.into_raw(), image_dimensions);
+    let image = glium::texture::RawImage2d::from_raw_rgba(image.to_rgba8().into_raw(), image_dimensions);
     let texture = glium::Texture2d::new(display, image).unwrap();
     
     texture

@@ -170,8 +170,11 @@ impl App {
         let x = (dungeon.rooms[5].x1 + dungeon.rooms[5].x2) / 2;
         let y = (dungeon.rooms[5].y1 + dungeon.rooms[5].y2) / 2;
 
+        let ui = UI::new(window, display, program, window_size);
+        let voxel_display_test = VoxelDisplayTest::new(&ui.display); 
 
-        let creature = generate_creature(&display, &mut layer_tileset[CREATURE_TILESET]);
+        let creature = generate_creature(&ui.display, &mut layer_tileset[CREATURE_TILESET],
+                                         &voxel_display_test.vector_ball);
         map.creature_factory.add("generated_creature", creature);
         map.populate("dungeon.csv", &mut rng, map_pos(x, y, 0));
 
@@ -189,10 +192,7 @@ impl App {
             map_backdrop,
         };
 
-        Self::load_map_textures(&mut world, &display);
-
-
-        let ui = UI::new(window, display, program, window_size);
+        Self::load_map_textures(&mut world, &ui.display);
         
         let editor = MapEditor::new();
 
@@ -220,7 +220,6 @@ impl App {
         let scroll = world.map.item_factory.create("identify_scroll", &mut world.rng);
         world.player_inventory.put_item(scroll, Slot::Bag);
 
-        let voxel_display_test = VoxelDisplayTest::new(&ui.display); 
 
         App {        
             ui,

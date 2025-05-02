@@ -2,6 +2,8 @@ use std::f32::consts::PI;
 
 use rand::Rng;
 
+use image::RgbaImage;
+
 use glutin::surface::ResizeableSurface;
 use glutin::surface::SurfaceTypeTrait;
 use glium::Display;
@@ -13,11 +15,14 @@ use crate::gfx::voxel::Voxelstack;
 use crate::creature::CreaturePrototype;
 use crate::TileSet;
 use crate::Tile;
+use crate::gfx::gl_support::load_image;
 
 
 pub struct VoxelDisplayTest
 {
     pub result: Texture2d,
+    pub vector_ball: RgbaImage,
+    pub soft_pen: RgbaImage,
 }
 
 
@@ -25,19 +30,24 @@ impl VoxelDisplayTest
 {
     pub fn new<T: SurfaceTypeTrait + ResizeableSurface>(display: &Display<T>) -> VoxelDisplayTest
     {
-        let fb = generate_fb_image();
-    
+        let soft_pen = load_image("resources/gfx/ui/soft_pen.png").to_rgba8();
+        let vector_ball = load_image("resources/gfx/ui/vector_ball.png").to_rgba8();
+        let fb = generate_fb_image(&soft_pen);
+
         VoxelDisplayTest {
             result: fb.to_texture(display),
+            vector_ball,
+            soft_pen,
         }
     }
 }
 
 
 pub fn generate_creature<T: SurfaceTypeTrait + ResizeableSurface>(display: &Display<T>, 
-                                                                  tileset: &mut TileSet) -> CreaturePrototype
+                                                                  tileset: &mut TileSet,
+                                                                  pen: &RgbaImage) -> CreaturePrototype
 {
-    let fb = generate_fb_image();
+    let fb = generate_fb_image(pen);
     let tile_id = tileset.get_new_id();
 
     let tile = Tile {
@@ -61,7 +71,7 @@ pub fn generate_creature<T: SurfaceTypeTrait + ResizeableSurface>(display: &Disp
 }
 
 
-pub fn generate_fb_image() -> Framebuffer
+pub fn generate_fb_image(pen: &RgbaImage) -> Framebuffer
 {
     let fb_size = 128;
     let mut fb = Framebuffer::new(fb_size, fb_size);
@@ -69,9 +79,9 @@ pub fn generate_fb_image() -> Framebuffer
     // fb.fill_box(0, 0, 256, 256, [255, 255, 255, 255]);
     // fb.fill_box(10, 10, 236, 236, [0, 0, 0, 255]);
 
-    // let mut voxels = generate_sphere(fb_size);
-    let mut voxels = generate_tendrils(fb_size, 0.5, 0.7, 7..9, 23, [128, 160, 64], [2, 10, 1]);
-    voxels.merge(generate_tendrils(fb_size, 1.0, 0.1, 15..17, 9, [192, 192, 128], [3, 3, 2]));
+    // let mut voxels = generate_sphere(0.0, 64.0, 0.0, 50.0, 24, [192, 192, 128, 255]);
+    let mut voxels = generate_tendrils(fb_size, 0.5 * 4.0, 0.7 * 4.0, 7..9, 23, [128, 160, 64], [2, 10, 1]);
+    voxels.merge(generate_tendrils(fb_size, 1.0 * 4.0, 0.1 * 4.0, 15..17, 9, [192, 192, 128], [3, 3, 2]));
 
     voxels.sort_depth_first();
 
@@ -94,16 +104,33 @@ pub fn generate_fb_image() -> Framebuffer
         // voxels are around x=0 and z=0, we need to shift them to half the framebuffer width
         let xp = voxel.x as i32 + fb.width / 2;
         let yp = (voxel.y - voxel.z * 0.5) as i32;
-        let size = std::cmp::min(((voxel.z - min_depth) * z_scale) as i32 + 1, 7);
+        let size = std::cmp::min(((voxel.z - min_depth) * z_scale) as u32 + 1, 7);
         
         // vballs have some size, do some bounds checking here
         if xp > 2 && yp > 2 && xp < fb.width - 2 && yp < fb.height - 2 {
-            fb.vball(xp, yp, size, voxel.color);
+            pen_at_size(&mut fb, xp, yp, pen, size + 2, voxel.color);
         }
         else {
-            println!("vball out of bounds: xp={} yp={} size={}", xp, yp, size);
+            println!("pen position is out of bounds: xp={} yp={} size={}", xp, yp, size);
         }
     }
+
+
+    // debug
+    /*
+    for y in 0 .. 128 {
+        for x in 0 .. 128 {
+            let source_x = x;
+            let source_y = y;
+
+            let pixel = vector_ball.get_pixel(source_x, source_y);
+
+            println!("sx={} sy={} pix={:?}", source_x, source_y, pixel);
+
+            fb.set_pix(x as i32, y as i32, pixel.0);
+        }    
+    }
+    */
 
     fb
 }
@@ -129,6 +156,7 @@ fn generate_sphere(xc: f32, yc: f32, zc: f32, rad: f32, steps: i32, color: [u8; 
                 xc + x, 
                 yc + fi * rad, 
                 zc + z + rad,
+                1.0, 
                 color
             ));
         }
@@ -161,21 +189,16 @@ fn generate_tendrils(fb_size: i32, dy: f32, dx: f32, steps_range: std::ops::Rang
             let xv = rng.random::<f32>() * dx;
             let yv = -rng.random::<f32>() * dy;
             let zv = rng.random::<f32>() * dx;
-            let steps = rng.random_range(4 .. 16);
-            // let color = [128, 160 + rng.random_range(0..96), 96, 255];
+            let steps = rng.random_range(2 .. 4);
 
-            println!("x={} y={} z={}, steps={}", x, y, z, steps);
+            // println!("x={} y={} z={}, steps={}", x, y, z, steps);
             
-            // try to generate fat tendrils by grouping lines
-            line(&mut voxels, x, y+1.0, z, xv, yv, zv, steps, color, cv);
-            line(&mut voxels, x+1.0, y, z+1.0, xv, yv, zv, steps, color, cv);
-
-            (x, y, z, color) = line(&mut voxels, x, y, z, xv, yv, zv, steps, color, cv);
+            (x, y, z, color) = line(&mut voxels, x, y, z, xv, yv, zv, steps, color, cv, 5.0);
         }
         
-        // voxels.merge(generate_sphere(x, y, z, 3.0, 12, color));
-        voxels.merge(generate_sphere(x, y, z, 3.0, 12, [rng.random_range(color[0]..=255), rng.random_range(color[1]..=255), rng.random_range(color[2]..=255), 255]));
+        voxels.merge(generate_sphere(x, y, z, 3.0, 8, [rng.random_range(color[0]..=255), rng.random_range(color[1]..=255), rng.random_range(color[2]..=255), 255]));
 
+        // spin before adding next tendril
         voxels.rotate_y(PI * 2.0 / tendrils as f32);
     }
 
@@ -185,7 +208,7 @@ fn generate_tendrils(fb_size: i32, dy: f32, dx: f32, steps_range: std::ops::Rang
 
 fn line(voxels: &mut Voxelstack,
         x: f32, y: f32, z: f32, xv: f32, yv: f32, zv: f32, steps: i32,
-        mut color: [u8; 4], cv: [u8; 4]) -> (f32, f32, f32, [u8; 4])
+        mut color: [u8; 4], cv: [u8; 4], size: f32) -> (f32, f32, f32, [u8; 4])
 {
     let mut xp = x;
     let mut yp = y;
@@ -200,10 +223,31 @@ fn line(voxels: &mut Voxelstack,
         color[1] = c_add(color[1], cv[1]);
         color[2] = c_add(color[2], cv[2]);
 
-        voxels.add(Voxel::new(xp, yp, zp, color));
+        voxels.add(Voxel::new(xp, yp, zp, 1.0, color));
     }
 
     (xp, yp, zp, color)
+}
+
+
+fn pen_at_size(fb: &mut Framebuffer, xp: i32, yp: i32, pen: &RgbaImage, size: u32, color: [u8; 4])
+{
+    for y in 0 .. size {
+        for x in 0 .. size {
+            let source_x = (x * 128 + 63) / size;
+            let source_y = (y * 128 + 63) / size;
+
+            let pixel = pen.get_pixel(source_x, source_y).0;
+
+            // println!("sx={} sy={} pix={:?} size={}", source_x, source_y, pixel, size);
+
+            fb.blend_pix(xp + x as i32, yp + y as i32, 
+                         [c_mul(color[0], pixel[0]), 
+                          c_mul(color[1], pixel[1]), 
+                          c_mul(color[2], pixel[2]), 
+                          c_mul(color[3], pixel[3])]);
+        }    
+    }
 }
 
 
@@ -215,4 +259,12 @@ fn c_add(a: u8, b: u8) -> u8
     else {
         a + b
     }
+}
+
+
+fn c_mul(a: u8, b: u8) -> u8
+{
+    let c = a as u32 * b as u32;
+
+    (c >> 8) as u8
 }

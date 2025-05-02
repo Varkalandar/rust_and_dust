@@ -94,7 +94,36 @@ impl Framebuffer
     }
 
 
-    pub fn setpix(&mut self, x: i32, y: i32, color: [u8; 4]) 
+    pub fn blend_pix(&mut self, x: i32, y: i32, color: [u8; 4]) 
+    {
+        let dpos = ((y * self.width + x) * 4) as usize;
+        let r1 = self.buffer[dpos] as i32;
+        let g1 = self.buffer[dpos+1] as i32;
+        let b1 = self.buffer[dpos+2] as i32;
+        let a1 = self.buffer[dpos+3] as i32;
+
+        let r2 = color[0] as i32;
+        let g2 = color[1] as i32;
+        let b2 = color[2] as i32;
+        let a2 = color[3] as i32;
+
+        // we round the result down always, so we must add 255 to each fractional value to get proper rounding
+        let r = r2 * a2 + r1 * (255 - a2) + 255;
+        let g = g2 * a2 + g1 * (255 - a2) + 255;
+        let b = b2 * a2 + b1 * (255 - a2) + 255;
+        
+        // what is right here?
+        // let a = b2 * a2 + b1 * (255 - a2) + 255;
+        let a =std::cmp::max(a1, a2) << 8;
+
+        self.buffer[dpos] = (r >> 8) as u8;
+        self.buffer[dpos+1] = (g >> 8) as u8;
+        self.buffer[dpos+2] = (b >> 8) as u8;
+        self.buffer[dpos+3] = (a >> 8) as u8;
+    }
+
+
+    pub fn set_pix(&mut self, x: i32, y: i32, color: [u8; 4]) 
     {
         let dpos = ((y * self.width + x) * 4) as usize;
         self.buffer[dpos] = color[0];
@@ -112,62 +141,62 @@ impl Framebuffer
             },
             1 => {
                 // darkened pixel
-                self.setpix(x, y, shade(color, 128));
+                self.set_pix(x, y, shade(color, 128));
             },
             2 => {
                 // darkened pixel
-                self.setpix(x, y, shade(color, 192));
+                self.set_pix(x, y, shade(color, 192));
             },
             3 => {
                 // one pixel
-                self.setpix(x, y, color);
+                self.set_pix(x, y, color);
             },
             4 => {
                 // half star
-                self.setpix(x, y, color);
+                self.set_pix(x, y, color);
                 let c2 = shade(color, 192);
-                self.setpix(x+1, y, c2);
-                self.setpix(x, y+1, c2);
+                self.set_pix(x+1, y, c2);
+                self.set_pix(x, y+1, c2);
             },
             5 => {
                 // star shape, center is brightest
-                self.setpix(x, y, color);
+                self.set_pix(x, y, color);
 
                 let c1 = shade(color, 224);
-                self.setpix(x-1, y, c1);
-                self.setpix(x, y-1, c1);
+                self.set_pix(x-1, y, c1);
+                self.set_pix(x, y-1, c1);
 
                 let c2 = shade(color, 192);
-                self.setpix(x+1, y, c2);
-                self.setpix(x, y+1, c2);
+                self.set_pix(x+1, y, c2);
+                self.set_pix(x, y+1, c2);
             },
             6 => {
                 // 3x3 box shape, center is brightest
-                self.setpix(x, y, color);
+                self.set_pix(x, y, color);
 
                 let c1 = shade(color, 224);
-                self.setpix(x-1, y, c1);
-                self.setpix(x, y-1, c1);
+                self.set_pix(x-1, y, c1);
+                self.set_pix(x, y-1, c1);
 
                 let c2 = shade(color, 192);
-                self.setpix(x+1, y, c2);
-                self.setpix(x, y+1, c2);
-                self.setpix(x-1, y-1, c2);
+                self.set_pix(x+1, y, c2);
+                self.set_pix(x, y+1, c2);
+                self.set_pix(x-1, y-1, c2);
 
                 let c3 = shade(color, 160);
-                self.setpix(x+1, y-1, c3);
-                self.setpix(x-1, y+1, c3);
-                self.setpix(x+1, y+1, c3);
+                self.set_pix(x+1, y-1, c3);
+                self.set_pix(x-1, y+1, c3);
+                self.set_pix(x+1, y+1, c3);
             },
             7 => {
                 // a case 6 base, with 4 more star ray dots
                 self.vball(x, y, 6, color);
 
                 let c1 = shade(color, 128);
-                self.setpix(x-2, y, c1);
-                self.setpix(x+2, y, c1);
-                self.setpix(x, y-2, c1);
-                self.setpix(x, y+2, c1);
+                self.set_pix(x-2, y, c1);
+                self.set_pix(x+2, y, c1);
+                self.set_pix(x, y-2, c1);
+                self.set_pix(x, y+2, c1);
             },
 
             _ => {
