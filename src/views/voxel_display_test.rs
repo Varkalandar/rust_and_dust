@@ -16,13 +16,15 @@ use crate::creature::CreaturePrototype;
 use crate::TileSet;
 use crate::Tile;
 use crate::gfx::gl_support::load_image;
+use crate::gfx::c_mul;
+use crate::gfx::c_add;
 
 
 pub struct VoxelDisplayTest
 {
     pub result: Texture2d,
-    pub vector_ball: RgbaImage,
-    pub soft_pen: RgbaImage,
+    pub vector_ball: Framebuffer,
+    pub soft_pen: Framebuffer,
 }
 
 
@@ -30,8 +32,8 @@ impl VoxelDisplayTest
 {
     pub fn new<T: SurfaceTypeTrait + ResizeableSurface>(display: &Display<T>) -> VoxelDisplayTest
     {
-        let soft_pen = load_image("resources/gfx/ui/soft_pen.png").to_rgba8();
-        let vector_ball = load_image("resources/gfx/ui/vector_ball.png").to_rgba8();
+        let soft_pen = Framebuffer::from_image("resources/gfx/ui/soft_pen.png");
+        let vector_ball = Framebuffer::from_image("resources/gfx/ui/vector_ball.png");
         let fb = generate_fb_image(&soft_pen);
 
         VoxelDisplayTest {
@@ -45,7 +47,7 @@ impl VoxelDisplayTest
 
 pub fn generate_creature<T: SurfaceTypeTrait + ResizeableSurface>(display: &Display<T>, 
                                                                   tileset: &mut TileSet,
-                                                                  pen: &RgbaImage) -> CreaturePrototype
+                                                                  pen: &Framebuffer) -> CreaturePrototype
 {
     let fb = generate_fb_image(pen);
     let tile_id = tileset.get_new_id();
@@ -71,7 +73,7 @@ pub fn generate_creature<T: SurfaceTypeTrait + ResizeableSurface>(display: &Disp
 }
 
 
-pub fn generate_fb_image(pen: &RgbaImage) -> Framebuffer
+pub fn generate_fb_image(pen: &Framebuffer) -> Framebuffer
 {
     let fb_size = 128;
     let mut fb = Framebuffer::new(fb_size, fb_size);
@@ -104,11 +106,12 @@ pub fn generate_fb_image(pen: &RgbaImage) -> Framebuffer
         // voxels are around x=0 and z=0, we need to shift them to half the framebuffer width
         let xp = voxel.x as i32 + fb.width / 2;
         let yp = (voxel.y - voxel.z * 0.5) as i32;
-        let size = std::cmp::min(((voxel.z - min_depth) * z_scale) as u32 + 1, 7);
+        let size = std::cmp::min(((voxel.z - min_depth) * z_scale) as i32 + 1, 7);
         
         // vballs have some size, do some bounds checking here
         if xp > 2 && yp > 2 && xp < fb.width - 2 && yp < fb.height - 2 {
-            pen_at_size(&mut fb, xp, yp, pen, size + 2, voxel.color);
+            // pen_at_size(&mut fb, xp, yp, pen, size + 2, voxel.color);
+            pen.draw_scaled(&mut fb, xp, yp, size + 2, size + 2, voxel.color);
         }
         else {
             println!("pen position is out of bounds: xp={} yp={} size={}", xp, yp, size);
@@ -248,23 +251,4 @@ fn pen_at_size(fb: &mut Framebuffer, xp: i32, yp: i32, pen: &RgbaImage, size: u3
                           c_mul(color[3], pixel[3])]);
         }    
     }
-}
-
-
-fn c_add(a: u8, b: u8) -> u8
-{
-    if b > 255 - a {
-        255
-    } 
-    else {
-        a + b
-    }
-}
-
-
-fn c_mul(a: u8, b: u8) -> u8
-{
-    let c = a as u32 * b as u32;
-
-    (c >> 8) as u8
 }

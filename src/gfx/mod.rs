@@ -7,8 +7,9 @@ use glutin::surface::ResizeableSurface;
 use glutin::surface::SurfaceTypeTrait;
 use glium::Display;
 use glium::Texture2d;
-use gl_support::texture_from_data;
 
+use crate::gfx::gl_support::texture_from_data;
+use crate::gfx::gl_support::load_image;
 
 pub struct Framebuffer 
 {
@@ -27,6 +28,78 @@ impl Framebuffer
             height,
             buffer: vec![0_u8; (width * height * 4) as usize],   // rgba
         }
+    }
+
+
+    pub fn from_image(filename: &str) -> Framebuffer
+    {
+        let image = load_image("resources/gfx/ui/soft_pen.png").to_rgba8();
+        let image_dimensions = image.dimensions();
+        let width = image_dimensions.0 as i32;
+        let height = image_dimensions.1 as i32;        
+
+        let mut fb = Self::new(width, height);
+
+        for y in 0 .. height {
+            for x in 0 .. width {
+                let pixel = image.get_pixel(x as u32, y as u32).0;
+                fb.set_pix(x, y, pixel);
+            }
+        }
+
+        fb
+    }
+
+
+    pub fn draw_scaled(&self, dest: &mut Self, 
+                       xp: i32, yp: i32, width: i32, height: i32,
+                       color: [u8; 4])
+    {
+        for y in 0 .. height {
+            for x in 0 .. width {
+                let pixel = self.sample_region(x * self.width / width, 
+                                               y * self.height / height, 
+                                               self.width / width + 1,
+                                               self.height / height + 1);
+
+                // dest.set_pix(xp + x, yp + y, color);
+
+                dest.blend_pix(xp + x, yp + y, 
+                    [c_mul(color[0], pixel[0]), 
+                     c_mul(color[1], pixel[1]), 
+                     c_mul(color[2], pixel[2]), 
+                     c_mul(color[3], pixel[3])]);
+
+            }
+        }
+    }
+
+
+    pub fn sample_region(&self, xp: i32, yp: i32, width: i32, height: i32) -> [u8; 4]
+    {
+        let mut r = 0;
+        let mut g = 0;
+        let mut b = 0;
+        let mut a = 0;
+
+        // clipping
+        let w = if xp + width < self.width { width } else { self.width - xp};
+        let h = if yp + height < self.height { height } else { self.height - yp};
+
+        for y in 0 .. h {
+            for x in 0 .. w {
+
+                let dpos = (((y + yp) * self.width + (x + xp)) * 4) as usize;
+                r += self.buffer[dpos] as u32;
+                g += self.buffer[dpos+1] as u32;
+                b += self.buffer[dpos+2] as u32;
+                a += self.buffer[dpos+3] as u32;
+            }
+        }
+
+        let samples = (w * h) as u32;
+
+        [(r / samples) as u8, (g / samples) as u8, (b / samples) as u8, (a / samples) as u8]
     }
 
 
@@ -220,4 +293,23 @@ pub fn shade(color: [u8; 4], shade: i32) -> [u8; 4]
     let b = (color[2] as i32 * shade) >> 8;
 
     [r as u8, g as u8, b as u8, color[3]]
+}
+
+
+pub fn c_add(a: u8, b: u8) -> u8
+{
+    if b > 255 - a {
+        255
+    } 
+    else {
+        a + b
+    }
+}
+
+
+pub fn c_mul(a: u8, b: u8) -> u8
+{
+    let c = a as u32 * b as u32;
+
+    (c >> 8) as u8
 }
