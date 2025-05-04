@@ -33,7 +33,7 @@ impl VoxelDisplayTest
     {
         let soft_pen = Framebuffer::from_image("resources/gfx/ui/soft_pen.png");
         let vector_ball = Framebuffer::from_image("resources/gfx/ui/vector_ball.png");
-        let fb = generate_goblet_image(&soft_pen, 0.0);
+        let fb = generate_goblet_image(&vector_ball, 0.0);
 
         VoxelDisplayTest {
             result: fb.to_texture(display),
@@ -195,6 +195,13 @@ pub fn generate_goblet_image(pen: &Framebuffer, rot: f32) -> Framebuffer
         }
     }
 
+    // debug
+    /*
+    pen.draw_scaled(&mut fb, 0, 0, pen.width, pen.height, 
+        [192, 224, 255, 255], 
+        |c| -> u8 {c});
+    */
+    
     fb
 }
 

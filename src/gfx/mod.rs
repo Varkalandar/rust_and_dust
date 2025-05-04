@@ -33,7 +33,9 @@ impl Framebuffer
 
     pub fn from_image(filename: &str) -> Framebuffer
     {
-        let image = load_image("resources/gfx/ui/soft_pen.png").to_rgba8();
+        // println!("Loading {}", filename);
+
+        let image = load_image(filename).to_rgba8();
         let image_dimensions = image.dimensions();
         let width = image_dimensions.0 as i32;
         let height = image_dimensions.1 as i32;        
