@@ -33,7 +33,7 @@ impl VoxelDisplayTest
     {
         let soft_pen = Framebuffer::from_image("resources/gfx/ui/soft_pen.png");
         let vector_ball = Framebuffer::from_image("resources/gfx/ui/vector_ball.png");
-        let fb = generate_fb_image(&soft_pen);
+        let fb = generate_goblet_image(&soft_pen, 0.0);
 
         VoxelDisplayTest {
             result: fb.to_texture(display),
@@ -48,33 +48,40 @@ pub fn generate_creature<T: SurfaceTypeTrait + ResizeableSurface>(display: &Disp
                                                                   tileset: &mut TileSet,
                                                                   pen: &Framebuffer) -> CreaturePrototype
 {
-    let fb = generate_fb_image(pen);
-    let tile_id = tileset.get_new_id();
+    let mut tile_id = 0;
 
-    let tile = Tile {
-        id: tile_id,
-        size: [fb.width as f32, fb.height as f32],
-        foot: [fb.width as f32 * 0.5, fb.height as f32 * 0.75],
-        tex: fb.to_texture(display),
-        name: "generated_creature".to_string(),
-    };
+    // create 8 directions
+    for i in 0 .. 8 {
+        let fb = generate_goblet_image(pen, (i as f32 / 8.0) * PI * 2.0);
+        tile_id = tileset.get_new_id();
+    
+        let tile = Tile {
+            id: tile_id,
+            size: [fb.width as f32, fb.height as f32],
+            foot: [fb.width as f32 * 0.5, fb.height as f32 * 0.75],
+            tex: fb.to_texture(display),
+            name: "generated_creature".to_string(),
+        };
 
-    tileset.add_tile(tile);
+        println!("Adding tile {}", tile_id);
+        tileset.add_tile(tile);
+    }
 
     CreaturePrototype {
-        base_tile_id: tile_id,
-        frames: 1,
+        base_tile_id: tile_id - 7,
+        frames: 8,
         speed: 100.0,
         min_hp: 1,
         max_hp: 2,
         projectile_spawn_distance: 25.0,
 
-        blend_mode: BlendMode::Add,
+        // blend_mode: BlendMode::Add,
+        blend_mode: BlendMode::Blend,
         movement_function: movement_glide,
     }
 }
 
-
+/*
 pub fn generate_fb_image(pen: &Framebuffer) -> Framebuffer
 {
     let fb_size = 128;
@@ -138,6 +145,89 @@ pub fn generate_fb_image(pen: &Framebuffer) -> Framebuffer
     */
 
     fb
+}
+*/
+
+pub fn generate_goblet_image(pen: &Framebuffer, rot: f32) -> Framebuffer
+{
+    let fb_size = 128;
+    let mut fb = Framebuffer::new(fb_size, fb_size);
+
+    let mut voxels = generate_goblet(7, 60.0, 40.0, [128, 160, 192, 255]);
+    voxels.merge(generate_goblet(5, 30.0, 64.0, [192, 224, 255, 255]));
+
+    voxels.rotate_y(rot);
+    voxels.sort_depth_first();
+
+    // scan for max and min depth
+    let mut max_depth = 0.0;
+    let mut min_depth = 100.0;
+
+    for voxel in &voxels.voxels {
+        if voxel.z < min_depth {min_depth = voxel.z;}
+        if voxel.z > max_depth {max_depth = voxel.z;}
+    }
+
+    // for the dot sizes, norm the depth to 0..1
+    let z_scale = 1.0 / (max_depth - min_depth);
+
+    println!("min_z={} max_z={} z_scale={}", min_depth, max_depth, z_scale);
+
+    for voxel in &voxels.voxels {
+
+        // voxels are around x=0 and z=0, we need to shift them to half the framebuffer width
+        let xp = voxel.x as i32 + fb.width / 2;
+        let yp = (voxel.y - voxel.z * 0.5) as i32;
+        let size = std::cmp::min(((voxel.z - min_depth) * z_scale) as i32 + 1, 7);
+        
+        // vballs have some size, do some bounds checking here
+        if xp > 2 && yp > 2 && xp < fb.width - 2 && yp < fb.height - 2 {
+            // pen_at_size(&mut fb, xp, yp, pen, size + 2, voxel.color);
+            pen.draw_scaled(&mut fb, xp, yp, size + 8, size + 8, 
+                            voxel.color, 
+                            |c| -> u8 {
+                                let base = c as f32 * PI * 0.5 / 255.0;
+                                (base.sin() * base.sin() * 255.0) as u8
+                            });
+        }
+        else {
+            println!("pen position is out of bounds: xp={} yp={} size={}", xp, yp, size);
+        }
+    }
+
+    fb
+}
+
+
+fn generate_goblet(steps: i32, rad: f32, height: f32, color: [u8; 4]) -> Voxelstack
+{
+    let mut voxels = Voxelstack::new();
+
+    for i in 0 .. steps {
+
+        let fi = i as f32 * 1.2 / steps as f32;
+        let r = fi.sin() * rad;
+
+        let y = 96.0 - (i as f32 * height) / steps as f32;
+
+        for n in 0 .. steps * 2 {
+            let start_angle = fi * - 1.0;
+            let angle = PI * n as f32 / steps as f32 + start_angle;
+
+            let x = angle.cos() * r;
+            let z = angle.sin() * r;
+
+            voxels.add(Voxel::new(
+                x, 
+                y, 
+                z,
+                1.0, 
+                color
+            ));
+        }
+    }
+
+    voxels
 }
 
 

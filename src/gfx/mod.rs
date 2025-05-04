@@ -53,7 +53,8 @@ impl Framebuffer
 
     pub fn draw_scaled(&self, dest: &mut Self, 
                        xp: i32, yp: i32, width: i32, height: i32,
-                       color: [u8; 4])
+                       color: [u8; 4],
+                       shade_func: fn(u8) -> u8)
     {
         for y in 0 .. height {
             for x in 0 .. width {
@@ -65,9 +66,9 @@ impl Framebuffer
                 // dest.set_pix(xp + x, yp + y, color);
 
                 dest.blend_pix(xp + x, yp + y, 
-                    [c_mul(color[0], pixel[0]), 
-                     c_mul(color[1], pixel[1]), 
-                     c_mul(color[2], pixel[2]), 
+                    [shade_func(c_mul(color[0], pixel[0])), 
+                     shade_func(c_mul(color[1], pixel[1])), 
+                     shade_func(c_mul(color[2], pixel[2])), 
                      c_mul(color[3], pixel[3])]);
 
             }
