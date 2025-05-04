@@ -2,7 +2,6 @@ use std::io::BufReader;
 use std::fs::File;
 
 use image::DynamicImage;
-use image::ImageResult;
 use image::GenericImageView;
 
 use glutin::surface::SurfaceTypeTrait;

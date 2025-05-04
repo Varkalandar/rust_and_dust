@@ -53,8 +53,7 @@ pub struct ItemPrototype
     pub color: [f32; 4],
     pub ilvl: u32,
     pub kind: ItemKind,
-    pub stack_size: u32,         // some items can be stacked and must have a stack count
-    pub max_stack_size: u32,
+    pub max_stack_size: u32,       // some items can be stacked and must have a stack count
     pub base_price: u32,
 
     pub activation: Activation,
@@ -157,12 +156,6 @@ impl Item
         }
 
         false
-    }
-
-
-    pub fn print_debug(&self) 
-    {
-        println!("{}", self.name());
     }
 }
 
@@ -356,7 +349,6 @@ fn read_proto_items(proto_mods: &HashMap<String, ModPrototype>) -> HashMap<Strin
                     color: parse_rgba(parts.next().unwrap()),
                     ilvl: parts.next().unwrap().parse::<u32>().unwrap(),
                     kind: parse_item_type(parts.next().unwrap()),
-                    stack_size: 1,
                     max_stack_size: parts.next().unwrap().parse::<u32>().unwrap(),
                     base_price: parts.next().unwrap().parse::<u32>().unwrap(),
 

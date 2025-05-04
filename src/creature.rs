@@ -99,7 +99,7 @@ fn read_creature_prototypes() -> HashMap <String, CreaturePrototype>
 
 // movement functions
 
-pub fn movement_glide(p: f32) -> f32
+pub fn movement_glide(_p: f32) -> f32
 {
     0.0
 }

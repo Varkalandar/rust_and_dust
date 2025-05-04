@@ -2,8 +2,6 @@ use std::f32::consts::PI;
 
 use rand::Rng;
 
-use image::RgbaImage;
-
 use glutin::surface::ResizeableSurface;
 use glutin::surface::SurfaceTypeTrait;
 use glium::Display;
@@ -183,7 +181,7 @@ fn generate_tendrils(fb_size: i32, dy: f32, dx: f32, steps_range: std::ops::Rang
     
     let size = fb_size as f32;
 
-    for rotation in 0 .. tendrils {
+    for _rotation in 0 .. tendrils {
 
         let mut x = 0.0;
         let mut y = size * 0.75;
@@ -234,25 +232,4 @@ fn line(voxels: &mut Voxelstack,
     }
 
     (xp, yp, zp, color)
-}
-
-
-fn pen_at_size(fb: &mut Framebuffer, xp: i32, yp: i32, pen: &RgbaImage, size: u32, color: [u8; 4])
-{
-    for y in 0 .. size {
-        for x in 0 .. size {
-            let source_x = (x * 128 + 63) / size;
-            let source_y = (y * 128 + 63) / size;
-
-            let pixel = pen.get_pixel(source_x, source_y).0;
-
-            // println!("sx={} sy={} pix={:?} size={}", source_x, source_y, pixel, size);
-
-            fb.blend_pix(xp + x as i32, yp + y as i32, 
-                         [c_mul(color[0], pixel[0]), 
-                          c_mul(color[1], pixel[1]), 
-                          c_mul(color[2], pixel[2]), 
-                          c_mul(color[3], pixel[3])]);
-        }    
-    }
 }
