@@ -9,13 +9,14 @@ use glutin::surface::SurfaceTypeTrait;
 use glium::Display;
 
 use crate::Texture2d;
+use crate::creature::CreaturePrototype;
+use crate::creature::movement_glide;
+use crate::TileSet;
+use crate::Tile;
 use crate::gfx::Framebuffer;
 use crate::gfx::voxel::Voxel;
 use crate::gfx::voxel::Voxelstack;
-use crate::creature::CreaturePrototype;
-use crate::TileSet;
-use crate::Tile;
-use crate::gfx::gl_support::load_image;
+use crate::gfx::gl_support::BlendMode;
 use crate::gfx::c_mul;
 use crate::gfx::c_add;
 
@@ -69,6 +70,9 @@ pub fn generate_creature<T: SurfaceTypeTrait + ResizeableSurface>(display: &Disp
         min_hp: 1,
         max_hp: 2,
         projectile_spawn_distance: 25.0,
+
+        blend_mode: BlendMode::Add,
+        movement_function: movement_glide,
     }
 }
 

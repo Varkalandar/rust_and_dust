@@ -1,6 +1,8 @@
 use std::collections::HashMap;
 
 use crate::read_lines;
+use crate::gfx::gl_support::BlendMode;
+
 
 pub struct CreatureFactory {
     prototypes: HashMap <String, CreaturePrototype>
@@ -14,6 +16,9 @@ pub struct CreaturePrototype {
     pub min_hp: i32,
     pub max_hp: i32,
     pub projectile_spawn_distance: f32,
+
+    pub blend_mode: BlendMode,
+    pub movement_function: fn(f32) -> f32,
 }
 
 
@@ -24,6 +29,9 @@ pub struct Creature {
     pub base_speed: f32,
     pub hit_points: i32,
     pub projectile_spawn_distance: f32,
+
+    pub blend_mode: BlendMode,
+    pub movement_function: fn(f32) -> f32,
 }
 
 
@@ -49,6 +57,8 @@ impl CreatureFactory {
             base_speed: proto.speed,
             hit_points: (proto.max_hp + proto.min_hp) / 2,
             projectile_spawn_distance: proto.projectile_spawn_distance,
+            blend_mode: proto.blend_mode,
+            movement_function: proto.movement_function,
         }
     }
     
@@ -78,8 +88,30 @@ fn read_creature_prototypes() -> HashMap <String, CreaturePrototype>
                 min_hp: parts.next().unwrap().parse::<i32>().unwrap(),
                 max_hp: parts.next().unwrap().parse::<i32>().unwrap(),
                 projectile_spawn_distance: parts.next().unwrap().parse::<f32>().unwrap(),
+                blend_mode: BlendMode::Blend,
+                movement_function: movement_bounce,
             });
     }
 
     prototypes
 }
+
+
+// movement functions
+
+pub fn movement_glide(p: f32) -> f32
+{
+    0.0
+}
+
+
+pub fn movement_bounce(p: f32) -> f32
+{
+    let t = ((p * 15.0) % 2.0) - 1.0;
+
+    let z = 1.0 - (t * t);
+
+    z * 10.0
+}
+
+

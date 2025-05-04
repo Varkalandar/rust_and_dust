@@ -805,7 +805,7 @@ impl Map {
                 if ok {
                     let mut mob = self.factory.create_mob(creature.base_tile_id, CREATURE_TILESET, [x, y], 32.0, scale);
                     mob.visual.directions = creature.frames;
-                    mob.visual.blend = BlendMode::Add;
+                    mob.visual.blend = creature.blend_mode;
                     mob.mob_type = MobType::Creature;
                     mob.creature = Some(creature);
                     mob.animation_timer = rng.random::<f32>(); // otherwise all start with the very same frame
@@ -937,23 +937,21 @@ pub struct MapObject {
 }
 
 
-fn bounce(p: f32) -> f32
-{
-    let t = ((p * 15.0) % 2.0) - 1.0;
-
-    let z = 1.0 - (t * t);
-
-    z * 10.0
-}
-
-
 impl MapObject 
 {   
     pub fn move_dt(&mut self, dt: f32) 
     {
         if self.move_time_left > 0.0 {
             let distance = vec2_scale(self.velocity, dt);
-            let z_off = bounce(self.move_time_total - self.move_time_left);
+            let z_off;
+            if self.creature.is_some() {
+                let creature = self.creature.as_ref().unwrap();
+                z_off = (creature.movement_function)(self.move_time_total - self.move_time_left);
+            }
+            else {
+                z_off = 0.0;
+            }
+            
             self.position = vec2_add(self.position, distance);
             self.move_time_left -= dt;
             self.visual.z_off = z_off;

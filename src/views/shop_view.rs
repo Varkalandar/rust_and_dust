@@ -13,8 +13,6 @@ use crate::GameWorld;
 use crate::ButtonEvent;
 use crate::MouseMoveEvent;
 use crate::ui::*;
-use crate::ui::*;
-use crate::ui::*;
 use crate::views::player_items_view::PlayerItemsView;
 use crate::views::draw_item;
 use crate::views::show_item_popup;
