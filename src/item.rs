@@ -271,7 +271,7 @@ impl ItemFactory
 
         while tries < max_mods {
             if rng.random::<f32>() < chance {
-                self.add_random_mods(&mut item, rng, 1);
+                self.add_random_mods(&mut item, rng, 1, max_level);
             }      
             
             chance = chance * mf_factor;    // shrink the chance
@@ -282,18 +282,26 @@ impl ItemFactory
     }
 
 
-    fn add_random_mods<R: Rng + ?Sized>(&self, item: &mut Item, rng: &mut R, mod_count: u32)
+    fn add_random_mods<R: Rng + ?Sized>(&self, item: &mut Item, rng: &mut R, 
+                                        mod_count: u32, max_level: u32)
     {
-        let mut keys: Vec<&String> = 
-            self.proto_mods.keys().filter( |mod_key| -> bool 
+        let mut keys: Vec<(&String, &ModPrototype)> = 
+            self.proto_mods.iter().filter( |value| -> bool 
                 {
                     if item.kind == ItemKind::Scroll || 
                        item.kind == ItemKind::Currency {
                         return false
                     }
                     else {
-                        // we allow all mods for testing
-                        true
+                        // only accept mods which match the level
+
+                        if value.1.ilvl <= max_level {
+                            // this mod is acceptable
+                            return true
+                        } 
+
+                        // we filter everything else
+                        false
                     }
                 }
             ).collect();
@@ -308,7 +316,7 @@ impl ItemFactory
 
             let n = rng.random_range(0 .. keys.len());
             let key = keys.remove(n);
-            let proto_mod = self.proto_mods.get(key).unwrap();
+            let proto_mod = self.proto_mods.get(key.0).unwrap();
 
             if item.has_mod_type(proto_mod.attribute.clone()) {
                 // a mod of this type is already on the item, 
@@ -383,6 +391,7 @@ fn read_proto_mods() -> HashMap<String, ModPrototype>
                     min_value: parts.next().unwrap().parse::<i32>().unwrap(),
                     max_value: parts.next().unwrap().parse::<i32>().unwrap(),
                     unit: parse_unit(parts.next().unwrap()),
+                    ilvl: parts.next().unwrap().parse::<u32>().unwrap(),
                 }
             );
         }
@@ -592,6 +601,7 @@ pub struct ModPrototype {
     pub min_value: i32,
     pub max_value: i32,
     pub unit: Unit,
+    pub ilvl: u32,
 }
 
 
@@ -602,6 +612,7 @@ pub struct Mod {
     pub max_value: i32,
     pub unit: Unit,
     pub kind: ModKind,
+    pub ilvl: u32,
 }
 
 
@@ -664,5 +675,6 @@ fn random_from_range<R: Rng + ?Sized>(modifier: &ModPrototype, rng: &mut R, kind
         max_value: actual_value,
         unit: modifier.unit.clone(),
         kind,
+        ilvl: modifier.ilvl,
     }
 }
