@@ -594,16 +594,16 @@ impl Map {
 
         let x = parts[3].parse::<f32>().unwrap();
         let y = parts[4].parse::<f32>().unwrap();
-        let height = parts[5].parse::<f32>().unwrap();
+        let z_off = parts[5].parse::<f32>().unwrap();
         let scale = parts[6].parse::<f32>().unwrap();
 
         // parts[7] is an RGBA tuple
         let color = parse_rgba(parts[7]);
         let blend = key_to_blend(parts[8]);
 
-        println!("{}, {}, {}, {}, {}, {}, {:?}, {:?}", layer, tile_id, x, y, height, scale, color, blend);
+        println!("{}, {}, {}, {}, {}, {}, {:?}, {:?}", layer, tile_id, x, y, z_off, scale, color, blend);
 
-        let mut mob = self.factory.create_mob(tile_id, layer, [x, y], height, scale);
+        let mut mob = self.factory.create_mob(tile_id, layer, [x, y], z_off, scale);
         mob.visual.color = color;
         mob.visual.blend = blend;
         mob.visual.directions = directions;
