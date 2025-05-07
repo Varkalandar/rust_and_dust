@@ -36,7 +36,7 @@ jobs:
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: rust_and_dust_collector.zip
+        file: rust_and_dust_collector_snapshot-ubuntu.zip
         asset_name: rust_and_dust_collector_snapshot-ubuntu.zip
         tag: dev_snapshot
         overwrite: true
