@@ -23,7 +23,7 @@ jobs:
       run: |
         sudo apt-get -y install podman
         cargo install cross
-        cross run --target x86_64-pc-windows-gnu
+        cross build --target x86_64-pc-windows-gnu
 
     - name: distribute
       run: |
