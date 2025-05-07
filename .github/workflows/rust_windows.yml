@@ -27,7 +27,7 @@ jobs:
 
     - name: distribute
       run: |
-        mv /target/x86_64-pc-windows-gnu/debug/rust_and_dust_collector.exe .
+        mv target/x86_64-pc-windows-gnu/debug/rust_and_dust_collector.exe .
         zip -r rust_and_dust_collector_snapshot-windows.zip resources rust_and_dust_collector.exe
 
     - name: Update binaries of development snapshot
