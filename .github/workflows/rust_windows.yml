@@ -23,12 +23,14 @@ jobs:
       run: |
         sudo apt-get -y install podman
         cargo install cross
-        cross build --target x86_64-pc-windows-gnu
+        cross build --release --target x86_64-pc-windows-gnu
 
     - name: distribute
       run: |
-        mv target/x86_64-pc-windows-gnu/debug/rust_and_dust_collector.exe .
-        zip -r rust_and_dust_collector_snapshot-windows.zip resources rust_and_dust_collector.exe
+        mkdir rust_and_dust_collector_snapshot-windows
+        mv target/x86_64-pc-windows-gnu/debug/rust_and_dust_collector.exe rust_and_dust_collector_snapshot-windows
+        cp -r resources rust_and_dust_collector_snapshot-windows
+        zip -r rust_and_dust_collector_snapshot-windows.zip rust_and_dust_collector_snapshot-windows
 
     - name: Update binaries of development snapshot
       uses: svenstaro/upload-release-action@v2
