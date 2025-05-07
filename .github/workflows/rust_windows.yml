@@ -30,6 +30,7 @@ jobs:
         mkdir rust_and_dust_collector_snapshot-windows
         mv target/x86_64-pc-windows-gnu/release/rust_and_dust_collector.exe rust_and_dust_collector_snapshot-windows
         cp -r resources rust_and_dust_collector_snapshot-windows
+        cp credits.txt license.txt rust_and_dust_collector_snapshot-windows
         zip -r rust_and_dust_collector_snapshot-windows.zip rust_and_dust_collector_snapshot-windows
 
     - name: Update binaries of development snapshot
