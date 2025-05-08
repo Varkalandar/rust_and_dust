@@ -36,7 +36,13 @@ impl Shop
         let mut rng = rand::rngs::StdRng::seed_from_u64(12345678901);
 
         for _i in 0 .. 20 {
-            let item = item_factory.create_random_item(&mut rng, 1, 6, MAGIC_ITEM_CHANCE, MAGIC_FIND_FACTOR);
+            let mut item = item_factory.create_random_item(&mut rng, 1, 6, MAGIC_ITEM_CHANCE, MAGIC_FIND_FACTOR);
+
+            // we need a better way to generate shop items ...
+            while item.key == "copper_coin" {
+                item = item_factory.create_random_item(&mut rng, 1, 6, MAGIC_ITEM_CHANCE, MAGIC_FIND_FACTOR);
+            }
+
             self.items.push(item);
         }
     }
