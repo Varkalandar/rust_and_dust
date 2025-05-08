@@ -1800,16 +1800,16 @@
       <Description>
         <version>4</version>
         <id>106</id>
-        <width>1</width>
-        <height>1</height>
+        <width>59</width>
+        <height>31</height>
         <offsetX>0</offsetX>
         <offsetY>0</offsetY>
-        <footX>0</footX>
-        <footY>0</footY>
+        <footX>28</footX>
+        <footY>14</footY>
       </Description>
       <Metadata>
         <int>0</int>
-        <string></string>
+        <string>wild_sun_amulet_map</string>
         <string></string>
       </Metadata>
     </Tile>
@@ -1817,8 +1817,8 @@
       <Description>
         <version>4</version>
         <id>107</id>
-        <width>1</width>
-        <height>1</height>
+        <width>121</width>
+        <height>119</height>
         <offsetX>0</offsetX>
         <offsetY>0</offsetY>
         <footX>0</footX>
@@ -1826,7 +1826,7 @@
       </Description>
       <Metadata>
         <int>0</int>
-        <string></string>
+        <string>wild_sun_amulet_inv</string>
         <string></string>
       </Metadata>
     </Tile>

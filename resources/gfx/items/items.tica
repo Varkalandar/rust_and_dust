@@ -1695,15 +1695,15 @@ data
 Tile Description
 v.5
 106
-1 1
+59 31
 0 0
-0 0
+28 14
 End Of Header
 Item
 v.1
 data
 2
-
+wild_sun_amulet_map
 
 1
 0
@@ -1711,7 +1711,7 @@ data
 Tile Description
 v.5
 107
-1 1
+121 119
 0 0
 0 0
 End Of Header
@@ -1719,7 +1719,7 @@ Item
 v.1
 data
 2
-
+wild_sun_amulet_inv
 
 1
 0
