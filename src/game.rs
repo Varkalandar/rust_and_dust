@@ -172,7 +172,7 @@ impl UiController for Game
 
     fn draw_overlay(&mut self, target: &mut Frame, ui: &mut UI, _world: &mut Self::Appdata) 
     {
-        ui.context.font_14.draw(&ui.display, target, &ui.program, 10, 20, "Game testing mode", &WHITE);
+        ui.context.font_normal.draw(&ui.display, target, &ui.program, 10, 20, "Game testing mode", &WHITE);
     }
 
 

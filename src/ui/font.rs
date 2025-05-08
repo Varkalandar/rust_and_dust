@@ -32,7 +32,7 @@ struct UiGlyph {
 
 pub struct UiFont {
     face: freetype::Face,
-    pub lineheight: i32,
+    pub line_height: i32,
     
     glyphs: HashMap<usize, UiGlyph>,
     texture: Texture2d,
@@ -52,19 +52,18 @@ impl UiFont {
         let face = ft.new_face(font, 0).unwrap();
         face.set_pixel_sizes(0, size).unwrap();
 
-        let char_height = ((face.ascender() - face.descender()) / 64) as f64; 
-        let lineheight = (char_height * 1.2) as i32;
+        let line_height = ((face.size_metrics().unwrap().height + 63) / 64) as i32;
 
         // println!("Ascend {} descend {}", face.ascender(), face.descender());
 
         let mut glyphs = HashMap::new();
-        let texture = create_glyphs(display, &face, &mut glyphs, lineheight as u32);
+        let texture = create_glyphs(display, &face, &mut glyphs, line_height as u32);
 
         let vertex_buffer = build_dynamic_quad_buffer(display);
 
         UiFont {
             face,
-            lineheight,
+            line_height,
             glyphs,
             texture,
             vertex_buffer,
@@ -165,7 +164,7 @@ impl UiFont {
             if run_x + word_width > width as f32 {
                 // we need to start a new line for this word.
                 run_x = 0.0;
-                yp += self.lineheight as f32;
+                yp += self.line_height as f32;
                 lines += 1;
             }
 

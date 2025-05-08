@@ -329,7 +329,7 @@ impl UiController for MapEditor {
                 &[1.0, 1.0, 1.0, 0.5]);
         }
 
-        let font = &ui.context.font_14;
+        let font = &ui.context.font_normal;
         
         font.draw(&ui.display, target, &ui.program, 10, 20, "Press F1 to see editor hotkeys", &WHITE);
         font.draw(&ui.display, target, &ui.program, 10, 40, "Press g to enter game mode", &WHITE);

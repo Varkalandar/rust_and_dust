@@ -68,7 +68,7 @@ impl ShopView
 
         self.player_items_view.draw(ui, target, 0, 0, player_inventory, item_tiles);
 
-        let font = &ui.context.font_24;
+        let font = &ui.context.font_large;
 
         font.draw(&ui.display, target, &ui.program, 
                   left + 10, top + 20, &shop.name, &WHITE);
@@ -115,16 +115,16 @@ impl ShopView
 
 
     fn draw_shop_inventory(&self, ui: &UI, target: &mut Frame, 
-                          shop: &Shop, item_tiles: &TileSet, player_money: u32)
+                           shop: &Shop, item_tiles: &TileSet, player_money: u32)
     {
-        let font = &ui.context.font_14;
-        let x = 84;
+        let font = &ui.context.font_small;
+        let x = 80;
         let y = 60;
         
         let mut row = 0;
         let mut col = 0;
 
-        let w = 106;
+        let w = 108;
         let h = 96;
 
         for item in &shop.items {
@@ -145,7 +145,8 @@ impl ShopView
             let limit = 17;
             let name = item.name().to_string();
 
-            draw_multiline_centered(&ui.display, target, &ui.program, &name, entry_x, entry_y, w, limit, font);
+            draw_multiline_centered(&ui.display, target, &ui.program, 
+                                    &name, entry_x, entry_y, w, limit, font);
 
             // display the price at the bottom
             let text_line = calculate_price_string(item);
@@ -178,7 +179,7 @@ impl ShopView
 
 fn draw_multiline_centered(display: &Display<WindowSurface>, target: &mut Frame, program: &Program,
                            name: &String, x: i32, y:i32,
-                            box_width: i32, limit: usize, font: &UiFont)
+                           box_width: i32, limit: usize, font: &UiFont)
 {
     let mut parts = name.split(" ");
     let mut line_y = 12 - (name.len() / limit) as i32 * 8;
@@ -215,7 +216,7 @@ fn draw_multiline_centered(display: &Display<WindowSurface>, target: &mut Frame,
             font.draw(display, target, program, 
                       x + (box_width - text_width) / 2, y + line_y, &text_line, &[0.9, 0.9, 0.9, 1.0]);
 
-            line_y += font.lineheight;
+            line_y += font.line_height;
 
             // now start a new text line with the remaining word
             text_line = word.to_string() + " ";
@@ -256,10 +257,10 @@ fn calculate_price_string(item: &Item) -> String
 fn find_item_at(mx: f32, my: f32) -> Option<usize>
 {
     // these must match the display code
-    let left = 84;
+    let left = 80;
     let top = 60;
 
-    let w = 106;
+    let w = 108;
     let h = 96;
 
     let x = mx as i32 - left;

@@ -17,11 +17,12 @@ use crate::gfx::gl_support::*;
 pub fn show_item_popup(ui: &UI, target: &mut Frame,
                        x: i32, y: i32, item: &Item) 
 {
-    let font = &ui.context.font_14;
+    let font = &ui.context.font_normal;
     
+    let line_space = ui.context.font_normal.line_height;
     let left = x + 6;
-    let line_space = 20;
-    let box_width = 200;
+    let top = y + 12 + line_space;
+    let box_width = 320;
     let mut line_count = 1; // first line is item name
 
     for modifier in &item.mods {
@@ -35,19 +36,21 @@ pub fn show_item_popup(ui: &UI, target: &mut Frame,
     }
 
     if item.description.len() > 0 {
+        
+        // don't actually draw, just count the lines required (false)
         line_count += 
-        ui.context.font_10.draw_multiline(&ui.display, target, &ui.program, 
-                                          0, 0, box_width,
-                                          &item.description, &OFF_WHITE, false);
+            ui.context.font_small.draw_multiline(&ui.display, target, &ui.program, 
+                                                 0, 0, box_width,
+                                                 &item.description, &OFF_WHITE, false);
     }
 
-    let mut line = y - line_count * line_space;
-    let bottom_margin = if line_count > 1 {8} else {4};
+    let mut line = top - line_count * line_space;
+    let bottom_margin = if line_count > 1 {12} else {8};
 
     ui.fill_box(target, x, line, box_width, (line_count * line_space) + bottom_margin, &[0.1, 0.1, 0.1, 0.9]);
     ui.draw_box(target, x, line, box_width, (line_count * line_space) + bottom_margin, &LIGHT_GREY);
 
-    line += 5;
+    line += 12;
 
     let headline_width = font.calc_string_width(&item.name()) as i32;
     font.draw(&ui.display, target, &ui.program, x + (box_width - headline_width) / 2, line, &item.name(), &WHITE);
@@ -71,7 +74,7 @@ pub fn show_item_popup(ui: &UI, target: &mut Frame,
     }
 
     if item.description.len() > 0 {
-        ui.context.font_10.draw_multiline(&ui.display, target, &ui.program, 
+        ui.context.font_small.draw_multiline(&ui.display, target, &ui.program, 
                                           left, line, box_width,
                                           &item.description, &OFF_WHITE, true);
         // line += line_space;

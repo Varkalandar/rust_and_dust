@@ -152,9 +152,9 @@ pub struct UiComponent {
 
 pub struct UiContext
 {
-    pub font_10: Rc<UiFont>,
-    pub font_14: Rc<UiFont>,
-    pub font_24: Rc<UiFont>,
+    pub font_small: Rc<UiFont>,
+    pub font_normal: Rc<UiFont>,
+    pub font_large: Rc<UiFont>,
     pub tex_white: Rc<Texture2d>,
 
     pub vertex_buffer: VertexBuffer<Vertex>,
@@ -188,9 +188,9 @@ impl UI {
             window_size,
             scissors: None,
 
-            font_10: Rc::new(UiFont::new(&display, 10)),
-            font_14: Rc::new(UiFont::new(&display, 14)),
-            font_24: Rc::new(UiFont::new(&display, 24)),
+            font_small: Rc::new(UiFont::new(&display, 14)),
+            font_normal: Rc::new(UiFont::new(&display, 18)),
+            font_large: Rc::new(UiFont::new(&display, 24)),
             tex_white: Rc::new(tex_white),
 
             vertex_buffer: build_dynamic_quad_buffer(&display),
@@ -245,7 +245,7 @@ impl UI {
                 w,
                 h,                
             }, 
-            font: self.context.font_14.clone(),
+            font: self.context.font_normal.clone(),
             label: label.to_string(),    
         };
         
@@ -264,7 +264,7 @@ impl UI {
                 w,
                 h,                
             }, 
-            font: self.context.font_10.clone(),
+            font: self.context.font_small.clone(),
             label: label.to_string(),
             tile: tile.clone(),
             id,
@@ -619,7 +619,7 @@ impl UiHead for UiButton {
 
         let label_width = self.font.calc_string_width(&self.label) as i32;
         let label_x = x + (area.w - label_width) / 2;
-        let label_y = y + (area.h - self.font.lineheight) / 2;
+        let label_y = y + (area.h - self.font.line_height) / 2;
 
         self.font.draw(display, target, program, label_x, label_y, &self.label, &WHITE);
     } 
@@ -680,7 +680,7 @@ impl UiHead for UiIcon
 
         let label_width = self.font.calc_string_width(&self.label) as i32;
         let label_x = xp as i32 + (area.w - label_width) / 2;
-        let label_y = yp as i32 + area.h - self.font.lineheight;
+        let label_y = yp as i32 + area.h - self.font.line_height;
 
         self.font.draw(display, target, program, label_x, label_y, &self.label, &[0.4, 0.6, 0.7, 1.0]);
     } 

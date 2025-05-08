@@ -386,7 +386,7 @@ impl App {
             self.update_time = now;
             let secs = difference.unwrap().as_secs_f32();
             let s = format!("Time: {:.4}s", secs);
-            let font = &self.ui.context.font_14;
+            let font = &self.ui.context.font_normal;
         
             font.draw(&self.ui.display, &mut target, &self.ui.program, 10, 600, &s, &WHITE);
         }
