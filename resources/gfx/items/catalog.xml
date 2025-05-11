@@ -1834,16 +1834,16 @@
       <Description>
         <version>4</version>
         <id>108</id>
-        <width>1</width>
-        <height>1</height>
+        <width>60</width>
+        <height>19</height>
         <offsetX>0</offsetX>
         <offsetY>0</offsetY>
-        <footX>0</footX>
-        <footY>0</footY>
+        <footX>26</footX>
+        <footY>11</footY>
       </Description>
       <Metadata>
         <int>0</int>
-        <string></string>
+        <string>falling_moon_pendant_map</string>
         <string></string>
       </Metadata>
     </Tile>
@@ -1851,8 +1851,8 @@
       <Description>
         <version>4</version>
         <id>109</id>
-        <width>1</width>
-        <height>1</height>
+        <width>114</width>
+        <height>57</height>
         <offsetX>0</offsetX>
         <offsetY>0</offsetY>
         <footX>0</footX>
@@ -1860,7 +1860,7 @@
       </Description>
       <Metadata>
         <int>0</int>
-        <string></string>
+        <string>falling_moon_pendant_inv</string>
         <string></string>
       </Metadata>
     </Tile>

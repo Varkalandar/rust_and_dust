@@ -1727,15 +1727,15 @@ wild_sun_amulet_inv
 Tile Description
 v.5
 108
-1 1
+60 19
 0 0
-0 0
+26 11
 End Of Header
 Item
 v.1
 data
 2
-
+falling_moon_pendant_map
 
 1
 0
@@ -1743,7 +1743,7 @@ data
 Tile Description
 v.5
 109
-1 1
+114 57
 0 0
 0 0
 End Of Header
@@ -1751,7 +1751,7 @@ Item
 v.1
 data
 2
-
+falling_moon_pendant_inv
 
 1
 0
