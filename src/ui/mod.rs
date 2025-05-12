@@ -139,7 +139,16 @@ pub struct UiArea {
 
 
 impl UiArea {
-    pub fn contains(&self, x: i32, y:i32) -> bool {
+
+    pub fn new(x: i32, y: i32, w: i32, h: i32) -> UiArea
+    {
+        UiArea {
+            x, y, w, h,
+        }
+    }
+
+    pub fn contains(&self, x: i32, y:i32) -> bool 
+    {
         x >= self.x && y >= self.y && x < self.x + self.w && y < self.y + self.h  
     }
 }

@@ -79,7 +79,11 @@ impl UiController for Game
 
                     // first check our self-controlled user interfaces
                     if self.show_shop_inventory {
-                        consumed = self.shop_view.handle_button_event(event, &ui.context.mouse_state, world);
+                        let closed;
+                        (consumed, closed) = self.shop_view.handle_button_event(&ui, event, world);
+                        if closed {
+                            self.show_shop_inventory = false;
+                        }
                     }
         
                     if !consumed && self.show_player_inventory {

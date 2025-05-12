@@ -57,36 +57,41 @@ impl ShopView
     pub fn draw(&self, ui: &UI, target: &mut Frame, 
                 shop: &Shop, player_inventory: &Inventory, item_tiles: &TileSet) 
     {
-        let size = ui.context.window_size;
-        let left = 70;
-        let width = (size[0] as i32) - left * 2;
-        let top = 10;
-        let height = (size[1] as i32) - top * 2;
+        let area = calc_view_area(ui.context.window_size);
 
-        ui.draw_box(target, left, top, width, height, &[0.6, 0.6, 0.6, 1.0]);
-        ui.fill_box(target, left + 1, top + 1, width - 2, height - 2 , &[0.08, 0.06, 0.03, 1.0]);
+        ui.draw_box(target, area.x, area.y, area.w, area.h, &[0.6, 0.6, 0.6, 1.0]);
+        ui.fill_box(target, area.x + 1, area.y + 1, area.w - 2, area.h - 2 , &[0.08, 0.06, 0.03, 1.0]);
 
         self.player_items_view.draw(ui, target, 0, 0, player_inventory, item_tiles);
 
         let font = &ui.context.font_large;
 
         font.draw(&ui.display, target, &ui.program, 
-                  left + 10, top + 20, &shop.name, &WHITE);
+                  area.x + 10, area.y + 20, &shop.name, &WHITE);
 
         self.draw_shop_inventory(ui, target, shop, item_tiles, player_inventory.total_money());
 
         let text = "Drop items here to sell.";
         font.draw(&ui.display, target, &ui.program, 
-                  left + 130, top + 570, text, &ORANGE);
+                  area.x + 130, area.y + 570, text, &ORANGE);
 
-        let text = "Click here to leave the shop.";
+        let text = "[X]";
         font.draw(&ui.display, target, &ui.program, 
-                  left + 110, top + 640, text, &OFF_WHITE);
+                  area.x + area.w - 40, area.y + 20, text, &OFF_WHITE);
     }
 
 
-    pub fn handle_button_event(&mut self, event: &ButtonEvent, mouse_state: &MouseState, world: &mut GameWorld) -> bool 
+    pub fn handle_button_event(&mut self, ui: &UI, event: &ButtonEvent, world: &mut GameWorld) 
+        -> (bool, bool) 
     {
+        let area = calc_view_area(ui.context.window_size);
+        let mut close_requested = false;
+
+        // did the player click the close button?
+        if (event.mx as i32) > area.x + area.w - 40 && (event.my as i32) < area.y + 70 {
+            close_requested = true;
+        }
+
         // did the player click a shop item?
         let item_index = find_item_at(event.mx, event.my);
         let shop = &mut world.map.shops[self.shop_index];
@@ -99,7 +104,7 @@ impl ShopView
         }
 
         // forward the event to the player item view
-        self.player_items_view.handle_button_event(event, mouse_state, world)
+        (self.player_items_view.handle_button_event(event, &ui.context.mouse_state, world), close_requested)
     }
 
 
@@ -284,3 +289,13 @@ fn buy_item_from_shop(item_index: usize, shop: &mut Shop,
     inventory.put_item(item, Slot::OnCursor);
 }
  
+
+fn calc_view_area(window_size: [u32; 2]) -> UiArea
+{
+    let left = 70;
+    let width = (window_size[0] as i32) - left * 2;
+    let top = 10;
+    let height = (window_size[1] as i32) - top * 2;
+
+    UiArea::new(left, top, width, height)
+}
