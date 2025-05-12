@@ -197,9 +197,9 @@ impl App {
         let editor = MapEditor::new();
 
         let inventory_bg = load_texture(&ui.display, "resources/gfx/ui/inventory_bg.png");
-        let shop_bg = load_texture(&ui.display, "resources/gfx/ui/inventory_bg.png");
-        let game = Game::new(inventory_bg, shop_bg, &ui, &world.layer_tileset[6]);
-
+        let inventory_fg = load_texture(&ui.display, "resources/gfx/ui/inventory_fg.png");
+        // let shop_bg = load_texture(&ui.display, "resources/gfx/ui/inventory_bg.png");
+        let game = Game::new(inventory_bg, inventory_fg, &ui, &world.layer_tileset[6]);
 
         // Some inventory contents for testing
 

@@ -1,8 +1,9 @@
 use vecmath::{Vector2, vec2_sub, vec2_add, vec2_scale, vec2_normalized};
 
+use glium::Frame;
 use glium::Texture2d;
 use glium::winit::keyboard::Key;
-use glium::Frame;
+use glium::winit::keyboard::NamedKey;
 
 use rand::Rng;
 
@@ -58,10 +59,17 @@ impl UiController for Game
 
         if event.args.state == ButtonState::Release {
 
+            // general key presses
             if event.args.button == Button::Keyboard(Key::Character("i".into())) {
                 self.show_player_inventory = !self.show_player_inventory;
-            }        
+            }
+            else if event.args.button == Button::Keyboard(Key::Named(NamedKey::Escape)) {
+                // close the views ... todo: if none are open show a game menu
+                self.show_player_inventory = false;
+                self.show_shop_inventory = false;
+            }
 
+            // mouse button presses
 
             match comp {
                 None => {
@@ -242,11 +250,11 @@ impl UiController for Game
 
 impl Game {
 
-    pub fn new(inventory_bg: Texture2d, shop_bg: Texture2d, ui: &UI, item_tiles: &TileSet) -> Game 
+    pub fn new(inventory_bg: Texture2d, inventory_fg: Texture2d, ui: &UI, item_tiles: &TileSet) -> Game 
     {
         let piv = PlayerItemsView::new((ui.context.window_size[0] as i32) / 2, 0, inventory_bg,);
     
-        let shop_view = ShopView::new(shop_bg);
+        let shop_view = ShopView::new(inventory_fg);
         
         Game 
         {
