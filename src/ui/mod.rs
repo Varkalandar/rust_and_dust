@@ -265,7 +265,9 @@ impl UI {
 
 
     pub fn make_icon(&self, x: i32, y: i32, w: i32, h: i32, 
-                     tile: &Rc<Tile>, label: &str, id: usize) -> UiComponent {
+                     tile: &Rc<Tile>, label: &str, id: usize,
+                     bg_color: [f32; 4], scale: f32) -> UiComponent 
+    {
         let icon = UiIcon {
             area: UiArea {
                 x, 
@@ -277,6 +279,8 @@ impl UI {
             label: label.to_string(),
             tile: tile.clone(),
             id,
+            bg_color,
+            scale,
         };
         
         UiComponent {
@@ -642,6 +646,8 @@ pub struct UiIcon
     pub label: String,
     pub tile: Rc<Tile>,
     pub id: usize,
+    pub scale: f32,
+    pub bg_color: [f32; 4],
 }
 
 
@@ -657,16 +663,19 @@ impl UiHead for UiIcon
         let xp = (x + area.x) as f32;
         let yp = (y + area.y) as f32;
 
-        draw_texture_clip_wb(target, program, &context.vertex_buffer,
-            BlendMode::Blend,
-            context.window_size[0], context.window_size[1],
-            &context.tex_white,
-            xp,
-            yp, 
-            area.w as f32 / 16.0, 
-            area.h as f32 / 16.0,
-            &[0.1, 0.1, 0.1, 1.0],
-            &context.scissors);    
+        // only draw if not transparent
+        if self.bg_color[3] > 0.0 {
+            draw_texture_clip_wb(target, program, &context.vertex_buffer,
+                BlendMode::Blend,
+                context.window_size[0], context.window_size[1],
+                &context.tex_white,
+                xp,
+                yp, 
+                area.w as f32 / 16.0, 
+                area.h as f32 / 16.0,
+                &self.bg_color,
+                &context.scissors);    
+        }
 
         let tw = self.tile.tex.width() as f32 * 0.25;
         let th = self.tile.tex.height() as f32 * 0.25;
@@ -682,16 +691,18 @@ impl UiHead for UiIcon
             &self.tile.tex,
             image_x,
             image_y, 
-            0.25, 
-            0.25,
+            self.scale, 
+            self.scale,
             &WHITE, 
             &context.scissors);    
 
-        let label_width = self.font.calc_string_width(&self.label) as i32;
-        let label_x = xp as i32 + (area.w - label_width) / 2;
-        let label_y = yp as i32 + area.h - self.font.line_height;
-
-        self.font.draw(display, target, program, label_x, label_y, &self.label, &[0.4, 0.6, 0.7, 1.0]);
+        // skip drawing of empty labels
+        if self.label.len() > 0 {
+            let label_width = self.font.calc_string_width(&self.label) as i32;
+            let label_x = xp as i32 + (area.w - label_width) / 2;
+            let label_y = yp as i32 + area.h - self.font.line_height;
+            self.font.draw(display, target, program, label_x, label_y, &self.label, &[0.4, 0.6, 0.7, 1.0]);
+        }
     } 
 
 

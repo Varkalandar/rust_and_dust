@@ -14,6 +14,7 @@ use crate::screen_to_world_pos;
 use crate::views::player_items_view::PlayerItemsView;
 use crate::views::shop_view::ShopView;
 use crate::TileSet;
+use crate::gfx::gl_support::load_texture;
 use crate::Map;
 use crate::map::MoveEndAction;
 use crate::map::MapObject;
@@ -101,7 +102,7 @@ impl UiController for Game
                     let pos = screen_to_world_pos(&ui, &world.map.get_player_position(), &ui.context.mouse_state.position);
                     
                     if event.args.button == Button::Mouse(MouseButton::Left) {
-                        ui.root.head.clear();
+                        // ui.root.head.clear();
 
                         let target_opt = Map::find_nearest_object(&world.map.layers[MAP_OBJECT_LAYER], &pos, 100.0, world.map.player_id);
                         match target_opt {
@@ -134,8 +135,13 @@ impl UiController for Game
                         fire_player_projectile(&mut world.map, pos, &mut world.speaker);
                     }
                 },
-                Some(_comp) => {
-                    // the click hit some UI element, so we ignore it.
+                Some(comp) => {
+                    // was it the backpack?
+                    let id = comp.get_id();
+                    if id == 0 {
+                        world.speaker.play(Sound::Click, 0.5);
+                        self.show_player_inventory = true;
+                    }
                 }
             }
         }
@@ -258,8 +264,17 @@ impl UiController for Game
 
 impl Game {
 
-    pub fn new(inventory_bg: Texture2d, inventory_fg: Texture2d, ui: &UI, item_tiles: &TileSet) -> Game 
+    pub fn new(inventory_bg: Texture2d, inventory_fg: Texture2d, ui: &mut UI, item_tiles: &TileSet) -> Game 
     {
+        let backpack_tex = load_texture(&ui.display, "resources/gfx/ui/backpack.png");
+        let tile = Tile::from_texture(backpack_tex);
+
+        let backpack = ui.make_icon(ui.context.window_size[0] as i32 - 80, 
+                                    ui.context.window_size[1] as i32 - 96, 
+                                    51, 64, &std::rc::Rc::new(tile), "", 
+                                    0, [0.0, 0.0, 0.0, 0.0], 1.0);
+        ui.root.head.add_child(backpack);
+
         let piv = PlayerItemsView::new((ui.context.window_size[0] as i32) / 2, 10, inventory_bg);
     
         let shop_view = ShopView::new(inventory_fg);

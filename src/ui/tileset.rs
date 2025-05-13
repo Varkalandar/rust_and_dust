@@ -15,6 +15,18 @@ pub struct Tile {
     pub name: String,
 }
 
+impl Tile {
+    pub fn from_texture(tex: Texture2d) -> Self {
+
+        Tile {
+            id: 0,
+            size: [tex.width() as f32, tex.height() as f32],
+            foot: [0.0, 0.0],
+            tex,
+            name: "".to_string(),
+        }
+    }
+}
 
 pub struct TileSet {
      pub tiles_by_id: HashMap<usize, Rc<Tile>>,

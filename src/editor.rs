@@ -451,7 +451,8 @@ impl MapEditor {
                 Some(id) => {
                     let tile = tileset.tiles_by_id.get(id).unwrap();
                     let icon = ui.make_icon(x+10, y+10, x_space-20, y_space-20, 
-                                            tile, &tile.name, *id);
+                                            tile, &tile.name, *id,
+                                            [0.1, 0.1, 0.1, 1.0], 0.25);
                         
                     cont.head.add_child(icon);
         

@@ -170,7 +170,7 @@ impl App {
         let x = (dungeon.rooms[5].x1 + dungeon.rooms[5].x2) / 2;
         let y = (dungeon.rooms[5].y1 + dungeon.rooms[5].y2) / 2;
 
-        let ui = UI::new(window, display, program, window_size);
+        let mut ui = UI::new(window, display, program, window_size);
         let voxel_display_test = VoxelDisplayTest::new(&ui.display); 
 
         let creature = generate_creature(&ui.display, &mut layer_tileset[CREATURE_TILESET],
@@ -199,7 +199,7 @@ impl App {
         let inventory_bg = load_texture(&ui.display, "resources/gfx/ui/inventory_bg.png");
         let inventory_fg = load_texture(&ui.display, "resources/gfx/ui/inventory_fg.png");
         // let shop_bg = load_texture(&ui.display, "resources/gfx/ui/inventory_bg.png");
-        let game = Game::new(inventory_bg, inventory_fg, &ui, &world.layer_tileset[6]);
+        let game = Game::new(inventory_bg, inventory_fg, &mut ui, &world.layer_tileset[6]);
 
         // Some inventory contents for testing
 
