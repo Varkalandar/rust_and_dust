@@ -145,24 +145,22 @@ impl PlayerItemsView
 
 
     pub fn draw(&self, ui: &UI, target: &mut Frame,
-                x: i32, y: i32, inventory: &Inventory,
+                inventory: &Inventory,
                 item_tiles: &TileSet)
     {
         let area = &self.area;
-        let xp = x + area.x;
-        let yp = y + area.y;
 
         draw_texture(&ui.display, target, &ui.program, BlendMode::Blend, 
                      &self.texture, 
-                     xp as f32, yp as f32, 1.0, 1.0, &[1.0, 1.0, 1.0, 0.95]);
+                     area.x as f32, area.y as f32, 1.0, 1.0, &[1.0, 1.0, 1.0, 0.95]);
 
         // show all items which are in the inventory space
         for entry in &inventory.entries {
 
             if entry.slot != Slot::Stash && entry.slot != Slot::OnCursor && entry.slot != Slot::Bag {
                 let offsets = self.slot_offsets.get(&entry.slot).unwrap();
-                let entry_x = xp + offsets[0] + entry.location_x * 32;
-                let entry_y = yp + offsets[1] + entry.location_y * 32;
+                let entry_x = area.x + offsets[0] + entry.location_x * 32;
+                let entry_y = area.y + offsets[1] + entry.location_y * 32;
                 
                 let item = inventory.bag.get(&entry.item_id).unwrap();
                 let size = self.find_slot_size(item, entry.slot);
@@ -185,7 +183,7 @@ impl PlayerItemsView
         }
 
         let ipos = self.slot_offsets.get(&Slot::Bag).unwrap();
-        self.inventory_view.draw(ui, target, xp + ipos[0], yp + ipos[1], 
+        self.inventory_view.draw(ui, target, area.x + ipos[0], area.y + ipos[1], 
                                  inventory, item_tiles);
        
         match self.hover_item {
@@ -198,8 +196,8 @@ impl PlayerItemsView
                     let offsets = self.slot_offsets.get(&entry.slot).unwrap();
                     let item = inventory.bag.get(&id).unwrap();
 
-                    let entry_x = xp + offsets[0] + entry.location_x * 32;
-                    let entry_y = yp + offsets[1] + entry.location_y * 32;
+                    let entry_x = area.x + offsets[0] + entry.location_x * 32;
+                    let entry_y = area.y + offsets[1] + entry.location_y * 32;
 
                     show_item_popup(ui, target, entry_x - 4, entry_y, item);
                 }
@@ -217,13 +215,27 @@ impl PlayerItemsView
                           item, item_tiles);
             }
         }
+
+        // close gadget
+        ui.context.font_large.draw(&ui.display, target, &ui.program, 
+                                   area.x + area.w - 40, area.y + 20, "[X]", &OFF_WHITE);
     }
 
 
-    pub fn handle_button_event(&mut self, event: &ButtonEvent, mouse: &MouseState, world: &mut GameWorld) -> bool {
+    pub fn handle_button_event(&mut self, event: &ButtonEvent, mouse: &MouseState, world: &mut GameWorld)
+     -> (bool, bool)
+    {
+        let area = &self.area;
+        let mut close_requested = false;
 
         if event.args.state == ButtonState::Release &&
            event.args.button == Button::Mouse(MouseButton::Left) {
+
+            // did the player click the close button?
+            if (event.mx as i32) > area.x + area.w - 40 && (event.my as i32) < area.y + 70 {
+                world.speaker.play(Sound::Click, 0.5);
+                close_requested = true;
+            }
 
             match self.dragged_item {
                 None => {
@@ -239,15 +251,15 @@ impl PlayerItemsView
                         let entry: &mut Entry = &mut inventory.entries[idx];
                         entry.slot = Slot::OnCursor;
 
-                        return true;
+                        return (true, close_requested);
                     }
                 },
                 Some(id) => {
 
                     world.speaker.play(Sound::Click, 0.5);
 
-                    let mx = (mouse.position[0] as i32) - self.area.x;
-                    let my = (mouse.position[1] as i32) - self.area.y;
+                    let mx = (mouse.position[0] as i32) - area.x;
+                    let my = (mouse.position[1] as i32) - area.y;
                     
                     let slot_opt = self.find_slot_at(mx, my);
 
@@ -257,7 +269,7 @@ impl PlayerItemsView
                                 self.dragged_item = None;
                                 self.drop_item(world, id);
         
-                                return true;
+                                return (true, close_requested);
                             }
                             else {
                                 println!("No suitable drop location {}, {}", mx, my);
@@ -268,14 +280,14 @@ impl PlayerItemsView
                             self.drop_item_to_slot(inventory, id, slot, mx, my);
                             self.dragged_item = None;
         
-                            return true;
+                            return (true, close_requested);
                         }
                     }
                 }
             }
         }
 
-        false
+        (false, close_requested)
     }
 
 

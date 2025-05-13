@@ -87,7 +87,11 @@ impl UiController for Game
                     }
         
                     if !consumed && self.show_player_inventory {
-                        consumed = self.piv.handle_button_event(event, &ui.context.mouse_state, world);
+                        let closed;
+                        (consumed, closed) = self.piv.handle_button_event(event, &ui.context.mouse_state, world);
+                        if closed {
+                            self.show_player_inventory = false;
+                        }
                     }
 
                     if consumed {return true;}
@@ -172,7 +176,7 @@ impl UiController for Game
         ui.draw(target);
  
         if self.show_player_inventory {
-            self.piv.draw(ui, target, 0, 10, &world.player_inventory, &self.item_tiles);
+            self.piv.draw(ui, target, &world.player_inventory, &self.item_tiles);
         }
 
         if self.show_shop_inventory {
@@ -256,7 +260,7 @@ impl Game {
 
     pub fn new(inventory_bg: Texture2d, inventory_fg: Texture2d, ui: &UI, item_tiles: &TileSet) -> Game 
     {
-        let piv = PlayerItemsView::new((ui.context.window_size[0] as i32) / 2, 0, inventory_bg,);
+        let piv = PlayerItemsView::new((ui.context.window_size[0] as i32) / 2, 10, inventory_bg);
     
         let shop_view = ShopView::new(inventory_fg);
         

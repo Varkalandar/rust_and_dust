@@ -62,7 +62,7 @@ impl ShopView
         ui.draw_box(target, area.x, area.y, area.w, area.h, &[0.6, 0.6, 0.6, 1.0]);
         ui.fill_box(target, area.x + 1, area.y + 1, area.w - 2, area.h - 2 , &[0.08, 0.06, 0.03, 1.0]);
 
-        self.player_items_view.draw(ui, target, 0, 0, player_inventory, item_tiles);
+        self.player_items_view.draw(ui, target, player_inventory, item_tiles);
 
         let font = &ui.context.font_large;
 
@@ -74,10 +74,6 @@ impl ShopView
         let text = "Drop items here to sell.";
         font.draw(&ui.display, target, &ui.program, 
                   area.x + 130, area.y + 570, text, &ORANGE);
-
-        let text = "[X]";
-        font.draw(&ui.display, target, &ui.program, 
-                  area.x + area.w - 40, area.y + 20, text, &OFF_WHITE);
     }
 
 
@@ -85,12 +81,6 @@ impl ShopView
         -> (bool, bool) 
     {
         let area = calc_view_area(ui.context.window_size);
-        let mut close_requested = false;
-
-        // did the player click the close button?
-        if (event.mx as i32) > area.x + area.w - 40 && (event.my as i32) < area.y + 70 {
-            close_requested = true;
-        }
 
         // did the player click a shop item?
         let item_index = find_item_at(event.mx, event.my);
@@ -104,7 +94,7 @@ impl ShopView
         }
 
         // forward the event to the player item view
-        (self.player_items_view.handle_button_event(event, &ui.context.mouse_state, world), close_requested)
+        self.player_items_view.handle_button_event(event, &ui.context.mouse_state, world)
     }
 
 
