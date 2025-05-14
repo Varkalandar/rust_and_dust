@@ -1,5 +1,4 @@
 use vecmath::{Vector2, vec2_sub, vec2_add, vec2_scale, vec2_len, vec2_square_len};
-use geo::Coord;
 use geo::Polygon;
 use geo::LineString;
 use geo::Contains;
@@ -32,7 +31,6 @@ use crate::CREATURE_TILESET;
 use crate::parse_rgba;
 use crate::gfx::gl_support::BlendMode;
 use crate::Slot;
-use crate::generate_dungeon;
 use crate::WHITE;
 
 

@@ -1,3 +1,4 @@
+use std::rc::Rc;
 use vecmath::{Vector2, vec2_sub, vec2_add, vec2_scale, vec2_normalized};
 
 use glium::Frame;
@@ -271,7 +272,7 @@ impl Game {
 
         let backpack = ui.make_icon(ui.context.window_size[0] as i32 - 80, 
                                     ui.context.window_size[1] as i32 - 96, 
-                                    51, 64, &std::rc::Rc::new(tile), "", 
+                                    51, 64, &Rc::new(tile), "", 
                                     0, [0.0, 0.0, 0.0, 0.0], 1.0);
         ui.root.head.add_child(backpack);
 

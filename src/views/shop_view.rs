@@ -80,8 +80,6 @@ impl ShopView
     pub fn handle_button_event(&mut self, ui: &UI, event: &ButtonEvent, world: &mut GameWorld) 
         -> (bool, bool) 
     {
-        let area = calc_view_area(ui.context.window_size);
-
         // did the player click a shop item?
         let item_index = find_item_at(event.mx, event.my);
         let shop = &mut world.map.shops[self.shop_index];

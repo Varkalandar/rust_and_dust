@@ -14,8 +14,6 @@ use crate::MAP_GROUND_LAYER;
 use crate::MAP_OBJECT_LAYER;
 use crate::Map;
 use crate::map::TransitionDestination;
-use crate::ItemFactory;
-use crate::item::Item;
 use crate::WHITE;
 
 
