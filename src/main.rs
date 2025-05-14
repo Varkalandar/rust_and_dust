@@ -52,6 +52,7 @@ mod particle_driver;
 mod animation;
 mod mob_group;
 mod gfx;
+mod voxel_image_generator;
 
 use dungeon::*;
 use map::{Map, MAP_GROUND_LAYER, MAP_OBJECT_LAYER, MAP_CLOUD_LAYER, MoveEndAction};
@@ -64,8 +65,8 @@ use inventory::{Inventory, Slot};
 use sound::SoundPlayer;
 use crate::gfx::gl_support::*;
 
-use crate::views::voxel_display_test::VoxelDisplayTest;
-use crate::views::voxel_display_test::generate_creature;
+use crate::voxel_image_generator::VoxelImageGenerator;
+use crate::voxel_image_generator::generate_creature;
 
 
 const MAP_RESOURCE_PATH: &str = "resources/gfx/map/";
@@ -116,7 +117,7 @@ pub struct App {
     world: GameWorld,
     controllers: GameControllers,
 
-    voxel_display_test: VoxelDisplayTest,
+    voxel_display_test: VoxelImageGenerator,
 
     update_time: SystemTime,
     need_focus: bool,
@@ -171,7 +172,7 @@ impl App {
         let y = (dungeon.rooms[5].y1 + dungeon.rooms[5].y2) / 2;
 
         let mut ui = UI::new(window, display, program, window_size);
-        let voxel_display_test = VoxelDisplayTest::new(&ui.display); 
+        let voxel_display_test = VoxelImageGenerator::new(&ui.display); 
 
         let creature = generate_creature(&ui.display, &mut layer_tileset[CREATURE_TILESET],
                                          &voxel_display_test.vector_ball);

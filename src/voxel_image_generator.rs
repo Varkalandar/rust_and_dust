@@ -15,11 +15,10 @@ use crate::gfx::Framebuffer;
 use crate::gfx::voxel::Voxel;
 use crate::gfx::voxel::Voxelstack;
 use crate::gfx::gl_support::BlendMode;
-use crate::gfx::c_mul;
 use crate::gfx::c_add;
 
 
-pub struct VoxelDisplayTest
+pub struct VoxelImageGenerator
 {
     pub result: Texture2d,
     pub vector_ball: Framebuffer,
@@ -27,15 +26,15 @@ pub struct VoxelDisplayTest
 }
 
 
-impl VoxelDisplayTest
+impl VoxelImageGenerator
 {
-    pub fn new<T: SurfaceTypeTrait + ResizeableSurface>(display: &Display<T>) -> VoxelDisplayTest
+    pub fn new<T: SurfaceTypeTrait + ResizeableSurface>(display: &Display<T>) -> VoxelImageGenerator
     {
         let soft_pen = Framebuffer::from_image("resources/gfx/ui/soft_pen.png");
         let vector_ball = Framebuffer::from_image("resources/gfx/ui/vector_ball.png");
         let fb = generate_goblet_image(&vector_ball, 0.0);
 
-        VoxelDisplayTest {
+        VoxelImageGenerator {
             result: fb.to_texture(display),
             vector_ball,
             soft_pen,
