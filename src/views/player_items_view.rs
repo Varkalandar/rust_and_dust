@@ -223,10 +223,9 @@ impl PlayerItemsView
 
 
     pub fn handle_button_event(&mut self, event: &ButtonEvent, mouse: &MouseState, world: &mut GameWorld)
-     -> (bool, bool)
+        -> (bool, bool)
     {
         let area = &self.area;
-        let mut close_requested = false;
 
         if event.args.state == ButtonState::Release &&
            event.args.button == Button::Mouse(MouseButton::Left) {
@@ -234,7 +233,7 @@ impl PlayerItemsView
             // did the player click the close button?
             if (event.mx as i32) > area.x + area.w - 40 && (event.my as i32) < area.y + 70 {
                 world.speaker.play(Sound::Click, 0.5);
-                close_requested = true;
+                return (true, true);
             }
 
             match self.dragged_item {
@@ -251,7 +250,7 @@ impl PlayerItemsView
                         let entry: &mut Entry = &mut inventory.entries[idx];
                         entry.slot = Slot::OnCursor;
 
-                        return (true, close_requested);
+                        return (true, false);
                     }
                 },
                 Some(id) => {
@@ -269,7 +268,7 @@ impl PlayerItemsView
                                 self.dragged_item = None;
                                 self.drop_item(world, id);
         
-                                return (true, close_requested);
+                                return (true, false);
                             }
                             else {
                                 println!("No suitable drop location {}, {}", mx, my);
@@ -280,14 +279,14 @@ impl PlayerItemsView
                             self.drop_item_to_slot(inventory, id, slot, mx, my);
                             self.dragged_item = None;
         
-                            return (true, close_requested);
+                            return (true, false);
                         }
                     }
                 }
             }
         }
 
-        (false, close_requested)
+        (false, false)
     }
 
 

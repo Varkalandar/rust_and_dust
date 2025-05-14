@@ -178,12 +178,14 @@ pub fn generate_goblet_image(pen: &Framebuffer, rot: f32) -> Framebuffer
         // voxels are around x=0 and z=0, we need to shift them to half the framebuffer width
         let xp = voxel.x as i32 + fb.width / 2;
         let yp = (voxel.y - voxel.z * 0.5) as i32;
-        let size = std::cmp::min(((voxel.z - min_depth) * z_scale) as i32 + 1, 7);
-        
-        // vballs have some size, do some bounds checking here
-        if xp > 2 && yp > 2 && xp < fb.width - 2 && yp < fb.height - 2 {
-            // pen_at_size(&mut fb, xp, yp, pen, size + 2, voxel.color);
-            pen.draw_scaled(&mut fb, xp, yp, size + 8, size + 8, 
+
+        // norm depth size scale to 0.9 .. 1.1
+        let size_f = 1.1 - ((voxel.z - min_depth) * z_scale) * 0.2;
+        let size = (size_f * voxel.size + 0.5) as i32;
+
+        // voxels have some size, do some bounds checking here
+        if xp > size && yp > size && xp < fb.width - size && yp < fb.height - size {
+            pen.draw_scaled(&mut fb, xp, yp, size, size, 
                             voxel.color, 
                             |c| -> u8 {
                                 let base = c as f32 * PI * 0.5 / 255.0;
@@ -228,7 +230,7 @@ fn generate_goblet(steps: i32, rad: f32, height: f32, color: [u8; 4]) -> Voxelst
                 x, 
                 y, 
                 z,
-                1.0, 
+                8.0, 
                 color
             ));
         }
@@ -325,7 +327,7 @@ fn line(voxels: &mut Voxelstack,
         color[1] = c_add(color[1], cv[1]);
         color[2] = c_add(color[2], cv[2]);
 
-        voxels.add(Voxel::new(xp, yp, zp, 1.0, color));
+        voxels.add(Voxel::new(xp, yp, zp, size, color));
     }
 
     (xp, yp, zp, color)
