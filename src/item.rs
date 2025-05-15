@@ -13,6 +13,20 @@ pub enum Activation
 {
     None,
     Fireball,
+    FrostBolt,
+    LightningStrike,
+}
+
+impl Activation
+{
+    pub fn info_str(&self) -> &str {
+        match self {
+            Activation::None => "",
+            Activation::Fireball => "Activation: Fireball",
+            Activation::FrostBolt => "Activation: Frost Bolt",
+            Activation::LightningStrike => "Activation: Lightning Strike",
+        }
+    }
 }
 
 
@@ -21,6 +35,8 @@ pub enum DropEffect
 {
     None,
     EnchantFireball,
+    EnchantFrostBolt,
+    EnchantLightningStrike,
 }
 
 
@@ -186,35 +202,41 @@ impl ItemFactory
 
     pub fn create_base(&mut self, key: &str) -> Item 
     {
-        let id = self.next_id;
-        self.next_id += 1;
+        let proto_opt = self.proto_items.get(key);
         
-        let proto = self.proto_items.get(key).unwrap();
+        if proto_opt.is_none() {
+            panic!("Unknown item '{}'", key);
+        }
+        else {
+            let id = self.next_id;
+            self.next_id += 1;
+            let proto = proto_opt.unwrap();
 
-        Item {
-            id, 
-            key: proto.key.to_string(),
-            singular: proto.singular.to_string(),
-            plural: proto.plural.to_string(),
-            mods: Vec::new(),
+            Item {
+                id, 
+                key: proto.key.to_string(),
+                singular: proto.singular.to_string(),
+                plural: proto.plural.to_string(),
+                mods: Vec::new(),
 
-            inventory_tile_id: proto.inventory_tile_id,
-            inventory_w: proto.inventory_w,
-            inventory_h: proto.inventory_h,
-            inventory_scale: proto.inventory_scale,
-            map_scale: proto.map_scale,
-            color: proto.color,
-            ilvl: proto.ilvl,
-            kind: proto.kind.clone(),
-        
-            map_tile_id: proto.map_tile_id,
-            stack_size: 1,
-            max_stack_size: proto.max_stack_size,
-            base_price: proto.base_price,
+                inventory_tile_id: proto.inventory_tile_id,
+                inventory_w: proto.inventory_w,
+                inventory_h: proto.inventory_h,
+                inventory_scale: proto.inventory_scale,
+                map_scale: proto.map_scale,
+                color: proto.color,
+                ilvl: proto.ilvl,
+                kind: proto.kind.clone(),
+            
+                map_tile_id: proto.map_tile_id,
+                stack_size: 1,
+                max_stack_size: proto.max_stack_size,
+                base_price: proto.base_price,
 
-            activation: proto.activation.clone(),
-            drop_effect: proto.drop_effect.clone(),
-            description: proto.description.to_string(),
+                activation: proto.activation.clone(),
+                drop_effect: proto.drop_effect.clone(),
+                description: proto.description.to_string(),
+            }
         }
     }
 
@@ -501,10 +523,19 @@ fn parse_range(input: &str) -> (i32, i32)
 fn parse_drop_effect(input: &str) -> DropEffect
 {
     if "enchant_fireball" == input {
-        return DropEffect::EnchantFireball
+        DropEffect::EnchantFireball
+    }
+    else if "enchant_frost_bolt" == input {
+        DropEffect::EnchantFrostBolt
+    }
+    else if "enchant_lightning_strike" == input {
+        DropEffect::EnchantLightningStrike
+    }
+    else if "" == input {
+        DropEffect::None
     }
     else {
-        return DropEffect::None
+        panic!("Unknown drop effect '{}'", input);
     }
 }
 

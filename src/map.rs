@@ -499,6 +499,7 @@ impl Map {
         mob.visual.current_image_id = item.map_tile_id + 
                                       Item::calc_image_offset_for_stack_size(item.stack_size);
         mob.visual.scale = item.map_scale;
+        mob.visual.color = item.color;
         mob.item = Some(item);
 
         self.layers[layer].insert(mob_id, mob);

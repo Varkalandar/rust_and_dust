@@ -428,11 +428,24 @@ fn try_merge_items(inventory: &mut Inventory, dropped_item_id: u64, target_item_
     
     let target_item = inventory.bag.get_mut(&target_item_id).unwrap();
 
-    if drop_effect == DropEffect::EnchantFireball {
-        // todo: Check for correct target type. Not all items can take all enchantment types
-        target_item.activation = Activation::Fireball;
-        return true;
+    match drop_effect {
+        DropEffect::EnchantFireball => {
+            // todo: Check for correct target type. Not all items can take all enchantment types
+            target_item.activation = Activation::Fireball;
+            true
+        },
+        DropEffect::EnchantFrostBolt => {
+            // todo: Check for correct target type. Not all items can take all enchantment types
+            target_item.activation = Activation::FrostBolt;
+            true
+        },
+        DropEffect::EnchantLightningStrike => {
+            // todo: Check for correct target type. Not all items can take all enchantment types
+            target_item.activation = Activation::LightningStrike;
+            true
+        },
+        DropEffect::None => {
+            false
+        },
     }
-    
-    false
 }

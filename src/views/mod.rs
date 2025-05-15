@@ -59,7 +59,7 @@ pub fn show_item_popup(ui: &UI, target: &mut Frame,
 
     if item.activation != Activation::None {
         font.draw(&ui.display, target, &ui.program, left, line, 
-                  "Activation: Fireball", &OFF_WHITE);
+                  item.activation.info_str(), &OFF_WHITE);
                   line += line_space;
     }
 
@@ -74,8 +74,8 @@ pub fn show_item_popup(ui: &UI, target: &mut Frame,
 
     if item.description.len() > 0 {
         ui.context.font_small.draw_multiline(&ui.display, target, &ui.program, 
-                                          left, line, box_width,
-                                          &item.description, &OFF_WHITE, true);
+                                             left, line, box_width - 4,
+                                             &item.description, &OFF_WHITE, true);
         // line += line_space;
     }
 }

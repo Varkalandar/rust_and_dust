@@ -215,10 +215,10 @@ impl App {
         coins.stack_size = 1000;
         world.player_inventory.put_item(coins, Slot::Bag);
 
-        let scroll = world.map.item_factory.create("fireball_scroll", &mut world.rng);
+        let scroll = world.map.item_factory.create("fire_ball_scroll", &mut world.rng);
         world.player_inventory.put_item(scroll, Slot::Bag);
 
-        let scroll = world.map.item_factory.create("identify_scroll", &mut world.rng);
+        let scroll = world.map.item_factory.create("frost_bolt_scroll", &mut world.rng);
         world.player_inventory.put_item(scroll, Slot::Bag);
 
 
