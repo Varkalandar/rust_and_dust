@@ -29,7 +29,7 @@ jobs:
     - name: distribute
       run: |
         mkdir rust_and_dust_collector_snapshot-ubuntu
-        mv target/debug/rust_and_dust_collector rust_and_dust_collector_snapshot-ubuntu
+        mv target/release/rust_and_dust_collector rust_and_dust_collector_snapshot-ubuntu
         cp -r resources rust_and_dust_collector_snapshot-ubuntu
         cp credits.txt license.txt rust_and_dust_collector_snapshot-ubuntu
         zip -r rust_and_dust_collector_snapshot-ubuntu.zip rust_and_dust_collector_snapshot-ubuntu
