@@ -2031,15 +2031,15 @@ data
 Tile Description
 v.5
 127
-1 1
+233 97
 0 0
-0 0
+134 64
 End Of Header
 Item
 v.1
 data
 2
-
+inscribed_scroll
 
 1
 0
@@ -2047,15 +2047,15 @@ data
 Tile Description
 v.5
 128
-1 1
+214 92
 0 0
-0 0
+119 61
 End Of Header
 Item
 v.1
 data
 2
-
+short_inscribed_scroll
 
 1
 0

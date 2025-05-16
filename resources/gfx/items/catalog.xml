@@ -2157,16 +2157,16 @@
       <Description>
         <version>4</version>
         <id>127</id>
-        <width>1</width>
-        <height>1</height>
+        <width>233</width>
+        <height>97</height>
         <offsetX>0</offsetX>
         <offsetY>0</offsetY>
-        <footX>0</footX>
-        <footY>0</footY>
+        <footX>134</footX>
+        <footY>64</footY>
       </Description>
       <Metadata>
         <int>0</int>
-        <string></string>
+        <string>inscribed_scroll</string>
         <string></string>
       </Metadata>
     </Tile>
@@ -2174,16 +2174,16 @@
       <Description>
         <version>4</version>
         <id>128</id>
-        <width>1</width>
-        <height>1</height>
+        <width>214</width>
+        <height>92</height>
         <offsetX>0</offsetX>
         <offsetY>0</offsetY>
-        <footX>0</footX>
-        <footY>0</footY>
+        <footX>119</footX>
+        <footY>61</footY>
       </Description>
       <Metadata>
         <int>0</int>
-        <string></string>
+        <string>short_inscribed_scroll</string>
         <string></string>
       </Metadata>
     </Tile>
