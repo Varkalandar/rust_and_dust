@@ -11,6 +11,7 @@ use crate::map::move_mob;
 use crate::game::launch_projectile;
 use crate::projectile::ProjectileBuilder;
 use crate::SoundPlayer;
+use crate::rng_source::RngReceiver;
 
 
 pub struct MobGroup {
@@ -32,14 +33,14 @@ pub struct MobGroupMember {
 
 impl MobGroup {
 
-    pub fn new(mobs: Vec<u64>, center: Vector2<f32>, mobile: bool, rng: &mut StdRng) -> MobGroup {
+    pub fn new(mobs: Vec<u64>, center: Vector2<f32>, mobile: bool, rng: &RngReceiver) -> MobGroup {
 
         let mut members = Vec::with_capacity(mobs.len());
 
         for id in mobs {
             members.push(MobGroupMember {
                 id,
-                action_countdown: 0.1 + rng.random::<f32>(),
+                action_countdown: 0.1 + rng.random(),
                 mobile,
             });
         }
@@ -51,7 +52,8 @@ impl MobGroup {
     }
 
 
-    pub fn update(&mut self, player_id: u64, dt: f32, mobs: &mut HashMap<u64, MapObject>, rng: &mut StdRng, 
+    pub fn update(&mut self, player_id: u64, dt: f32, mobs: &mut HashMap<u64, MapObject>, 
+                  rng: &RngReceiver, 
                   factory: &mut MapObjectFactory, projectile_builder: &mut ProjectileBuilder,
                   speaker: &mut SoundPlayer) {
             
@@ -75,7 +77,7 @@ impl MobGroup {
                     if member.action_countdown < 0.0 {
 
                         // fire at a player?
-                        if rng.random::<f64>() < 0.25 {
+                        if rng.random() < 0.25 {
 
                             // player in range?
                             let len = vec2_square_len(vec2_sub(mob.position, player_position));
@@ -87,7 +89,7 @@ impl MobGroup {
                                 projectile_builder.configure_projectile("Iron shot", &mut projectile.visual, &mut projectile.velocity, speaker);
                                 mobs.insert(projectile.uid, projectile);
 
-                                member.action_countdown = 1.0 + rng.random::<f32>();
+                                member.action_countdown = 1.0 + rng.random();
                             }
                         }
                         else if member.mobile {
@@ -98,8 +100,8 @@ impl MobGroup {
                             let mut y;
 
                             loop {
-                                x = mob.position[0] + 100.0 - rng.random::<f32>() * 200.0;
-                                y = mob.position[1] + 100.0 - rng.random::<f32>() * 200.0;
+                                x = mob.position[0] + 100.0 - rng.random() * 200.0;
+                                y = mob.position[1] + 100.0 - rng.random() * 200.0;
 
                                 let dx = x - self.center[0];
                                 let dy = y - self.center[1];
@@ -114,8 +116,8 @@ impl MobGroup {
 
                             if count >= 5 {
                                 println!("make {} return from {:?} to group center at {:?}", mob.uid, mob.position, self.center);
-                                x = self.center[0] + 50.0 - rng.random::<f32>() * 100.0;
-                                y = self.center[1] + 50.0 - rng.random::<f32>() * 100.0;
+                                x = self.center[0] + 50.0 - rng.random() * 100.0;
+                                y = self.center[1] + 50.0 - rng.random() * 100.0;
                             }
 
                             // println!("id=" + creature.id + "moves to " + x + ", " + y);
@@ -123,7 +125,7 @@ impl MobGroup {
                             let creature = mob.creature.as_ref().unwrap();
                             move_mob(mob, [x, y], creature.base_speed);
                             
-                            member.action_countdown = 3.0 + rng.random::<f32>() * 2.0;
+                            member.action_countdown = 3.0 + rng.random() * 2.0;
                         }
                     }
                 }

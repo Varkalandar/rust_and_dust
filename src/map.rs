@@ -32,7 +32,7 @@ use crate::parse_rgba;
 use crate::gfx::gl_support::BlendMode;
 use crate::Slot;
 use crate::WHITE;
-
+use crate::RngReceiver;
 
 pub const MAP_GROUND_LAYER:usize = 0;
 pub const MAP_OBJECT_LAYER:usize = 1;
@@ -234,7 +234,7 @@ impl Map {
      * @return A list of all MapObjects which had been killed or destroyed during this update
      */
     pub fn update(&mut self, dt: f32, 
-                  inventory: &mut Inventory, rng: &mut StdRng, speaker: &mut SoundPlayer) 
+                  inventory: &mut Inventory, rng: &RngReceiver, speaker: &mut SoundPlayer) 
         -> (Vec<MapObject>, Option<usize>)
     {
         let mut transition = None;
@@ -280,8 +280,8 @@ impl Map {
 
                 if len > 0 {
                     let chance = particles.spawn_chance * dt;
-                    if rng.random::<f32>() < chance {
-                        let spark = particles.spawn_ids[rng.random_range(0..len)];
+                    if rng.random() < chance {
+                        let spark = particles.spawn_ids[rng.random_urange(0, len)];
                         
                         particles.add_particle(0.0, -400.0, 0.0, 0.0, 0.0, 0.0, 
                                                0.1, spark, [0.7, 0.75, 0.9]);
@@ -417,7 +417,7 @@ impl Map {
     }
 
 
-    fn handle_projectile_hit(&mut self, projectile_uid: u64, target_uid: u64, rng: &mut StdRng, speaker: &mut SoundPlayer) -> bool {
+    fn handle_projectile_hit(&mut self, projectile_uid: u64, target_uid: u64, rng: &RngReceiver, speaker: &mut SoundPlayer) -> bool {
 
         let projectile_type = self.layers[MAP_OBJECT_LAYER].get_mut(&projectile_uid).unwrap().mob_type;
         let target = self.layers[MAP_OBJECT_LAYER].get_mut(&target_uid).unwrap();
@@ -459,14 +459,14 @@ impl Map {
                 speaker.play(Sound::FireballHit, 0.5);
 
                 for _i in 0..10 {
-                    let xv = rng.random::<f32>() * 2.0 - 1.0;
-                    let yv = rng.random::<f32>() * 2.0 - 1.0;
-                    let zv = rng.random::<f32>();
+                    let xv = rng.random() * 2.0 - 1.0;
+                    let yv = rng.random() * 2.0 - 1.0;
+                    let zv = rng.random();
 
-                    let color = [0.8 + rng.random::<f32>() * 0.4, 0.5 + rng.random::<f32>() * 0.4, 0.1 + rng.random::<f32>() * 0.4];
-                    let tile = sparks[rng.random_range(0..sparks.len())];
+                    let color = [0.8 + rng.random() * 0.4, 0.5 + rng.random() * 0.4, 0.1 + rng.random() * 0.4];
+                    let tile = sparks[rng.random_urange(0, sparks.len())];
 
-                    let speed = if tile == 403 {100.0} else {100.0 + rng.random_range(1.0..50.0)};
+                    let speed = if tile == 403 {100.0} else {100.0 + rng.random_frange(1.0, 50.0)};
 
                     target.visual.particles.add_particle(0.0, 0.0, z_off, xv * speed, yv * speed, zv * speed, 0.7, tile, color);
                     target.visual.color = [0.0, 0.0, 0.0, 0.0];
@@ -508,7 +508,7 @@ impl Map {
     }
     
 
-    pub fn populate(&mut self, _filename: &str, rng: &mut StdRng, position: Vector2<f32>) {
+    pub fn populate(&mut self, _filename: &str, rng: &RngReceiver, position: Vector2<f32>) {
 
         // let group = self.make_creature_group("Targetting Drone", 5, 9, position, 40.0, rng);
         let group = self.make_creature_group("generated_creature", 5, 9, position, 40.0, rng);
@@ -771,9 +771,9 @@ impl Map {
     }
 
 
-    pub fn make_creatures(&mut self, id: &str, min_count: i32, max_count: i32, center: Vector2<f32>, spacing: f32, scale: f32, rng: &mut StdRng) -> Vec<MapObject> {
-
-        let count = rng.random_range(min_count ..= max_count) as usize;
+    pub fn make_creatures(&mut self, id: &str, min_count: i32, max_count: i32, center: Vector2<f32>, spacing: f32, scale: f32, rng: &RngReceiver) -> Vec<MapObject> 
+    {
+        let count = rng.random_irange(min_count, max_count + 1) as usize;
 
         let mut list: Vec<MapObject> = Vec::with_capacity(count);
     
@@ -785,8 +785,8 @@ impl Map {
             // don't place mobs in the same spot if possible
             // 10 tries will be made to find a clear spot
             loop {
-                let x = center[0] + spacing * (rng.random::<f32>() * 10.0 - 5.0);
-                let y = center[1] + spacing * (rng.random::<f32>() * 10.0 - 5.0);
+                let x = center[0] + spacing * (rng.random() * 10.0 - 5.0);
+                let y = center[1] + spacing * (rng.random() * 10.0 - 5.0);
     
                 let mut ok = true;
                 for mob in &list {
@@ -807,7 +807,7 @@ impl Map {
                     mob.visual.blend = creature.blend_mode;
                     mob.mob_type = MobType::Creature;
                     mob.creature = Some(creature);
-                    mob.animation_timer = rng.random::<f32>(); // otherwise all start with the very same frame
+                    mob.animation_timer = rng.random(); // otherwise all start with the very same frame
                     list.push(mob);
 
                     break; 
@@ -823,7 +823,7 @@ impl Map {
     }
 
     
-    pub fn make_creature_group(&mut self, id: &str, min_count: i32, max_count: i32, center: Vector2<f32>, spacing: f32, rng: &mut StdRng) -> MobGroup {
+    pub fn make_creature_group(&mut self, id: &str, min_count: i32, max_count: i32, center: Vector2<f32>, spacing: f32, rng: &RngReceiver) -> MobGroup {
         
         println!("Placing creatures at {}, {}", center[0], center[1]);
 
@@ -845,7 +845,7 @@ impl Map {
 }
 
 
-fn emit_drive_particles(mob: &mut MapObject, dt: f32, rng: &mut StdRng) {
+fn emit_drive_particles(mob: &mut MapObject, dt: f32, rng: &RngReceiver) {
 
     let direction = vec2_scale(mob.velocity, -1.0);
     let rad = 0.05;
@@ -853,18 +853,18 @@ fn emit_drive_particles(mob: &mut MapObject, dt: f32, rng: &mut StdRng) {
     let chance_per_second = 20.0;
     let chance = chance_per_second * dt;
 
-    if rng.random::<f32>() < chance {
+    if rng.random() < chance {
                 
-        let xp = direction[0] * rad + direction[1] * (rng.random::<f32>() * 2.0 - 1.0) * 0.05;
-        let yp = direction[1] * rad + direction[0] * (rng.random::<f32>() * 2.0 - 1.0) * 0.05;                
+        let xp = direction[0] * rad + direction[1] * (rng.random() * 2.0 - 1.0) * 0.05;
+        let yp = direction[1] * rad + direction[0] * (rng.random() * 2.0 - 1.0) * 0.05;                
 
-        let xv = direction[0] + rng.random::<f32>() * 2.0 - 1.0;
-        let yv = direction[1] + rng.random::<f32>() * 2.0 - 1.0;
+        let xv = direction[0] + rng.random() * 2.0 - 1.0;
+        let yv = direction[1] + rng.random() * 2.0 - 1.0;
         
-        let zv = (rng.random::<f32>() *2.0 - 1.0) * 0.15;
+        let zv = (rng.random() *2.0 - 1.0) * 0.15;
         let speed = 1.0;
 
-        let spark = 1993 + (rng.random::<f32>() * 5.0) as usize;
+        let spark = 1993 + (rng.random() * 5.0) as usize;
 
         mob.visual.particles.add_particle(xp, yp, 25.0, xv * speed, yv * speed, zv * speed, 1.0, spark, [0.5, 0.8, 1.0]);
     }

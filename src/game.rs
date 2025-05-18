@@ -206,7 +206,7 @@ impl UiController for Game
         let rng = &mut world.rng;
         let speaker = &mut world.speaker;
         
-        let (killed_mob_list, transition_opt) = map.update(dt, inv, rng, speaker);
+        let (killed_mob_list, transition_opt) = map.update(dt, inv, &world.rng_receiver, speaker);
 
         drop_loot(map, killed_mob_list, rng, speaker);
 
@@ -235,7 +235,7 @@ impl UiController for Game
                         let x = (dungeon.rooms[5].x1 + dungeon.rooms[5].x2) / 2;
                         let y = (dungeon.rooms[5].y1 + dungeon.rooms[5].y2) / 2;
         
-                        world.map.populate("dungeon.csv", rng, map_pos(x, y, 0));
+                        world.map.populate("dungeon.csv", &world.rng_receiver, map_pos(x, y, 0));
                     }
                     else {
                         world.map.load("town.map");

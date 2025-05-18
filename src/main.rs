@@ -28,6 +28,7 @@ use geo::LineString;
 
 use rand::SeedableRng;
 
+use std::sync::mpsc::sync_channel;
 use std::time::SystemTime;
 use std::time::Duration;
 use std::thread::sleep;
@@ -53,6 +54,7 @@ mod animation;
 mod mob_group;
 mod gfx;
 mod voxel_image_generator;
+mod rng_source;
 
 use dungeon::*;
 use map::{Map, MAP_GROUND_LAYER, MAP_OBJECT_LAYER, MAP_CLOUD_LAYER, MoveEndAction};
@@ -68,6 +70,8 @@ use crate::gfx::gl_support::*;
 use crate::voxel_image_generator::VoxelImageGenerator;
 use crate::voxel_image_generator::generate_creature;
 
+use crate::rng_source::RngReceiver;
+use crate::rng_source::RngSource;
 
 const MAP_RESOURCE_PATH: &str = "resources/gfx/map/";
 const CREATURE_TILESET: usize = 3;
@@ -85,6 +89,7 @@ pub struct GameWorld {
     speaker: SoundPlayer,
 
     rng: rand::rngs::StdRng,
+    rng_receiver: RngReceiver,
 
     black_texture: Texture2d,
     map_texture: Option<Texture2d>,
@@ -177,8 +182,14 @@ impl App {
         let creature = generate_creature(&ui.display, &mut layer_tileset[CREATURE_TILESET],
                                          &voxel_display_test.vector_ball);
         map.creature_factory.add("generated_creature", creature);
-        map.populate("dungeon.csv", &mut rng, map_pos(x, y, 0));
 
+
+        let (sender, receiver) = sync_channel::<f32>(64);
+        let rng_receiver = RngReceiver::new(receiver);
+        let rng_source = RngSource::new(sender);
+        rng_source.start();
+
+        map.populate("dungeon.csv", &rng_receiver, map_pos(x, y, 0));
 
         let mut world = GameWorld {
             map,
@@ -187,11 +198,15 @@ impl App {
             speaker: SoundPlayer::new(),
 
             rng,
+            rng_receiver,
 
             black_texture,
             map_texture,
             map_backdrop,
         };
+
+
+        for _i in 0 .. 100 {println!("Random number from thread: {}", world.rng_receiver.random());}
 
         Self::load_map_textures(&mut world, &ui.display);
         
