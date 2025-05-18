@@ -28,6 +28,7 @@ use crate::SoundPlayer;
 use crate::sound::Sound;
 use crate::generate_dungeon;
 use crate::map_pos;
+use crate::rng_source::RngReceiver;
 
 
 const MAGIC_ITEM_CHANCE: f32 = 0.4;
@@ -203,12 +204,11 @@ impl UiController for Game
     {
         let map = &mut world.map;
         let inv = &mut world.player_inventory;
-        let rng = &mut world.rng;
         let speaker = &mut world.speaker;
         
         let (killed_mob_list, transition_opt) = map.update(dt, inv, &world.rng_receiver, speaker);
 
-        drop_loot(map, killed_mob_list, rng, speaker);
+        drop_loot(map, killed_mob_list, &world.rng_receiver, speaker);
 
         if transition_opt.is_some() {
             let index = transition_opt.unwrap();
@@ -219,28 +219,37 @@ impl UiController for Game
 
                     if to_map == 501 {
                         // preserve player
-                        let mut player = world.map.layers[MAP_OBJECT_LAYER].remove(&world.map.player_id).unwrap();
-        
-                        world.map.clear();
-                        let dungeon = generate_dungeon(&mut world.map);
+                        let map = &mut world.map;
+                        let mut player = map.layers[MAP_OBJECT_LAYER].remove(&map.player_id).unwrap();
+                        let rng = &world.rng_receiver;
+
+                        map.clear();
+                        let dungeon = generate_dungeon(map, rng);
                 
                         // stop player movement
                         player.move_time_total = 0.0;
                         player.move_time_left = 0.0;
                         player.visual.z_off = 0.0;
-                        world.map.layers[MAP_OBJECT_LAYER].insert(world.map.player_id, player);
+                        map.layers[MAP_OBJECT_LAYER].insert(map.player_id, player);
                 
-                        world.map.set_player_position(dungeon.start_position);
+                        map.set_player_position(dungeon.start_position);
         
                         let x = (dungeon.rooms[5].x1 + dungeon.rooms[5].x2) / 2;
                         let y = (dungeon.rooms[5].y1 + dungeon.rooms[5].y2) / 2;
         
-                        world.map.populate("dungeon.csv", &world.rng_receiver, map_pos(x, y, 0));
+                        map.populate("dungeon.csv", &world.rng_receiver, map_pos(x, y, 0));
                     }
                     else {
                         world.map.load("town.map");
-                        // self.populate("town.csv", rng);
-            
+                        
+                        let item_factory = &mut world.map.item_factory;
+                        let rng = &world.rng_receiver;
+
+                        // process shops
+                        for shop in &mut world.map.shops {
+                            shop.restock(item_factory, rng);
+                        }
+
                         world.map.set_player_position(to_location);
                     }
 
@@ -342,8 +351,8 @@ pub fn launch_projectile(shooter_position: Vector2<f32>, fire_at: Vector2<f32>,
 } 
 
 
-fn drop_loot<R: Rng + ?Sized>(map: &mut Map, killed_mob_list: Vec<MapObject>, 
-                              rng: &mut R, speaker: &mut SoundPlayer) 
+fn drop_loot(map: &mut Map, killed_mob_list: Vec<MapObject>, 
+             rng: &RngReceiver, speaker: &mut SoundPlayer) 
 {
     // todo: monster or area levels
     for mob in killed_mob_list {

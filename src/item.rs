@@ -1,11 +1,11 @@
 use core::str::Split;
 use std::fmt::Formatter;
 use std::collections::HashMap;
-use rand::Rng;
 
 use crate::inventory::Slot;
 use crate::read_lines;
 use crate::parse_rgba;
+use crate::rng_source::RngReceiver;
 
 
 #[derive(Clone, Debug, PartialEq)]
@@ -241,7 +241,7 @@ impl ItemFactory
     }
 
 
-    pub fn create<R: Rng + ?Sized>(&mut self, key: &str, rng: &mut R) -> Item 
+    pub fn create(&mut self, key: &str, rng: &RngReceiver) -> Item 
     {
         let mut item = self.create_base(key);
         let proto = self.proto_items.get(key).unwrap();
@@ -251,7 +251,7 @@ impl ItemFactory
     }
 
 
-    pub fn create_random<R: Rng + ?Sized>(&mut self, rng: &mut R, max_level: u32) -> Item
+    pub fn create_random(&mut self, rng: &RngReceiver, max_level: u32) -> Item
     {
         let mut matches = Vec::with_capacity(self.proto_items.len());
 
@@ -264,7 +264,7 @@ impl ItemFactory
         }
 
         // pick a random one
-        let index = rng.random_range(0 .. matches.len());
+        let index = rng.random_urange(0, matches.len());
 
         let item = self.create(&matches[index], rng);
 
@@ -283,16 +283,16 @@ impl ItemFactory
      *                  so we can control how likely it is to create another mod after the one
      * @return The generated item.
      */
-    pub fn create_random_item<R: Rng + ?Sized>(&mut self, rng: &mut R,
-                                               max_level: u32, max_mods: u32, 
-                                               base_chance: f32, mf_factor: f32) -> Item
+    pub fn create_random_item(&mut self, rng: &RngReceiver,
+                              max_level: u32, max_mods: u32, 
+                              base_chance: f32, mf_factor: f32) -> Item
     {
         let mut item = self.create_random(rng, max_level);        
         let mut chance = base_chance;
         let mut tries = 0;
 
         while tries < max_mods {
-            if rng.random::<f32>() < chance {
+            if rng.random() < chance {
                 self.add_random_mods(&mut item, rng, 1, max_level);
             }      
             
@@ -304,8 +304,8 @@ impl ItemFactory
     }
 
 
-    fn add_random_mods<R: Rng + ?Sized>(&self, item: &mut Item, rng: &mut R, 
-                                        mod_count: u32, max_level: u32)
+    fn add_random_mods(&self, item: &mut Item, rng: &RngReceiver, 
+                       mod_count: u32, max_level: u32)
     {
         let mut keys: Vec<(&String, &ModPrototype)> = 
             self.proto_mods.iter().filter( |value| -> bool 
@@ -336,7 +336,7 @@ impl ItemFactory
                 break;
             }
 
-            let n = rng.random_range(0 .. keys.len());
+            let n = rng.random_urange(0, keys.len());
             let key = keys.remove(n);
             let proto_mod = self.proto_mods.get(key.0).unwrap();
 
@@ -675,7 +675,7 @@ impl Mod
 }
 
 
-fn process_proto_mods<R: Rng + ?Sized>(mods: &Vec<ModPrototype>, rng: &mut R) -> Vec<Mod>
+fn process_proto_mods(mods: &Vec<ModPrototype>, rng: &RngReceiver) -> Vec<Mod>
 {
     let mut result = Vec::with_capacity(mods.len());
 
@@ -697,9 +697,9 @@ fn process_proto_mods<R: Rng + ?Sized>(mods: &Vec<ModPrototype>, rng: &mut R) ->
 }
 
 
-fn random_from_range<R: Rng + ?Sized>(modifier: &ModPrototype, rng: &mut R, kind: ModKind) -> Mod 
+fn random_from_range(modifier: &ModPrototype, rng: &RngReceiver, kind: ModKind) -> Mod 
 {
-    let actual_value = rng.random_range(modifier.min_value .. modifier.max_value);
+    let actual_value = rng.random_irange(modifier.min_value, modifier.max_value);
     Mod {
         attribute: modifier.attribute.clone(),
         min_value: actual_value,

@@ -4,16 +4,13 @@ use geo::LineString;
 use geo::Contains;
 use geo::coord;
 
-use std::f64::consts::PI;
+use std::f32::consts::PI;
 use std::io::prelude::*;
 use std::io::{Result, BufWriter};
 use std::fs::File;
 use std::path::PathBuf;
 use std::collections::HashMap;
 use std::boxed::Box;
-
-use rand::Rng;
-use rand::rngs::StdRng;
 
 use crate::shop::Shop;
 use crate::item::Item;
@@ -632,8 +629,7 @@ impl Map {
             destination = TransitionDestination::Map {to_map: map_id, to_location};
         }
         else {
-            let mut shop = Shop::new();
-            shop.restock(&mut self.item_factory);
+            let shop = Shop::new();
             let index = self.shops.len();
             destination = TransitionDestination::Shop {index};
             self.shops.push(shop);
@@ -1051,7 +1047,6 @@ pub struct Visual {
 impl Visual {
     pub fn orient(&self, direction: Vector2<f32>) -> usize {
         let directions = self.directions as f32;
-        let pi = PI as f32;
         let mut result = 0;
 
         if direction[0] != 0.0 && direction[1] != 0.0 {
@@ -1059,11 +1054,11 @@ impl Visual {
             let mut r = direction[1].atan2(direction[0]);
             
             // round to a segment
-            r = r + pi + pi * 2.0 / directions;
+            r = r + PI + PI * 2.0 / directions;
         
             // calculate tile offsets from 0 to directions-1
 
-            let f = (r * directions)  / (pi * 2.0) - 0.5;
+            let f = (r * directions)  / (PI * 2.0) - 0.5;
 
             result = self.directions/2 + f.floor() as usize;
 

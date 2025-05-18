@@ -1,7 +1,5 @@
 use std::collections::HashMap;
 
-use rand::Rng;
-use rand::rngs::StdRng;
 use vecmath::{Vector2, vec2_sub, vec2_square_len};
 
 use crate::map::MapObject;

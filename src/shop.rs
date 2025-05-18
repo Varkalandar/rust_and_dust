@@ -1,11 +1,10 @@
 use std::vec::Vec;
-use rand::SeedableRng;
-use rand::Rng;
 
 use crate::ItemFactory;
 use crate::item::Item;
 use crate::Inventory;
 use crate::Slot;
+use crate::rng_source::RngReceiver;
 
 const MAGIC_ITEM_CHANCE: f32 = 0.4;
 const MAGIC_FIND_FACTOR: f32 = 0.8;
@@ -29,18 +28,16 @@ impl Shop
     }
 
 
-    pub fn restock(&mut self, item_factory: &mut ItemFactory)
+    pub fn restock(&mut self, item_factory: &mut ItemFactory, rng: &RngReceiver)
     {
         self.items.clear();
 
-        let mut rng = rand::rngs::StdRng::seed_from_u64(12345678901);
-
         for _i in 0 .. 20 {
-            let mut item = item_factory.create_random_item(&mut rng, 1, 6, MAGIC_ITEM_CHANCE, MAGIC_FIND_FACTOR);
+            let mut item = item_factory.create_random_item(rng, 1, 6, MAGIC_ITEM_CHANCE, MAGIC_FIND_FACTOR);
 
             // we need a better way to generate shop items ...
             while item.key == "copper_coin" {
-                item = item_factory.create_random_item(&mut rng, 1, 6, MAGIC_ITEM_CHANCE, MAGIC_FIND_FACTOR);
+                item = item_factory.create_random_item(rng, 1, 6, MAGIC_ITEM_CHANCE, MAGIC_FIND_FACTOR);
             }
 
             self.items.push(item);

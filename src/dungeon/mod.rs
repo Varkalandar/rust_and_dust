@@ -15,6 +15,7 @@ use crate::MAP_OBJECT_LAYER;
 use crate::Map;
 use crate::map::TransitionDestination;
 use crate::WHITE;
+use crate::rng_source::RngReceiver;
 
 
 pub struct Room {
@@ -33,21 +34,19 @@ pub struct Dungeon {
 }
 
 
-pub fn generate_dungeon(map: &mut Map) -> Dungeon {
+pub fn generate_dungeon(map: &mut Map, rng: &RngReceiver) -> Dungeon {
 
     map.map_image_name = "".to_string();
     map.backdrop_image_name = "".to_string();
 
-    let mut rng = rand::rng();
+    let dungeon = rooms_and_corridors(map, rng);
+    furnish_dungeon(&dungeon, map, rng);
 
-    let dungeon = rooms_and_corridors(map, &mut rng);
-
-    furnish_dungeon(&dungeon, map, &mut rng);
     dungeon
 }
 
 
-fn rooms_and_corridors<R: Rng + ?Sized>(map: &mut Map, rng: &mut R) -> Dungeon {
+fn rooms_and_corridors(map: &mut Map, rng: &RngReceiver) -> Dungeon {
 
     let mut corridors: Vec<HashMap<i32, [i32; 2]>> = Vec::new();
     let mut rooms: Vec<Room> = Vec::new();
@@ -56,13 +55,13 @@ fn rooms_and_corridors<R: Rng + ?Sized>(map: &mut Map, rng: &mut R) -> Dungeon {
 
     for ry in 0 .. 4 {
         for rx in 0 .. 4 {
-            let x = rx * 13 + rng.random_range(-3..3);
-            let y = ry * 13 + rng.random_range(-3..3);
+            let x = rx * 13 + rng.random_irange(-3, 3);
+            let y = ry * 13 + rng.random_irange(-3, 3);
 
-            let x1 = x - rng.random_range(1..3);
-            let y1 = y - rng.random_range(1..3); 
-            let x2 = x + rng.random_range(1..3);
-            let y2 = y + rng.random_range(1..3);
+            let x1 = x - rng.random_irange(1, 3);
+            let y1 = y - rng.random_irange(1, 3); 
+            let x2 = x + rng.random_irange(1, 3);
+            let y2 = y + rng.random_irange(1, 3);
 
             // keep track of entrances
 
@@ -122,7 +121,7 @@ fn rooms_and_corridors<R: Rng + ?Sized>(map: &mut Map, rng: &mut R) -> Dungeon {
                 );
 
                 // now the windy connection
-                let wriggle_prob = rng.random_range(0.1 .. 1.0);
+                let wriggle_prob = rng.random_frange(0.1, 1.0);
                 build_winded_corridor(map, &mut floors, rng, 
                     entrances[room + 4], //  = x;
                     entrances[room + 5] + 2, //  = b;
@@ -159,7 +158,7 @@ fn rooms_and_corridors<R: Rng + ?Sized>(map: &mut Map, rng: &mut R) -> Dungeon {
                     0,
                 );
     
-                let wriggle_prob = rng.random_range(0.1 .. 1.0);
+                let wriggle_prob = rng.random_frange(0.1, 1.0);
                 build_winded_corridor(map, &mut floors, rng, 
                     entrances[room + 2] + 2,
                     entrances[room + 3],
@@ -169,7 +168,6 @@ fn rooms_and_corridors<R: Rng + ?Sized>(map: &mut Map, rng: &mut R) -> Dungeon {
                     wriggle_prob);
             }
 
-            // build_tunnel_from_coordinates(map, &floors);
             build_corridor_from_coordinates(map, &floors);
             corridors.push(floors);
         }
@@ -197,7 +195,7 @@ fn rooms_and_corridors<R: Rng + ?Sized>(map: &mut Map, rng: &mut R) -> Dungeon {
 }
 
 
-fn furnish_dungeon<R: Rng + ?Sized>(dungeon: &Dungeon, map: &mut Map, rng: &mut R) {
+fn furnish_dungeon(dungeon: &Dungeon, map: &mut Map, rng: &RngReceiver) {
 
     // place entrance stairs
     place_wall_tile(map, dungeon.rooms[0].x2, dungeon.rooms[0].y1, 
@@ -210,22 +208,22 @@ fn furnish_dungeon<R: Rng + ?Sized>(dungeon: &Dungeon, map: &mut Map, rng: &mut 
                       
     for i in 1 .. dungeon.rooms.len() {
         place_coins(map,
-                    rng.random_range(dungeon.rooms[i].x1 .. dungeon.rooms[i].x2), 
-                    rng.random_range(dungeon.rooms[i].y1 .. dungeon.rooms[i].y2), 
-                    "copper_coin", rng.random_range(1 .. 6), rng);
+                    rng.random_irange(dungeon.rooms[i].x1, dungeon.rooms[i].x2), 
+                    rng.random_irange(dungeon.rooms[i].y1, dungeon.rooms[i].y2), 
+                    "copper_coin", rng.random_irange(1, 6) as u32, rng);
     }
 }
 
 
-fn build_room<R: Rng + ?Sized>(map: &mut Map, rng: &mut R, 
-                               sx: i32, sy: i32, dx: i32, dy: i32,
-                               entrances: &[i32]) {
-
+fn build_room(map: &mut Map, rng: &RngReceiver, 
+              sx: i32, sy: i32, dx: i32, dy: i32,
+              entrances: &[i32]) 
+{
     let wall_color = WHITE;
 
     for y in sy .. dy + 1 {
         for x in sx .. dx + 1 {
-            place_floor_tile(map, x, y, rng.random_range(51..=53), [0.97, 0.92, 0.9, 1.0]);
+            place_floor_tile(map, x, y, rng.random_urange(51, 53+1), [0.97, 0.92, 0.9, 1.0]);
         }
     }
 
@@ -307,9 +305,11 @@ fn store_walkable_area(sx: i32, sy: i32, dx: i32, dy: i32,
 }
 
 
-fn build_winded_corridor<R: Rng + ?Sized>(map: &mut Map, floors: &mut HashMap<i32, [i32; 2]>, rng: &mut R, 
-                                          sx: i32, sy: i32, dx: i32, dy: i32,
-                                          wriggle_prob: f64) {
+fn build_winded_corridor(map: &mut Map, floors: &mut HashMap<i32, [i32; 2]>, 
+                         rng: &RngReceiver, 
+                         sx: i32, sy: i32, dx: i32, dy: i32,
+                         wriggle_prob: f32) 
+{
     // is this straight?
 
     if sx == dx || sy == dy {
@@ -322,7 +322,7 @@ fn build_winded_corridor<R: Rng + ?Sized>(map: &mut Map, floors: &mut HashMap<i3
 
         // two options to chose
 
-        if rng.random() {
+        if rng.random() < 0.5 {
             subdivide_corridor(map, floors, rng, sx, sy, sx, dy, wriggle_prob);
             subdivide_corridor(map, floors, rng, sx, dy, dx, dy, wriggle_prob);
         }
@@ -334,9 +334,11 @@ fn build_winded_corridor<R: Rng + ?Sized>(map: &mut Map, floors: &mut HashMap<i3
 }
 
 
-fn subdivide_corridor<R: Rng + ?Sized>(map: &mut Map, floors: &mut HashMap<i32, [i32; 2]>, rng: &mut R,
-                                       sx: i32, sy: i32, dx: i32, dy: i32,
-                                       wriggle_prob: f64) {
+fn subdivide_corridor(map: &mut Map, floors: &mut HashMap<i32, [i32; 2]>, 
+                      rng: &RngReceiver,
+                      sx: i32, sy: i32, dx: i32, dy: i32,
+                      wriggle_prob: f32) 
+{
     let vx = (dx - sx).signum();
     let vy = (dy - sy).signum();
 
@@ -345,7 +347,7 @@ fn subdivide_corridor<R: Rng + ?Sized>(map: &mut Map, floors: &mut HashMap<i32, 
     }
 
     let n = cmp::max((dx - sx).abs(), (dy - sy).abs());
-    let p: f64 = rng.random();
+    let p = rng.random();
 
     if n < 6 || p > wriggle_prob{
         // too short to be wriggled. Build straight, include end piece
@@ -359,7 +361,7 @@ fn subdivide_corridor<R: Rng + ?Sized>(map: &mut Map, floors: &mut HashMap<i32, 
         build_straight_corridor(floors, sx, sy, sx + min * vx, sy + min * vy, 0);
 
         // depth of turn
-        let d:i32 = rng.random_range(-n/2 .. n/2);
+        let d:i32 = rng.random_irange(-n/2, n/2+1);
 
         // U turn
 
@@ -568,9 +570,9 @@ fn place_wall_tile(map: &mut Map, x: i32, y: i32, z_off: i32, id: usize, color: 
 }
 
 
-fn place_coins<R: Rng + ?Sized>(map: &mut Map,
-                                x: i32, y: i32, id: &str, count: u32,
-                                rng: &mut R) -> u64 
+fn place_coins(map: &mut Map,
+               x: i32, y: i32, id: &str, count: u32,
+               rng: &RngReceiver) -> u64 
 {
     let mut item = map.item_factory.create(id, rng);
     item.stack_size = count;

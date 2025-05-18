@@ -88,7 +88,6 @@ pub struct GameWorld {
 
     speaker: SoundPlayer,
 
-    rng: rand::rngs::StdRng,
     rng_receiver: RngReceiver,
 
     black_texture: Texture2d,
@@ -165,13 +164,17 @@ impl App {
 
         let item_factory = ItemFactory::new();
         let player_inventory = Inventory::new();
-        let mut rng = rand::rngs::StdRng::seed_from_u64(12345678901);
 
         let mut map = Map::new("Demo Map", map_image_file, map_backdrop_file, item_factory);
-        // map.load("town.map");
+
+        // set up async RNG
+        let (sender, receiver) = sync_channel::<f32>(64);
+        let rng_receiver = RngReceiver::new(receiver);
+        let rng_source = RngSource::new(sender);
+        rng_source.start();
 
         // Testing dungeon generation
-        let dungeon = generate_dungeon(&mut map);
+        let dungeon = generate_dungeon(&mut map, &rng_receiver);
         map.set_player_position(dungeon.start_position);
         let x = (dungeon.rooms[5].x1 + dungeon.rooms[5].x2) / 2;
         let y = (dungeon.rooms[5].y1 + dungeon.rooms[5].y2) / 2;
@@ -184,11 +187,6 @@ impl App {
         map.creature_factory.add("generated_creature", creature);
 
 
-        let (sender, receiver) = sync_channel::<f32>(64);
-        let rng_receiver = RngReceiver::new(receiver);
-        let rng_source = RngSource::new(sender);
-        rng_source.start();
-
         map.populate("dungeon.csv", &rng_receiver, map_pos(x, y, 0));
 
         let mut world = GameWorld {
@@ -197,7 +195,6 @@ impl App {
             player_inventory,
             speaker: SoundPlayer::new(),
 
-            rng,
             rng_receiver,
 
             black_texture,
@@ -219,21 +216,21 @@ impl App {
 
         // Some inventory contents for testing
 
-        let wand = world.map.item_factory.create("wooden_wand", &mut world.rng);
+        let wand = world.map.item_factory.create("wooden_wand", &world.rng_receiver);
         world.player_inventory.put_item(wand, Slot::Bag);
 
-        let mut wand = world.map.item_factory.create("engraved_wand", &mut world.rng);
+        let mut wand = world.map.item_factory.create("engraved_wand", &world.rng_receiver);
         wand.activation = Activation::Fireball;
         world.player_inventory.put_item(wand, Slot::RHand);
 
-        let mut coins = world.map.item_factory.create("copper_coin", &mut world.rng);
+        let mut coins = world.map.item_factory.create("copper_coin", &world.rng_receiver);
         coins.stack_size = 1000;
         world.player_inventory.put_item(coins, Slot::Bag);
 
-        let scroll = world.map.item_factory.create("fire_ball_scroll", &mut world.rng);
+        let scroll = world.map.item_factory.create("fire_ball_scroll", &world.rng_receiver);
         world.player_inventory.put_item(scroll, Slot::Bag);
 
-        let scroll = world.map.item_factory.create("frost_bolt_scroll", &mut world.rng);
+        let scroll = world.map.item_factory.create("frost_bolt_scroll", &world.rng_receiver);
         world.player_inventory.put_item(scroll, Slot::Bag);
 
 
