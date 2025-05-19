@@ -1,6 +1,5 @@
 use std::vec::Vec;
 use rand::SeedableRng;
-use rand::Rng;
 
 use crate::ItemFactory;
 use crate::item::Item;

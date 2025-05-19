@@ -32,7 +32,9 @@ impl VoxelImageGenerator
     {
         let soft_pen = Framebuffer::from_image("resources/gfx/ui/soft_pen.png");
         let vector_ball = Framebuffer::from_image("resources/gfx/ui/vector_ball.png");
-        let fb = generate_goblet_image(&vector_ball, 0.0);
+        let generator = generate_goblet;
+
+        let fb = generate_image(&vector_ball, 0.0, generator);
 
         VoxelImageGenerator {
             result: fb.to_texture(display),
@@ -49,9 +51,11 @@ pub fn generate_creature<T: SurfaceTypeTrait + ResizeableSurface>(display: &Disp
 {
     let mut tile_id = 0;
 
+    let generator = generate_goblet;
+
     // create 8 directions
     for i in 0 .. 8 {
-        let fb = generate_goblet_image(pen, (i as f32 / 8.0) * PI * 2.0);
+        let fb = generate_image(pen, (i as f32 / 8.0) * PI * 2.0, generator);
         tile_id = tileset.get_new_id();
     
         let tile = Tile {
@@ -80,80 +84,13 @@ pub fn generate_creature<T: SurfaceTypeTrait + ResizeableSurface>(display: &Disp
     }
 }
 
-/*
-pub fn generate_fb_image(pen: &Framebuffer) -> Framebuffer
+
+pub fn generate_image(pen: &Framebuffer, rot: f32, generator: fn() -> Voxelstack) -> Framebuffer
 {
     let fb_size = 128;
     let mut fb = Framebuffer::new(fb_size, fb_size);
 
-    // fb.fill_box(0, 0, 256, 256, [255, 255, 255, 255]);
-    // fb.fill_box(10, 10, 236, 236, [0, 0, 0, 255]);
-
-    // let mut voxels = generate_sphere(0.0, 64.0, 0.0, 50.0, 24, [192, 192, 128, 255]);
-    let mut voxels = generate_tendrils(fb_size, 0.5 * 4.0, 0.7 * 4.0, 7..9, 23, [128, 160, 64], [2, 10, 1]);
-    voxels.merge(generate_tendrils(fb_size, 1.0 * 4.0, 0.1 * 4.0, 15..17, 9, [192, 192, 128], [3, 3, 2]));
-
-    voxels.sort_depth_first();
-
-    // scan for max and min depth
-    let mut max_depth = 0.0;
-    let mut min_depth = 100.0;
-
-    for voxel in &voxels.voxels {
-        if voxel.z < min_depth {min_depth = voxel.z;}
-        if voxel.z > max_depth {max_depth = voxel.z;}
-    }
-
-    // for the dot sizes, norm the depth to 0..1
-    let z_scale = 1.0 / (max_depth - min_depth);
-
-    println!("min_z={} max_z={} z_scale={}", min_depth, max_depth, z_scale);
-
-    for voxel in &voxels.voxels {
-
-        // voxels are around x=0 and z=0, we need to shift them to half the framebuffer width
-        let xp = voxel.x as i32 + fb.width / 2;
-        let yp = (voxel.y - voxel.z * 0.5) as i32;
-        let size = std::cmp::min(((voxel.z - min_depth) * z_scale) as i32 + 1, 7);
-        
-        // vballs have some size, do some bounds checking here
-        if xp > 2 && yp > 2 && xp < fb.width - 2 && yp < fb.height - 2 {
-            // pen_at_size(&mut fb, xp, yp, pen, size + 2, voxel.color);
-            pen.draw_scaled(&mut fb, xp, yp, size + 2, size + 2, voxel.color);
-        }
-        else {
-            println!("pen position is out of bounds: xp={} yp={} size={}", xp, yp, size);
-        }
-    }
-
-
-    // debug
-    /*
-    for y in 0 .. 128 {
-        for x in 0 .. 128 {
-            let source_x = x;
-            let source_y = y;
-
-            let pixel = vector_ball.get_pixel(source_x, source_y);
-
-            println!("sx={} sy={} pix={:?}", source_x, source_y, pixel);
-
-            fb.set_pix(x as i32, y as i32, pixel.0);
-        }    
-    }
-    */
-
-    fb
-}
-*/
-
-pub fn generate_goblet_image(pen: &Framebuffer, rot: f32) -> Framebuffer
-{
-    let fb_size = 128;
-    let mut fb = Framebuffer::new(fb_size, fb_size);
-
-    let mut voxels = generate_goblet(7, 60.0, 40.0, [128, 160, 192, 255]);
-    voxels.merge(generate_goblet(5, 30.0, 64.0, [192, 224, 255, 255]));
+    let mut voxels = (generator)();
 
     voxels.rotate_y(rot);
     voxels.sort_depth_first();
@@ -207,7 +144,16 @@ pub fn generate_goblet_image(pen: &Framebuffer, rot: f32) -> Framebuffer
 }
 
 
-fn generate_goblet(steps: i32, rad: f32, height: f32, color: [u8; 4]) -> Voxelstack
+fn generate_goblet() -> Voxelstack
+{
+    let mut voxels = generate_goblet_aux(7, 60.0, 40.0, [128, 160, 192, 255]);
+    voxels.merge(generate_goblet_aux(5, 30.0, 64.0, [192, 224, 255, 255]));
+
+    voxels
+}
+
+
+fn generate_goblet_aux(steps: i32, rad: f32, height: f32, color: [u8; 4]) -> Voxelstack
 {
     let mut voxels = Voxelstack::new();
 
@@ -233,6 +179,32 @@ fn generate_goblet(steps: i32, rad: f32, height: f32, color: [u8; 4]) -> Voxelst
                 color
             ));
         }
+    }
+
+    voxels
+}
+
+
+
+fn generate_scorpion(color: [u8; 4]) -> Voxelstack
+{
+    let mut voxels = Voxelstack::new();
+
+    // body
+    for n in 0 .. 10 {
+
+        let x = n as f32 * 2.0;
+        let y = 96.0;
+        let z = 0.0;
+
+        voxels.add(Voxel::new(
+            x, 
+            y, 
+            z,
+            8.0, 
+            color
+        ));
+
     }
 
     voxels
