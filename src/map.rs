@@ -837,7 +837,7 @@ impl Map {
             self.layers[MAP_OBJECT_LAYER].insert(id, mob);
             list.push(id);
         
-            self.animations.insert(id, Box::new(SpinAnimation::new(12.0)));
+            // self.animations.insert(id, Box::new(SpinAnimation::new(12.0)));
         }
 
         MobGroup::new(list, center, true, rng)

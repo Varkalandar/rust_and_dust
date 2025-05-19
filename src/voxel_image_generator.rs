@@ -32,9 +32,11 @@ impl VoxelImageGenerator
     {
         let soft_pen = Framebuffer::from_image("resources/gfx/ui/soft_pen.png");
         let vector_ball = Framebuffer::from_image("resources/gfx/ui/vector_ball.png");
-        let generator = generate_goblet;
 
-        let fb = generate_image(&vector_ball, 0.0, generator);
+        // let generator = generate_goblet;
+        let generator = generate_scorpion;
+
+        let fb = generate_image(&vector_ball, 1.0, generator);
 
         VoxelImageGenerator {
             result: fb.to_texture(display),
@@ -51,11 +53,12 @@ pub fn generate_creature<T: SurfaceTypeTrait + ResizeableSurface>(display: &Disp
 {
     let mut tile_id = 0;
 
-    let generator = generate_goblet;
+    // let generator = generate_goblet;
+    let generator = generate_scorpion;
 
     // create 8 directions
     for i in 0 .. 8 {
-        let fb = generate_image(pen, (i as f32 / 8.0) * PI * 2.0, generator);
+        let fb = generate_image(pen, ((i + 4) as f32 / 8.0) * PI * -2.0, generator);
         tile_id = tileset.get_new_id();
     
         let tile = Tile {
@@ -105,7 +108,7 @@ pub fn generate_image(pen: &Framebuffer, rot: f32, generator: fn() -> Voxelstack
     }
 
     // for the dot sizes, norm the depth to 0..1
-    let z_scale = 1.0 / (max_depth - min_depth);
+    let z_scale = if max_depth - min_depth != 0.0 {1.0 / (max_depth - min_depth)} else {1.0};
 
     println!("min_z={} max_z={} z_scale={}", min_depth, max_depth, z_scale);
 
@@ -121,7 +124,7 @@ pub fn generate_image(pen: &Framebuffer, rot: f32, generator: fn() -> Voxelstack
 
         // voxels have some size, do some bounds checking here
         if xp > size && yp > size && xp < fb.width - size && yp < fb.height - size {
-            pen.draw_scaled(&mut fb, xp, yp, size, size, 
+            pen.draw_scaled(&mut fb, xp - size/2, yp - size/2, size, size, 
                             voxel.color, 
                             |c| -> u8 {
                                 let base = c as f32 * PI * 0.5 / 255.0;
@@ -185,27 +188,60 @@ fn generate_goblet_aux(steps: i32, rad: f32, height: f32, color: [u8; 4]) -> Vox
 }
 
 
+fn generate_scorpion() -> Voxelstack
+{
+    generate_scorpion_aux([224, 160, 128, 255])
+}
 
-fn generate_scorpion(color: [u8; 4]) -> Voxelstack
+
+fn generate_scorpion_aux(color: [u8; 4]) -> Voxelstack
 {
     let mut voxels = Voxelstack::new();
 
-    // body
-    for n in 0 .. 10 {
+    // head/eyes
+    voxels.add(Voxel::new(-36.0, 94.0, 4.0, 9.0, [128, 160, 192, 255]));
+    voxels.add(Voxel::new(-36.0, 94.0, -4.0, 9.0, [128, 160, 192, 255]));
 
-        let x = n as f32 * 2.0;
+    // body
+    for n in -4 .. -0 {
+
+        let x = n as f32 * 8.0;
         let y = 96.0;
         let z = 0.0;
 
-        voxels.add(Voxel::new(
-            x, 
-            y, 
-            z,
-            8.0, 
-            color
-        ));
+        voxels.add(Voxel::new(x, y, z, 16.0, color));
 
+        // feet
+        voxels.add(Voxel::new(x + 10.0, y + 6.0, 8.0, 8.0, [255, 224, 160, 255]));
+        voxels.add(Voxel::new(x + 10.0, y + 6.0, -8.0, 8.0, [255, 224, 160, 255]));
     }
+
+    // arc
+    let mut ac = color;
+    for n in -6 .. 10 {
+        let size = 16.0 - (n + 6) as f32 * 8.0 / 12.0; 
+        let angle = PI * n as f32 / 12.0;
+
+        let x = angle.cos() * 30.0;
+        let y = 96.0 - 30.0 - angle.sin() * 30.0;
+        let z = 0.0;
+
+        ac[0] += 1;
+        ac[1] += 4;
+
+        voxels.add(Voxel::new(x, y, z, size, ac));
+    }
+
+    // stinger
+    for n in 0 .. 5 {
+
+        let x = -24.0 + n as f32 * -3.0;
+        let y = 45.0 + n as f32 * 2.0;
+        let z = 0.0;
+
+        voxels.add(Voxel::new(x, y, z, 5.0, [255, 255, 160, 255]));
+    }
+
 
     voxels
 }
