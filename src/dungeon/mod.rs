@@ -7,7 +7,6 @@ use rand::prelude::*;
 use geo::LineString;
 use geo::Polygon;
 use geo::CoordsIter;
-use geo::Contains;
 use geo::BooleanOps;
 
 use crate::MAP_GROUND_LAYER;

@@ -29,6 +29,10 @@ pub struct MobGroupMember {
     mobile: bool,
 }
 
+enum MemberAction {
+    SHOOT (Vector2<f32>),
+    MOVE (Vector2<f32>),
+}
 
 impl MobGroup {
 
@@ -58,11 +62,18 @@ impl MobGroup {
         let player_position = mobs.get(&player_id).unwrap().position;
 
         let mut kill_list = Vec::new();
+        let mut action_map: HashMap<u64, MemberAction> = HashMap::new();
         let mut index = 0;
 
+        // count down the action timers
         for member in &mut self.members {
+            member.action_countdown -= dt;
+        }
 
-            let mob_opt = mobs.get_mut(&member.id);
+        // now see who is ready to do something
+        for member in &self.members {
+
+            let mob_opt = mobs.get(&member.id);
 
             match mob_opt {
                 None => {
@@ -70,24 +81,18 @@ impl MobGroup {
                     kill_list.insert(0, index);
                 }
                 Some(mob) => {
-                    member.action_countdown -= dt;
 
                     if member.action_countdown < 0.0 {
 
                         // fire at a player?
-                        if rng.random::<f64>() < 0.25 {
+                        if rng.random::<f32>() < 0.25 {
 
                             // player in range?
                             let len = vec2_square_len(vec2_sub(mob.position, player_position));
                             let reach = 500.0 * 500.0;
                             if len < reach {
-                                
-                                let projectile_spawn_distance = mob.creature.as_ref().unwrap().projectile_spawn_distance;
-                                let mut projectile = launch_projectile(mob.position, player_position, projectile_spawn_distance, MobType::CreatureProjectile, factory);
-                                projectile_builder.configure_projectile("Iron shot", &mut projectile.visual, &mut projectile.velocity, speaker);
-                                mobs.insert(projectile.uid, projectile);
-
-                                member.action_countdown = 1.0 + rng.random::<f32>();
+                                let action = MemberAction::SHOOT(player_position);
+                                action_map.insert(member.id, action);
                             }
                         }
                         else if member.mobile {
@@ -109,7 +114,9 @@ impl MobGroup {
 
                                 // println!("len={}", len);
 
-                                if len < 100.0 * 100.0 || count >= 5 { break; }
+                                if len < 100.0 * 100.0 
+                                   && self.is_destination_clear(mobs, x, y)
+                                   || count >= 5 { break; }
                             } 
 
                             if count >= 5 {
@@ -119,11 +126,8 @@ impl MobGroup {
                             }
 
                             // println!("id=" + creature.id + "moves to " + x + ", " + y);
-
-                            let creature = mob.creature.as_ref().unwrap();
-                            move_mob(mob, [x, y], creature.base_speed);
-                            
-                            member.action_countdown = 3.0 + rng.random::<f32>() * 2.0;
+                            let action = MemberAction::MOVE([x, y]);
+                            action_map.insert(member.id, action);
                         }
                     }
                 }
@@ -132,10 +136,71 @@ impl MobGroup {
             index += 1;
         }
 
+        // now perform the chosen actions
+        for member in &mut self.members {
+            let action = action_map.get(&member.id);
+            if action.is_some() {
+                match action.unwrap() {
+                    MemberAction::SHOOT(target_position) => {
+                        fire_at(mobs, member.id, *target_position, 
+                                factory, projectile_builder, speaker);
+                        member.action_countdown = 1.0 + rng.random::<f32>() * 1.0;
+                    },
+                    MemberAction::MOVE(target_position) => {
+                        move_to(mobs, member.id, *target_position);
+                        member.action_countdown = 3.0 + rng.random::<f32>() * 2.0;
+                    },
+                }
+            }
+        }
+
         for index in kill_list {
             self.members.remove(index);
         }
 
         // todo: cleaup of groups with no members left?
     }
+
+    fn is_destination_clear(&self, mobs: &HashMap<u64, MapObject>, x: f32, y: f32) -> bool
+    {
+         for member in &self.members {
+            let mob_opt = mobs.get(&member.id);
+            match mob_opt {
+                None => { /* doesn't exist anymore. Will be cleaned up after moving.*/ },
+                Some(mob) => {
+                    // check distance
+                    let dx = mob.position[0] - x;
+                    let dy = mob.position[1] - y;
+                    let len2 = dx * dx + dy * dy;
+
+                    if len2 < 1000.0 {
+                        // loction is too cklose to another mob of the group
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+}
+
+
+fn move_to(mobs: &mut HashMap<u64, MapObject>, member_id: u64, target_position: Vector2::<f32>) 
+{
+    let mob = mobs.get_mut(&member_id).unwrap();
+    let creature = mob.creature.as_ref().unwrap();
+    move_mob(mob, target_position, creature.base_speed);
+}
+
+
+fn fire_at(mobs: &mut HashMap<u64, MapObject>, member_id: u64, target_position: Vector2::<f32>, 
+           factory: &mut MapObjectFactory, projectile_builder: &mut ProjectileBuilder,
+           speaker: &mut SoundPlayer) 
+{
+    let mob = mobs.get(&member_id).unwrap();
+    let projectile_spawn_distance = mob.creature.as_ref().unwrap().projectile_spawn_distance;
+    let mut projectile = launch_projectile(mob.position, target_position, projectile_spawn_distance, MobType::CreatureProjectile, factory);
+    projectile_builder.configure_projectile("Iron shot", &mut projectile.visual, &mut projectile.velocity, speaker);
+    mobs.insert(projectile.uid, projectile);
 }
