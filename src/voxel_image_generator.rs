@@ -56,9 +56,10 @@ pub fn generate_creature<T: SurfaceTypeTrait + ResizeableSurface>(display: &Disp
     // let generator = generate_goblet;
     let generator = generate_scorpion;
 
-    // create 8 directions
-    for i in 0 .. 8 {
-        let fb = generate_image(pen, ((i + 4) as f32 / 8.0) * PI * -2.0, generator);
+    // create n directions
+    let n = 16;
+    for i in 0 .. n {
+        let fb = generate_image(pen, ((i + n/2) as f32 / n as f32) * PI * -2.0, generator);
         tile_id = tileset.get_new_id();
     
         let tile = Tile {
@@ -74,8 +75,8 @@ pub fn generate_creature<T: SurfaceTypeTrait + ResizeableSurface>(display: &Disp
     }
 
     CreaturePrototype {
-        base_tile_id: tile_id - 7,
-        frames: 8,
+        base_tile_id: tile_id - n + 1,
+        frames: n,
         speed: 100.0,
         min_hp: 1,
         max_hp: 2,
