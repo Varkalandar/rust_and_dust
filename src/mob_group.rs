@@ -168,13 +168,22 @@ impl MobGroup {
             match mob_opt {
                 None => { /* doesn't exist anymore. Will be cleaned up after moving.*/ },
                 Some(mob) => {
-                    // check distance
-                    let dx = mob.position[0] - x;
-                    let dy = mob.position[1] - y;
-                    let len2 = dx * dx + dy * dy;
 
-                    if len2 < 1000.0 {
-                        // loction is too cklose to another mob of the group
+                    // find out where this mob is moving to. That is the spot
+                    // we want to avoid moving to as well to avoid collisions
+                    let time = if mob.move_time_left > 0.0 {mob.move_time_left} else {0.0}; 
+                    let mob_x = mob.position[0] + mob.velocity[0] * time;
+                    let mob_y = mob.position[1] + mob.velocity[1] * time;
+
+                    // check distance
+                    let dx = mob_x - x;
+                    let dy = mob_y - y;
+                    let len2 = dx * dx + dy * dy;
+                    
+                    let size = mob.creature.as_ref().unwrap().projectile_spawn_distance;
+
+                    if len2 < size * size {
+                        // loction is too close to another mob of the group
                         return false;
                     }
                 }
