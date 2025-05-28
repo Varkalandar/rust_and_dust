@@ -9,13 +9,13 @@ pub struct Voxel
 
     pub size: f32,
 
-    pub color: [u8; 4],
+    pub color: [f32; 4],
 }
 
 
 impl Voxel
 {
-    pub fn new(x: f32, y: f32, z: f32, size: f32, color: [u8; 4]) -> Voxel
+    pub fn new(x: f32, y: f32, z: f32, size: f32, color: [f32; 4]) -> Voxel
     {
         Voxel {
             x,

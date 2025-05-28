@@ -16,7 +16,8 @@ use crate::gfx::Framebuffer;
 use crate::gfx::voxel::Voxel;
 use crate::gfx::voxel::Voxelstack;
 use crate::gfx::gl_support::BlendMode;
-use crate::gfx::c_add;
+use crate::gfx::c_add_clamp;
+use crate::gfx::fcol_to_icol;
 
 
 pub struct VoxelImageGenerator
@@ -128,7 +129,7 @@ pub fn generate_image(pen: &Framebuffer, rot: f32, generator: fn() -> Voxelstack
         // voxels have some size, do some bounds checking here
         if xp > size && yp > size && xp < fb.width - size && yp < fb.height - size {
             pen.draw_scaled(&mut fb, xp - size/2, yp - size/2, size, size, 
-                            voxel.color, 
+                            fcol_to_icol(voxel.color), 
                             |c| -> u8 {
                                 let base = c as f32 * PI * 0.5 / 255.0;
                                 (base.sin() * base.sin() * 255.0) as u8
@@ -152,14 +153,14 @@ pub fn generate_image(pen: &Framebuffer, rot: f32, generator: fn() -> Voxelstack
 
 fn generate_goblet() -> Voxelstack
 {
-    let mut voxels = generate_goblet_aux(7, 60.0, 40.0, [128, 160, 192, 255]);
-    voxels.merge(generate_goblet_aux(5, 30.0, 64.0, [192, 224, 255, 255]));
+    let mut voxels = generate_goblet_aux(7, 60.0, 40.0, [0.5, 0.6, 0.7, 1.0]);
+    voxels.merge(generate_goblet_aux(5, 30.0, 64.0, [0.7, 0.8, 0.9, 1.0]));
 
     voxels
 }
 
 
-fn generate_goblet_aux(steps: i32, rad: f32, height: f32, color: [u8; 4]) -> Voxelstack
+fn generate_goblet_aux(steps: i32, rad: f32, height: f32, color: [f32; 4]) -> Voxelstack
 {
     let mut voxels = Voxelstack::new();
 
@@ -193,17 +194,17 @@ fn generate_goblet_aux(steps: i32, rad: f32, height: f32, color: [u8; 4]) -> Vox
 
 fn generate_scorpion() -> Voxelstack
 {
-    generate_scorpion_aux([224, 160, 128, 255])
+    generate_scorpion_aux([0.9, 0.7, 0.5, 1.0])
 }
 
 
-fn generate_scorpion_aux(color: [u8; 4]) -> Voxelstack
+fn generate_scorpion_aux(color: [f32; 4]) -> Voxelstack
 {
     let mut voxels = Voxelstack::new();
 
     // head/eyes
-    voxels.add(Voxel::new(-36.0, 94.0, 4.0, 9.0, [128, 160, 192, 255]));
-    voxels.add(Voxel::new(-36.0, 94.0, -4.0, 9.0, [128, 160, 192, 255]));
+    voxels.add(Voxel::new(-36.0, 94.0, 4.0, 9.0, [0.5, 0.6, 0.7, 1.0]));
+    voxels.add(Voxel::new(-36.0, 94.0, -4.0, 9.0, [0.5, 0.6, 0.7, 1.0]));
 
     // body
     for n in -4 .. -0 {
@@ -215,8 +216,8 @@ fn generate_scorpion_aux(color: [u8; 4]) -> Voxelstack
         voxels.add(Voxel::new(x, y, z, 16.0, color));
 
         // feet
-        voxels.add(Voxel::new(x + 10.0, y + 6.0, 8.0, 8.0, [255, 224, 160, 255]));
-        voxels.add(Voxel::new(x + 10.0, y + 6.0, -8.0, 8.0, [255, 224, 160, 255]));
+        voxels.add(Voxel::new(x + 10.0, y + 6.0, 8.0, 8.0, [1.0, 0.9, 0.7, 1.0]));
+        voxels.add(Voxel::new(x + 10.0, y + 6.0, -8.0, 8.0, [1.0, 0.9, 0.7, 1.0]));
     }
 
     // arc
@@ -229,8 +230,7 @@ fn generate_scorpion_aux(color: [u8; 4]) -> Voxelstack
         let y = 96.0 - 30.0 - angle.sin() * 30.0;
         let z = 0.0;
 
-        ac[0] += 1;
-        ac[1] += 4;
+        ac = c_add_clamp(ac, [0.005, 0.02, 0.0, 0.0]);
 
         voxels.add(Voxel::new(x, y, z, size, ac));
     }
@@ -242,15 +242,14 @@ fn generate_scorpion_aux(color: [u8; 4]) -> Voxelstack
         let y = 45.0 + n as f32 * 2.0;
         let z = 0.0;
 
-        voxels.add(Voxel::new(x, y, z, 5.0, [255, 255, 160, 255]));
+        voxels.add(Voxel::new(x, y, z, 5.0, [1.0, 1.0, 0.7, 1.0]));
     }
-
 
     voxels
 }
 
 
-fn generate_sphere(xc: f32, yc: f32, zc: f32, rad: f32, steps: i32, color: [u8; 4]) -> Voxelstack
+fn generate_sphere(xc: f32, yc: f32, zc: f32, rad: f32, steps: i32, color: [f32; 4]) -> Voxelstack
 {
     let mut voxels = Voxelstack::new();
 
@@ -280,8 +279,9 @@ fn generate_sphere(xc: f32, yc: f32, zc: f32, rad: f32, steps: i32, color: [u8; 
 }
 
 
-fn generate_tendrils(fb_size: i32, dy: f32, dx: f32, steps_range: std::ops::Range<u32>, tendrils: i32,
-                     start_color: [u8; 3], cv_range_max: [u8; 3]) -> Voxelstack
+fn generate_tendrils(fb_size: i32, dy: f32, dx: f32, steps_range: std::ops::Range<u32>,
+                     tendrils: i32,
+                     start_color: [f32; 3], cv_range_max: [f32; 3]) -> Voxelstack
 {
     let mut rng = rand::rng();
     let mut voxels = Voxelstack::new();
@@ -295,8 +295,11 @@ fn generate_tendrils(fb_size: i32, dy: f32, dx: f32, steps_range: std::ops::Rang
         let mut x = 0.0;
         let mut y = size * 0.75;
         let mut z = 0.0;
-        let mut color = [start_color[0], start_color[1], start_color[2], 255];
-        let cv = [rng.random_range(0 .. cv_range_max[0]), rng.random_range(0 .. cv_range_max[1]), rng.random_range(0 .. cv_range_max[2]), 255];
+        let mut color = [start_color[0], start_color[1], start_color[2], 1.0];
+        let cv = [rng.random_range(0.0 .. cv_range_max[0]), 
+                  rng.random_range(0.0 .. cv_range_max[1]),
+                  rng.random_range(0.0 .. cv_range_max[2]),
+                  1.0];
 
         for _i in 0 .. steps {
 
@@ -310,7 +313,7 @@ fn generate_tendrils(fb_size: i32, dy: f32, dx: f32, steps_range: std::ops::Rang
             (x, y, z, color) = line(&mut voxels, x, y, z, xv, yv, zv, steps, color, cv, 5.0);
         }
         
-        voxels.merge(generate_sphere(x, y, z, 3.0, 8, [rng.random_range(color[0]..=255), rng.random_range(color[1]..=255), rng.random_range(color[2]..=255), 255]));
+        voxels.merge(generate_sphere(x, y, z, 3.0, 8, [rng.random_range(color[0]..=1.0), rng.random_range(color[1]..=1.0), rng.random_range(color[2]..=1.0), 1.0]));
 
         // spin before adding next tendril
         voxels.rotate_y(PI * 2.0 / tendrils as f32);
@@ -322,7 +325,7 @@ fn generate_tendrils(fb_size: i32, dy: f32, dx: f32, steps_range: std::ops::Rang
 
 fn line(voxels: &mut Voxelstack,
         x: f32, y: f32, z: f32, xv: f32, yv: f32, zv: f32, steps: i32,
-        mut color: [u8; 4], cv: [u8; 4], size: f32) -> (f32, f32, f32, [u8; 4])
+        mut color: [f32; 4], cv: [f32; 4], size: f32) -> (f32, f32, f32, [f32; 4])
 {
     let mut xp = x;
     let mut yp = y;
@@ -333,9 +336,7 @@ fn line(voxels: &mut Voxelstack,
         yp += yv;
         zp += zv;
 
-        color[0] = c_add(color[0], cv[0]);
-        color[1] = c_add(color[1], cv[1]);
-        color[2] = c_add(color[2], cv[2]);
+        color = c_add_clamp(color, cv);
 
         voxels.add(Voxel::new(xp, yp, zp, size, color));
     }

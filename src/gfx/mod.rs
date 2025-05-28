@@ -2,7 +2,7 @@ pub mod gl_support;
 pub mod voxel;
 
 use std::collections::HashSet;
-
+use std::cmp::max;
 use glutin::surface::ResizeableSurface;
 use glutin::surface::SurfaceTypeTrait;
 use glium::Display;
@@ -68,10 +68,10 @@ impl Framebuffer
                 // dest.set_pix(xp + x, yp + y, color);
 
                 dest.blend_pix(xp + x, yp + y, 
-                    [shade_func(c_mul(color[0], pixel[0])), 
-                     shade_func(c_mul(color[1], pixel[1])), 
-                     shade_func(c_mul(color[2], pixel[2])), 
-                     c_mul(color[3], pixel[3])]);
+                    [shade_func(c_imul(color[0], pixel[0])), 
+                     shade_func(c_imul(color[1], pixel[1])), 
+                     shade_func(c_imul(color[2], pixel[2])), 
+                     c_imul(color[3], pixel[3])]);
 
             }
         }
@@ -190,7 +190,7 @@ impl Framebuffer
         
         // what is right here?
         // let a = b2 * a2 + b1 * (255 - a2) + 255;
-        let a =std::cmp::max(a1, a2) << 8;
+        let a = max(a1, a2) << 8;
 
         self.buffer[dpos] = (r >> 8) as u8;
         self.buffer[dpos+1] = (g >> 8) as u8;
@@ -299,20 +299,49 @@ pub fn shade(color: [u8; 4], shade: i32) -> [u8; 4]
 }
 
 
-pub fn c_add(a: u8, b: u8) -> u8
-{
-    if b > 255 - a {
-        255
-    } 
-    else {
-        a + b
-    }
-}
-
-
-pub fn c_mul(a: u8, b: u8) -> u8
+pub fn c_imul(a: u8, b: u8) -> u8
 {
     let c = a as u32 * b as u32;
 
     (c >> 8) as u8
+}
+
+
+pub fn icol_to_fcol(c: [u8; 4]) -> [f32; 4]
+{
+    [
+        c[0] as f32 / 255.0,
+        c[1] as f32 / 255.0,
+        c[2] as f32 / 255.0,
+        c[3] as f32 / 255.0,
+    ]
+}
+
+
+pub fn fcol_to_icol(c: [f32; 4]) -> [u8; 4]
+{
+    [
+        (c[0] * 255.0) as u8,
+        (c[1] * 255.0) as u8,
+        (c[2] * 255.0) as u8,
+        (c[3] * 255.0) as u8,
+    ]
+}
+
+
+pub fn cc_clamp(v: f32) -> f32
+{
+    let low = if v > 0.0 { v } else { 0.0 };
+    if low < 1.0 { low } else { 1.0 }
+}
+
+
+pub fn c_add_clamp(a: [f32; 4], b: [f32; 4]) -> [f32; 4]
+{
+    [
+        cc_clamp(a[0] + b[0]),
+        cc_clamp(a[1] + b[1]),
+        cc_clamp(a[2] + b[2]),
+        cc_clamp(a[3] + b[3]),
+    ]
 }
