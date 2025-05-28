@@ -51,12 +51,21 @@ impl VoxelImageGenerator
 
 pub fn generate_creature<T: SurfaceTypeTrait + ResizeableSurface>(display: &Display<T>, 
                                                                   tileset: &mut TileSet,
-                                                                  pen: &Framebuffer) -> CreaturePrototype
+                                                                  pen: &Framebuffer,
+                                                                  name: &str) -> CreaturePrototype
 {
     let mut tile_id = 0;
+    let generator: fn() -> Voxelstack;
+    let animation_type: CreatureAnimation;
 
-    // let generator = generate_goblet;
-    let generator = generate_scorpion;
+    if name.ends_with("_2") {
+        generator = generate_goblet;
+        animation_type = CreatureAnimation::SPIN(12.0);
+    }
+    else {
+        generator = generate_scorpion;
+        animation_type = CreatureAnimation::NONE;
+    }
 
     // create n directions
     let n = 16;
@@ -69,7 +78,7 @@ pub fn generate_creature<T: SurfaceTypeTrait + ResizeableSurface>(display: &Disp
             size: [fb.width as f32, fb.height as f32],
             foot: [fb.width as f32 * 0.5, fb.height as f32 * 0.75],
             tex: fb.to_texture(display),
-            name: "generated_creature".to_string(),
+            name: name.to_string(),
         };
 
         println!("Adding tile {}", tile_id);
@@ -87,7 +96,7 @@ pub fn generate_creature<T: SurfaceTypeTrait + ResizeableSurface>(display: &Disp
         // blend_mode: BlendMode::Add,
         blend_mode: BlendMode::Blend,
         movement_function: movement_glide,
-        animation_type: CreatureAnimation::NONE,
+        animation_type,
     }
 }
 

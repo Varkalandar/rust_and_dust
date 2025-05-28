@@ -10,6 +10,7 @@ use rand::Rng;
 
 use crate::ui::*;
 use crate::GameWorld;
+use crate::Dungeon;
 use crate::move_player;
 use crate::screen_to_world_pos;
 use crate::views::player_items_view::PlayerItemsView;
@@ -232,10 +233,8 @@ impl UiController for Game
                 
                         world.map.set_player_position(dungeon.start_position);
         
-                        let x = (dungeon.rooms[5].x1 + dungeon.rooms[5].x2) / 2;
-                        let y = (dungeon.rooms[5].y1 + dungeon.rooms[5].y2) / 2;
-        
-                        world.map.populate("dungeon.csv", rng, map_pos(x, y, 0));
+                        let creature_positions = find_suitable_creature_positions(&dungeon);
+                        world.map.populate("dungeon.csv", rng, creature_positions);
                     }
                     else {
                         world.map.load("town.map");
@@ -352,4 +351,24 @@ fn drop_loot<R: Rng + ?Sized>(map: &mut Map, killed_mob_list: Vec<MapObject>,
         map.place_item(item, mob.position);
         speaker.play(Sound::Click, 0.2);
     }
+}
+
+
+pub fn find_suitable_creature_positions(dungeon: &Dungeon) -> Vec<[f32; 2]>
+{
+    let mut positions = Vec::new();
+
+    // for testing, always generate a creture group in this room 
+
+    let x = (dungeon.rooms[5].x1 + dungeon.rooms[5].x2) / 2;
+    let y = (dungeon.rooms[5].y1 + dungeon.rooms[5].y2) / 2;
+
+    positions.push(map_pos(x, y, 0));
+
+    let x = (dungeon.rooms[1].x1 + dungeon.rooms[1].x2) / 2;
+    let y = (dungeon.rooms[1].y1 + dungeon.rooms[1].y2) / 2;
+
+    positions.push(map_pos(x, y, 0));
+
+    positions
 }

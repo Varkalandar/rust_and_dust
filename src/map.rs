@@ -509,10 +509,13 @@ impl Map {
     }
     
 
-    pub fn populate(&mut self, _filename: &str, rng: &mut StdRng, position: Vector2<f32>) {
+    pub fn populate(&mut self, _filename: &str, rng: &mut StdRng, positions: Vec<[f32;2]>) {
 
         // let group = self.make_creature_group("Targetting Drone", 5, 9, position, 40.0, rng);
-        let group = self.make_creature_group("generated_creature", 5, 9, position, 40.0, rng);
+        let group = self.make_creature_group("generated_creature_1", 5, 9, positions[0], 40.0, rng);
+        self.mob_groups.push(group);
+
+        let group = self.make_creature_group("generated_creature_2", 5, 9, positions[1], 40.0, rng);
         self.mob_groups.push(group);
     }
 
@@ -884,7 +887,7 @@ pub fn move_mob(mob: &mut MapObject, destination: Vector2<f32>, base_speed: f32)
 
     let direction = vec2_sub(destination, mob.position);
 
-    println!("creature {} moves in direction {:?}", mob.uid, direction);
+    // println!("creature {} moves in direction {:?}", mob.uid, direction);
 
     let distance = vec2_len(direction);
     let time = distance / base_speed; // pixel per second
@@ -1095,7 +1098,7 @@ impl Visual {
         let offset = self.orient(direction);
         self.current_image_id = self.base_image_id + offset;
 
-        println!("orient_in_direction(): dx={} dy={} base={} current={} offset={} directions={}", direction[0], direction[1], self.base_image_id, self.current_image_id, offset, self.directions);
+        // println!("orient_in_direction(): dx={} dy={} base={} current={} offset={} directions={}", direction[0], direction[1], self.base_image_id, self.current_image_id, offset, self.directions);
     }
 }
 

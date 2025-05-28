@@ -58,7 +58,8 @@ use dungeon::*;
 use map::{Map, MAP_GROUND_LAYER, MAP_OBJECT_LAYER, MAP_CLOUD_LAYER, MoveEndAction};
 use ui::*;
 use editor::MapEditor;
-use game::Game;
+use crate::game::Game;
+use crate::game::find_suitable_creature_positions;
 use item::ItemFactory;
 use item::Activation;
 use inventory::{Inventory, Slot};
@@ -168,17 +169,23 @@ impl App {
         // Testing dungeon generation
         let dungeon = generate_dungeon(&mut map);
         map.set_player_position(dungeon.start_position);
-        let x = (dungeon.rooms[5].x1 + dungeon.rooms[5].x2) / 2;
-        let y = (dungeon.rooms[5].y1 + dungeon.rooms[5].y2) / 2;
 
         let mut ui = UI::new(window, display, program, window_size);
         let voxel_display_test = VoxelImageGenerator::new(&ui.display); 
 
-        let creature = generate_creature(&ui.display, &mut layer_tileset[CREATURE_TILESET],
-                                         &voxel_display_test.vector_ball);
-        map.creature_factory.add("generated_creature", creature);
-        map.populate("dungeon.csv", &mut rng, map_pos(x, y, 0));
+        let creature1 = generate_creature(&ui.display, &mut layer_tileset[CREATURE_TILESET],
+                                         &voxel_display_test.vector_ball,
+                                        "generated_creature_1");
+        map.creature_factory.add("generated_creature_1", creature1);
 
+        let creature2 = generate_creature(&ui.display, &mut layer_tileset[CREATURE_TILESET],
+                                         &voxel_display_test.vector_ball,
+                                        "generated_creature_2");
+        map.creature_factory.add("generated_creature_2", creature2);
+
+        let creature_positions = find_suitable_creature_positions(&dungeon);
+
+        map.populate("dungeon.csv", &mut rng, creature_positions);
 
         let mut world = GameWorld {
             map,
@@ -844,7 +851,7 @@ fn main() {
         .expect("event loop building");
 
     let (window, display) = glium::backend::glutin::SimpleWindowBuilder::new()
-        .with_title("Rust and Dust Collector v0.0.2")
+        .with_title("Rust and Dust Collector v0.0.3")
         .with_inner_size(window_size[0], window_size[1])
         .build(&event_loop);
 
