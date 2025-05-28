@@ -4,12 +4,14 @@ use crate::read_lines;
 use crate::gfx::gl_support::BlendMode;
 
 
-pub struct CreatureFactory {
+pub struct CreatureFactory 
+{
     prototypes: HashMap <String, CreaturePrototype>
 }
 
 
-pub struct CreaturePrototype {
+pub struct CreaturePrototype 
+{
     pub base_tile_id: usize,
     pub frames: usize,
     pub speed: f32,
@@ -19,11 +21,13 @@ pub struct CreaturePrototype {
 
     pub blend_mode: BlendMode,
     pub movement_function: fn(f32) -> f32,
+    pub animation_type: CreatureAnimation,
 }
 
 
 #[allow(dead_code)]
-pub struct Creature {
+pub struct Creature 
+{
     pub base_tile_id: usize,
     pub frames: usize,
     pub base_speed: f32,
@@ -32,6 +36,15 @@ pub struct Creature {
 
     pub blend_mode: BlendMode,
     pub movement_function: fn(f32) -> f32,
+    pub animation_type: CreatureAnimation,
+}
+
+
+#[derive(Copy, Clone)]
+pub enum CreatureAnimation
+{
+    NONE,
+    SPIN(f32),
 }
 
 
@@ -59,6 +72,7 @@ impl CreatureFactory {
             projectile_spawn_distance: proto.projectile_spawn_distance,
             blend_mode: proto.blend_mode,
             movement_function: proto.movement_function,
+            animation_type: proto.animation_type,
         }
     }
     
@@ -90,6 +104,7 @@ fn read_creature_prototypes() -> HashMap <String, CreaturePrototype>
                 projectile_spawn_distance: parts.next().unwrap().parse::<f32>().unwrap(),
                 blend_mode: BlendMode::Blend,
                 movement_function: movement_bounce,
+                animation_type: CreatureAnimation::NONE,
             });
     }
 

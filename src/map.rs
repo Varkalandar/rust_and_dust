@@ -20,6 +20,7 @@ use crate::item::Item;
 use crate::ItemFactory;
 use crate::creature::Creature;
 use crate::creature::CreatureFactory;
+use crate::creature::CreatureAnimation;
 use crate::projectile::ProjectileBuilder;
 use crate::inventory::Inventory;
 use crate::particle_driver::ParticleDriver;
@@ -833,11 +834,19 @@ impl Map {
         for i in (0..mobs.len()).rev() {
             let mob = mobs.remove(i);
             let id = mob.uid;
+            let creature = mob.creature.as_ref().unwrap();
+
+            match creature.animation_type {
+                CreatureAnimation::NONE => {
+                    // doesn't do anything ...
+                },
+                CreatureAnimation::SPIN(speed) => {
+                    self.animations.insert(id, Box::new(SpinAnimation::new(speed)));
+                },
+            }
 
             self.layers[MAP_OBJECT_LAYER].insert(id, mob);
-            list.push(id);
-        
-            // self.animations.insert(id, Box::new(SpinAnimation::new(12.0)));
+            list.push(id);      
         }
 
         MobGroup::new(list, center, true, rng)

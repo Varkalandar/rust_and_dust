@@ -9,6 +9,7 @@ use glium::Display;
 use crate::Texture2d;
 use crate::creature::CreaturePrototype;
 use crate::creature::movement_glide;
+use crate::creature::CreatureAnimation;
 use crate::TileSet;
 use crate::Tile;
 use crate::gfx::Framebuffer;
@@ -85,6 +86,7 @@ pub fn generate_creature<T: SurfaceTypeTrait + ResizeableSurface>(display: &Disp
         // blend_mode: BlendMode::Add,
         blend_mode: BlendMode::Blend,
         movement_function: movement_glide,
+        animation_type: CreatureAnimation::NONE,
     }
 }
 
