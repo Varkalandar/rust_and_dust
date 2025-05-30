@@ -1,5 +1,6 @@
 pub mod gl_support;
 pub mod voxel;
+pub mod color_gradient;
 
 use std::collections::HashSet;
 use std::cmp::max;

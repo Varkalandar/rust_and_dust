@@ -7,7 +7,7 @@ pub struct ColorGradient
 
 impl ColorGradient
 {
-    pub fn new(start: [f32; 4], end [f32; 4]) -> Self
+    pub fn new(start: [f32; 4], end: [f32; 4]) -> Self
     {
         let gradient = [
             end[0] - start[0],
@@ -23,7 +23,7 @@ impl ColorGradient
     }
 
 
-    pub fn new_with_gradient(start: [f32; 4], gradient [f32; 4]) -> Self
+    pub fn new_with_gradient(start: [f32; 4], gradient: [f32; 4]) -> Self
     {
         ColorGradient {
             start,
