@@ -81,6 +81,11 @@ impl CreatureFactory {
     {
         self.prototypes.insert(name.to_string(), creature);
     }
+
+    pub fn has(&self, name: &str) -> bool
+    {
+        self.prototypes.get(&name.to_string()).is_some()
+    }
 }
 
 
