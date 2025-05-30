@@ -16,6 +16,7 @@ use crate::gfx::Framebuffer;
 use crate::gfx::voxel::Voxel;
 use crate::gfx::voxel::Voxelstack;
 use crate::gfx::gl_support::BlendMode;
+use crate::gfx::color_gradient::ColorGradient;
 use crate::gfx::c_add_clamp;
 use crate::gfx::fcol_to_icol;
 
@@ -162,21 +163,24 @@ pub fn generate_image(pen: &Framebuffer, rot: f32, generator: fn() -> Voxelstack
 
 fn generate_goblet() -> Voxelstack
 {
-    let mut voxels = generate_goblet_aux(7, 60.0, 40.0, [0.5, 0.6, 0.7, 1.0]);
-    voxels.merge(generate_goblet_aux(5, 30.0, 64.0, [0.7, 0.8, 0.9, 1.0]));
+    let gradient_wide_goblet = ColorGradient::new([0.2, 0.3, 0.5, 1.0], [0.8, 0.9, 0.7, 1.0]);
+    let gradient_narrow_goblet = ColorGradient::new([0.4, 0.5, 0.7, 1.0], [0.9, 1.0, 0.8, 1.0]);
+
+    let mut voxels = generate_goblet_aux(7, 60.0, 40.0, &gradient_wide_goblet);
+    voxels.merge(generate_goblet_aux(5, 30.0, 64.0, &gradient_narrow_goblet));
 
     voxels
 }
 
 
-fn generate_goblet_aux(steps: i32, rad: f32, height: f32, color: [f32; 4]) -> Voxelstack
+fn generate_goblet_aux(steps: i32, rad: f32, height: f32, gradient: &ColorGradient) -> Voxelstack
 {
     let mut voxels = Voxelstack::new();
 
     for i in 0 .. steps {
 
-        let fi = i as f32 * 1.2 / steps as f32;
-        let r = fi.sin() * rad;
+        let fi = i as f32 / steps as f32;
+        let r = (fi * 1.2).sin() * rad;
 
         let y = 96.0 - (i as f32 * height) / steps as f32;
 
@@ -192,7 +196,7 @@ fn generate_goblet_aux(steps: i32, rad: f32, height: f32, color: [f32; 4]) -> Vo
                 y, 
                 z,
                 8.0, 
-                color
+                gradient.color_at(fi),
             ));
         }
     }
