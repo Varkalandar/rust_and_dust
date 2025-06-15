@@ -7,9 +7,10 @@ use glium::Program;
 
 use crate::Activation;
 use crate::item::Item;
+use crate::item::ItemKind;
+use crate::item::ModKind;
 use crate::ui::*;
 use crate::TileSet;
-use crate::item::ModKind;
 use crate::gfx::gl_support::*;
 
 
@@ -22,17 +23,21 @@ pub fn show_item_popup(ui: &UI, target: &mut Frame,
     let left = x + 6;
     let top = y + 12 + line_space;
     let box_width = 320;
-    let mut line_count = 1; // first line is item name
 
-    for modifier in &item.mods {
-        if modifier.max_value > 0 {
-            line_count += 1;
-        }
-    }
+    // first, find out how big the box has to be, that's mostly determined
+    // by the number of lines of text in it, plus some separators.
+
+    let mut line_count = 1;    
 
     if item.activation != Activation::None {
         line_count += 1;
     }
+
+    if item.kind != ItemKind::Currency {
+        line_count += 1;
+    }
+
+    line_count += item.mods.len() as i32;
 
     if item.description.len() > 0 {
         
@@ -42,6 +47,8 @@ pub fn show_item_popup(ui: &UI, target: &mut Frame,
                                                  0, 0, box_width,
                                                  &item.description, &OFF_WHITE, false);
     }
+
+    // now we know the number of lines and can draw the box
 
     let mut line = top - line_count * line_space;
     let bottom_margin = if line_count > 1 {12} else {8};
@@ -57,10 +64,9 @@ pub fn show_item_popup(ui: &UI, target: &mut Frame,
     line += 2;
     line += line_space;
 
-    if item.activation != Activation::None {
-        font.draw(&ui.display, target, &ui.program, left, line, 
-                  item.activation.info_str(), &OFF_WHITE);
-                  line += line_space;
+    if item.kind != ItemKind::Currency {
+        let type_line_width = font.calc_string_width(item.kind.name_str()) as i32;
+        font.draw(&ui.display, target, &ui.program, x + (box_width - type_line_width) / 2, line, item.kind.name_str(), &WHITE);
     }
 
     for modifier in &item.mods {

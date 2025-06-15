@@ -46,9 +46,27 @@ pub enum ItemKind
     Misc,
     Wand,
     Ring,
+    Amulet,
     Scroll,
     Currency,
     Plugin
+}
+
+
+impl ItemKind
+{
+    pub fn name_str(&self) -> &str
+    {
+        match self {
+            ItemKind::Misc => "Miscellaneous",
+            ItemKind::Wand => "Wand",
+            ItemKind::Ring => "Ring",
+            ItemKind::Amulet => "Amulet",
+            ItemKind::Scroll => "Scroll",
+            ItemKind::Currency => "Currency",
+            ItemKind::Plugin => "Plugin",
+        }
+    }
 }
 
 
@@ -547,6 +565,9 @@ fn parse_item_type(input: &str) -> ItemKind
     }
     else if "ring" == input {
         return ItemKind::Ring;
+    }
+    else if "amulet" == input {
+        return ItemKind::Amulet;
     }
     else if "scroll" == input {
         return ItemKind::Scroll;
