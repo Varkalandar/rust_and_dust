@@ -33,7 +33,7 @@ pub fn show_item_popup(ui: &UI, target: &mut Frame,
         line_count += 1;
     }
 
-    if item.kind != ItemKind::Currency {
+    if item.kind != ItemKind::Currency && item.kind != ItemKind::Ring {
         line_count += 1;
     }
 
@@ -64,9 +64,11 @@ pub fn show_item_popup(ui: &UI, target: &mut Frame,
     line += 2;
     line += line_space;
 
-    if item.kind != ItemKind::Currency {
+    if item.kind != ItemKind::Currency && item.kind != ItemKind::Ring {
         let type_line_width = font.calc_string_width(item.kind.name_str()) as i32;
         font.draw(&ui.display, target, &ui.program, x + (box_width - type_line_width) / 2, line, item.kind.name_str(), &WHITE);
+        line += 2;
+        line += line_space;
     }
 
     for modifier in &item.mods {
