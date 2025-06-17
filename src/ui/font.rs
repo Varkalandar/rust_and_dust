@@ -112,6 +112,16 @@ impl UiFont {
         }
     }
 
+
+    pub fn draw_centered(&self,
+                display: &Display<WindowSurface>, target: &mut Frame, program: &Program,
+                x: i32, y: i32, box_width: i32, text: &str, color: &[f32; 4])
+    {
+        let text_width = self.calc_string_width(text) as i32;
+        self.draw(display, target, program, x + (box_width - text_width) / 2, y, text, color);
+    }
+
+
     pub fn draw_multiline(&self,
                           display: &Display<WindowSurface>, target: &mut Frame, program: &Program,
                           x: i32, y: i32, width: i32, text: &str, color: &[f32; 4], 

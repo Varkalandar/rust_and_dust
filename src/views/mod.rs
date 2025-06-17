@@ -19,56 +19,56 @@ pub fn show_item_popup(ui: &UI, target: &mut Frame,
 {
     let font = &ui.context.font_normal;
     
-    let line_space = ui.context.font_normal.line_height;
+    let line_height = ui.context.font_normal.line_height;
     let left = x + 6;
-    let top = y + 12 + line_space;
+    let top = y + 12 + line_height;
     let box_width = 320;
 
     // first, find out how big the box has to be, that's mostly determined
     // by the number of lines of text in it, plus some separators.
 
-    let mut line_count = 1;    
+    let mut box_height = line_height + 4;
 
     if item.activation != Activation::None {
-        line_count += 1;
+        box_height += line_height;
     }
 
     if item.kind != ItemKind::Currency && item.kind != ItemKind::Ring {
-        line_count += 1;
+        box_height += line_height;
     }
 
-    line_count += item.mods.len() as i32;
+    box_height += line_height * item.mods.len() as i32;
 
     if item.description.len() > 0 {
         
         // don't actually draw, just count the lines required (false)
-        line_count += 
+        let line_count = 
             ui.context.font_small.draw_multiline(&ui.display, target, &ui.program, 
                                                  0, 0, box_width,
                                                  &item.description, &OFF_WHITE, false);
+        box_height += line_count * line_height;
     }
 
     // now we know the number of lines and can draw the box
 
-    let mut line = top - line_count * line_space;
-    let bottom_margin = if line_count > 1 {12} else {8};
+    let bottom_margin = if box_height > line_height * 2 {12} else {8};
 
-    ui.fill_box(target, x, line, box_width, (line_count * line_space) + bottom_margin, &[0.1, 0.1, 0.1, 0.9]);
-    ui.draw_box(target, x, line, box_width, (line_count * line_space) + bottom_margin, &LIGHT_GREY);
+    box_height += bottom_margin;
 
-    line += 12;
+    ui.fill_box(target, x, top, box_width, box_height, &[0.1, 0.1, 0.1, 0.9]);
+    ui.draw_box(target, x, top, box_width, box_height, &LIGHT_GREY);
 
-    let headline_width = font.calc_string_width(&item.name()) as i32;
-    font.draw(&ui.display, target, &ui.program, x + (box_width - headline_width) / 2, line, &item.name(), &WHITE);
+    let mut line_y = top + line_height/2;
 
-    line += 2;
-    line += line_space;
+    font.draw_centered(&ui.display, target, &ui.program, x, line_y, box_width, &item.name(), &WHITE);
+
+    line_y += 2;
+    line_y += line_height;
 
     if item.kind != ItemKind::Currency && item.kind != ItemKind::Ring {
-        let type_line_width = font.calc_string_width(item.kind.name_str()) as i32;
-        font.draw(&ui.display, target, &ui.program, x + (box_width - type_line_width) / 2, line, item.kind.name_str(), &WHITE);
-        line += 2;
-        line += line_space;
+        font.draw_centered(&ui.display, target, &ui.program, x, line_y, box_width, item.kind.name_str(), &WHITE);
+        line_y += 2;
+        line_y += line_height;
     }
 
     for modifier in &item.mods {
@@ -76,15 +76,15 @@ pub fn show_item_popup(ui: &UI, target: &mut Frame,
 
         let color = if modifier.kind == ModKind::Implicit {&OFF_WHITE} else {&[0.6, 0.8, 1.0, 1.0]};
 
-        font.draw(&ui.display, target, &ui.program, left, line, &text, color);
-        line += line_space;
+        font.draw(&ui.display, target, &ui.program, left, line_y, &text, color);
+        line_y += line_height;
     }
 
     if item.description.len() > 0 {
         ui.context.font_small.draw_multiline(&ui.display, target, &ui.program, 
-                                             left, line, box_width - 4,
+                                             left, line_y, box_width - 4,
                                              &item.description, &OFF_WHITE, true);
-        // line += line_space;
+        // line += line_height;
     }
 }
 
