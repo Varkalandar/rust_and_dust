@@ -2367,15 +2367,15 @@ data
 Tile Description
 v.5
 148
-1 1
+143 39
 0 0
-0 0
+66 19
 End Of Header
 Item
 v.1
 data
 2
-
+stick_bow_map
 
 1
 0
@@ -2383,7 +2383,7 @@ data
 Tile Description
 v.5
 149
-1 1
+130 338
 0 0
 0 0
 End Of Header
@@ -2391,7 +2391,7 @@ Item
 v.1
 data
 2
-
+stick_bow_inv
 
 1
 0

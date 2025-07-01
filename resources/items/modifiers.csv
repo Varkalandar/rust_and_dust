@@ -10,3 +10,5 @@ res_cold_2,res_cold,10,19,%,5
 res_cold_3,res_cold,20,39,%,10
 spell_dam_1,spell_dam,5,9,,1
 spell_dam_2,spell_dam,10,19,,5
+phys_dam_1,phys_dam,5,9,,1
+phys_dam_2,phys_dam,10,19,,5

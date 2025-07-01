@@ -2514,16 +2514,16 @@
       <Description>
         <version>4</version>
         <id>148</id>
-        <width>1</width>
-        <height>1</height>
+        <width>143</width>
+        <height>39</height>
         <offsetX>0</offsetX>
         <offsetY>0</offsetY>
-        <footX>0</footX>
-        <footY>0</footY>
+        <footX>66</footX>
+        <footY>19</footY>
       </Description>
       <Metadata>
         <int>0</int>
-        <string></string>
+        <string>stick_bow_map</string>
         <string></string>
       </Metadata>
     </Tile>
@@ -2531,8 +2531,8 @@
       <Description>
         <version>4</version>
         <id>149</id>
-        <width>1</width>
-        <height>1</height>
+        <width>130</width>
+        <height>338</height>
         <offsetX>0</offsetX>
         <offsetY>0</offsetY>
         <footX>0</footX>
@@ -2540,7 +2540,7 @@
       </Description>
       <Metadata>
         <int>0</int>
-        <string></string>
+        <string>stick_bow_inv</string>
         <string></string>
       </Metadata>
     </Tile>

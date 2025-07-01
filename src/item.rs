@@ -509,6 +509,7 @@ fn parse_attribute(input: &str) -> Attribute
         "res_light" => Attribute::ResLight,
         "res_cold" => Attribute::ResCold,
         "spell_dam" => Attribute::SpellDamage,
+        "phys_dam" => Attribute::PhysicalDamage,
         _ => panic!("parse_attribute: unknown attribute {}", input),
     }
 }
