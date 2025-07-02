@@ -45,6 +45,7 @@ pub enum ItemKind
 {
     Misc,
     Wand,
+    Bow,
     Ring,
     Amulet,
     Scroll,
@@ -60,6 +61,7 @@ impl ItemKind
         match self {
             ItemKind::Misc => "Miscellaneous",
             ItemKind::Wand => "Wand",
+            ItemKind::Bow => "Bow",
             ItemKind::Ring => "Ring",
             ItemKind::Amulet => "Amulet",
             ItemKind::Scroll => "Scroll",
@@ -76,6 +78,7 @@ pub struct ItemPrototype
     pub key: String,              // for prototype lookup
     pub singular: String,         // name for stack size == 1
     pub plural: String,           // name for stack size >= 2
+    pub show_type: bool,          // display item type on a separate line?
     pub mods: Vec<ModPrototype>,
     
     pub inventory_tile_id: usize,
@@ -106,6 +109,7 @@ pub struct Item
     pub key: String,              // for prototype lookup
     pub singular: String,         // name for stack size == 1
     pub plural: String,           // name for stack size >= 2
+    pub show_type: bool,          // display item type on a separate line?
     pub mods: Vec<Mod>,
     
     pub inventory_tile_id: usize,
@@ -235,6 +239,7 @@ impl ItemFactory
                 key: proto.key.to_string(),
                 singular: proto.singular.to_string(),
                 plural: proto.plural.to_string(),
+                show_type: proto.show_type,
                 mods: Vec::new(),
 
                 inventory_tile_id: proto.inventory_tile_id,
@@ -388,6 +393,7 @@ fn read_proto_items(proto_mods: &HashMap<String, ModPrototype>) -> HashMap<Strin
                     key,
                     singular: parts.next().unwrap().to_string(),
                     plural:  parts.next().unwrap().to_string(),
+                    show_type: "yes" == parts.next().unwrap(), 
                     inventory_tile_id: parts.next().unwrap().parse::<usize>().unwrap(),
                     map_tile_id: parts.next().unwrap().parse::<usize>().unwrap(),
                     inventory_w: parts.next().unwrap().parse::<i32>().unwrap(),
@@ -566,6 +572,9 @@ fn parse_item_type(input: &str) -> ItemKind
     }
     else if "ring" == input {
         return ItemKind::Ring;
+    }
+    else if "bow" == input {
+        return ItemKind::Bow;
     }
     else if "amulet" == input {
         return ItemKind::Amulet;

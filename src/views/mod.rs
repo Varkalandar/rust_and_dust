@@ -33,7 +33,7 @@ pub fn show_item_popup(ui: &UI, target: &mut Frame,
         box_height += line_height;
     }
 
-    if item.kind != ItemKind::Currency && item.kind != ItemKind::Ring {
+    if item.show_type {
         box_height += line_height;
     }
 
@@ -65,7 +65,7 @@ pub fn show_item_popup(ui: &UI, target: &mut Frame,
     line_y += 2;
     line_y += line_height;
 
-    if item.kind != ItemKind::Currency && item.kind != ItemKind::Ring {
+    if item.show_type {
         font.draw_centered(&ui.display, target, &ui.program, x, line_y, box_width, item.kind.name_str(), &WHITE);
         line_y += 2;
         line_y += line_height;
