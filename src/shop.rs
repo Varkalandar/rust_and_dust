@@ -11,8 +11,10 @@ const MAGIC_FIND_FACTOR: f32 = 0.8;
 
 pub struct Shop
 {
-    pub items: Vec<Item>,
     pub name: String,
+    pub items: Vec<Item>,
+    pub tabs: Vec<String>,
+    pub active_tab: usize,
 }
 
 
@@ -22,8 +24,10 @@ impl Shop
     {
         Shop
         {
-            items: Vec::new(),
             name: "Test Shop".to_string(),
+            items: Vec::new(),
+            tabs: vec!("Wands and Staves".to_string(), "Jewelry".to_string(), "Miscellaneous".to_string()),
+            active_tab: 0,
         }
     }
 

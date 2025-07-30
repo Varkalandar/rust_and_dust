@@ -18,6 +18,9 @@ use crate::views::draw_item;
 use crate::views::show_item_popup;
 use crate::TileSet;
 
+const SHOP_ITEMS_TOP: i32 = 60;
+const SHOP_ITEMS_LEFT: i32 = 80;
+const SHOP_TAB_HEIGHT: i32 = 28;
 
 pub struct ShopView
 {
@@ -111,12 +114,28 @@ impl ShopView
                            shop: &Shop, item_tiles: &TileSet, player_money: u32)
     {
         let font = &ui.context.font_small;
-        let x = 80;
-        let y = 60;
+        let mut x = SHOP_ITEMS_LEFT;
+        let y = SHOP_ITEMS_TOP;
         
         let mut row = 0;
         let mut col = 0;
 
+        for tab in &shop.tabs {
+            let w = font.calc_string_width(&tab) as i32 + 8;
+            let y_off = if col == shop.active_tab {0} else {2};
+
+            ui.draw_box(target, x, y+y_off, w, SHOP_TAB_HEIGHT-y_off, &[0.4, 0.5, 0.6, 1.0]);
+            font.draw(&ui.display, target, &ui.program,
+                      x + 4, y + 6 + y_off/2, &tab, &[1.0, 0.9, 0.5, 1.0]);
+            x += w;
+            col += 1;
+        }
+
+        let mut row = 0;
+        let mut col = 0;
+
+        let x = SHOP_ITEMS_LEFT;
+        let y = SHOP_ITEMS_TOP + SHOP_TAB_HEIGHT;
         let w = 108;
         let h = 96;
 
@@ -143,9 +162,8 @@ impl ShopView
 
             // display the price at the bottom
             let text_line = calculate_price_string(item);
-            let text_width = font.calc_string_width(&text_line) as i32;
-            font.draw(&ui.display, target, &ui.program, 
-                      entry_x + (w - text_width) / 2, entry_y + h - 18, &text_line, &[1.0, 0.9, 0.5, 1.0]);
+            font.draw_centered(&ui.display, target, &ui.program, 
+                               entry_x, entry_y + h - 18, w, &text_line, &[1.0, 0.9, 0.5, 1.0]);
 
             col += 1;
 
@@ -249,9 +267,8 @@ fn calculate_price_string(item: &Item) -> String
 
 fn find_item_at(mx: f32, my: f32) -> Option<usize>
 {
-    // these must match the display code
-    let left = 80;
-    let top = 60;
+    let left = SHOP_ITEMS_LEFT;
+    let top = SHOP_ITEMS_TOP + SHOP_TAB_HEIGHT;
 
     let w = 108;
     let h = 96;
