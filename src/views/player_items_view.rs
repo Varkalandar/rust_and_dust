@@ -70,7 +70,8 @@ impl PlayerItemsView
                 x, 
                 y,
                 w: 500,
-                h: 750,                
+                h: 750,
+                id: 0,
             },
             
             texture,

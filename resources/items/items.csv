@@ -1,6 +1,6 @@
 Key,Singular,Plural,Show Type,Inventory tile id,Map tile id,Inventory width,Inventory height,Inventory scale,Map Scale,Color,Ilvl,Type,Stack Size,Price,Drop Effect,Key,Value,Pairs,->
-wooden_wand,Magic Stick,,yes,86,85,1,3,0.9,0.2,1 1 1 1,1,wand,1,200,,spell_dam_1,,,
-engraved_wand,Engraved Stick,,yes,88,87,1,3,0.9,0.2,1 1 1 1,1,wand,1,250,,spell_dam_2,,,
+wooden_wand,Stick Wand,,no,86,85,1,3,0.9,0.2,1 1 1 1,1,wand,1,200,,spell_dam_1,,,
+engraved_wand,Engraved Wand,,no,88,87,1,3,0.9,0.2,1 1 1 1,1,wand,1,250,,spell_dam_2,,,
 silver_ring,Silver Ring,,no,14,13,1,1,0.6,0.2,1 1 1 1,1,ring,1,125,,,,,
 gold_ring,Gold Ring,,no,20,19,1,1,0.6,0.2,1 1 1 1,1,ring,1,500,,,,,
 ruby_ring,Ruby Ring,,no,2,1,1,1,0.8,0.2,1 1 1 1,1,ring,1,150,,res_fire_1,,,

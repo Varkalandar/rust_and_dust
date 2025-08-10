@@ -45,6 +45,7 @@ pub enum ItemKind
 {
     Misc,
     Wand,
+    Staff,
     Bow,
     Ring,
     Amulet,
@@ -61,6 +62,7 @@ impl ItemKind
         match self {
             ItemKind::Misc => "Miscellaneous",
             ItemKind::Wand => "Wand",
+            ItemKind::Staff => "Staff",
             ItemKind::Bow => "Bow",
             ItemKind::Ring => "Ring",
             ItemKind::Amulet => "Amulet",

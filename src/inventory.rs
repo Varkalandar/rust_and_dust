@@ -99,12 +99,13 @@ impl Inventory {
                 for entry in &self.entries {
                     let bag_item = self.bag.get(&entry.item_id).unwrap();
 
-                    let area = UiArea {
-                        x: entry.location_x,                        
-                        y: entry.location_y,
-                        w: bag_item.inventory_w,
-                        h: bag_item.inventory_h,
-                    };
+                    let area = UiArea::new(
+                        entry.location_x,                        
+                        entry.location_y,
+                        bag_item.inventory_w,
+                        bag_item.inventory_h,
+                        0,
+                    );
 
                     for x in 0..item.inventory_w {
                         for y in 0..item.inventory_h {

@@ -26,8 +26,8 @@ impl Shop
         {
             name: "Test Shop".to_string(),
             items: Vec::new(),
-            tabs: vec!("Wands and Staves".to_string(), "Jewelry".to_string(), "Miscellaneous".to_string()),
-            active_tab: 0,
+            tabs: vec!("Wands and Staves".to_string(), "Jewelry".to_string(), "All Items".to_string()),
+            active_tab: 2,
         }
     }
 

@@ -135,15 +135,16 @@ pub struct UiArea {
     pub y: i32,
     pub w: i32,
     pub h: i32,
+    pub id: usize,
 }
 
 
 impl UiArea {
 
-    pub fn new(x: i32, y: i32, w: i32, h: i32) -> UiArea
+    pub fn new(x: i32, y: i32, w: i32, h: i32, id: usize) -> UiArea
     {
         UiArea {
-            x, y, w, h,
+            x, y, w, h, id,
         }
     }
 
@@ -230,12 +231,7 @@ impl UI {
 
     fn make_container_intern(x: i32, y: i32, w: i32, h: i32) -> UiComponent {
         let container = UiContainer {
-            area: UiArea {
-                x, 
-                y,
-                w,
-                h,                
-            }, 
+            area: UiArea::new(x, y, w, h, 0), 
             children: Vec::new(),
         };
 
@@ -245,14 +241,15 @@ impl UI {
     }
     
 
-    pub fn make_button(&self, x: i32, y: i32, w: i32, h: i32, label: &str, _id: usize) -> UiComponent 
+    pub fn make_button(&self, x: i32, y: i32, w: i32, h: i32, label: &str, id: usize) -> UiComponent 
     {
         let button = UiButton {
             area: UiArea {
                 x, 
                 y,
                 w,
-                h,                
+                h,
+                id,
             }, 
             font: self.context.font_normal.clone(),
             label: label.to_string(),    
@@ -273,12 +270,12 @@ impl UI {
                 x, 
                 y,
                 w,
-                h,                
+                h,
+                id,
             }, 
             font: self.context.font_small.clone(),
             label: label.to_string(),
             tile: tile.clone(),
-            id,
             bg_color,
             scale,
         };
@@ -297,7 +294,8 @@ impl UI {
                 x, 
                 y,
                 w,
-                h,                
+                h,
+                id: 0,               
             }, 
             child,
             offset_x: 0,
@@ -425,7 +423,7 @@ pub struct ScrollEvent {
 pub trait UiHead {
 
     fn area(&self) -> &UiArea {
-        &UiArea { x: 0, y: 0, w: 0, h: 0}
+        &UiArea { x: 0, y: 0, w: 0, h: 0, id: 0}
     }
 
     fn set_position(&mut self, _x: i32, _y: i32) {
@@ -519,7 +517,7 @@ impl UiHead for UiContainer {
         let scissors = 
             match &context.scissors {
                 Some(area) => area.clone(),
-                None => UiArea{x: 0, y: 0, w: context.window_size[0] as i32, h: context.window_size[1] as i32},
+                None => UiArea::new(0, 0, context.window_size[0] as i32, context.window_size[1] as i32, 0),
             };
 
         // println!("Scissors = {:?}", scissors);
@@ -645,7 +643,6 @@ pub struct UiIcon
     pub font: Rc<UiFont>,
     pub label: String,
     pub tile: Rc<Tile>,
-    pub id: usize,
     pub scale: f32,
     pub bg_color: [f32; 4],
 }
@@ -718,7 +715,7 @@ impl UiHead for UiIcon
 
 
     fn get_id(&self) -> usize {
-        self.id
+        self.area.id
     }
 }
 
@@ -757,7 +754,7 @@ impl UiHead for UiScrollpane
             area.h as f32 / 16.0,
             &[0.3, 0.2, 0.1, 0.5]);
 
-        context.scissors = Some(UiArea {x: xp, y: yp, w: area.w, h: area.h});
+        context.scissors = Some(UiArea::new(xp, yp, area.w, area.h, 0));
 
         self.child.head.draw(display, target, program, 
                              context, xp + self.offset_x, yp + self.offset_y);
@@ -798,7 +795,6 @@ impl UiHead for UiScrollpane
 pub struct UiColorchoice {
     pub area: UiArea,
     bandwidth: i32,
-    pub id: usize,
     tex: Texture2d,
     light: Texture2d,
     trans: Texture2d,
@@ -823,10 +819,10 @@ impl UiColorchoice {
                 x, 
                 y,
                 w,
-                h,                
+                h,
+                id,                
             }, 
             bandwidth: tw,
-            id,
             r: (color[0] * 255.0) as u32,
             g: (color[1] * 255.0) as u32,
             b: (color[2] * 255.0) as u32,
@@ -1084,11 +1080,10 @@ impl UiHead for UiColorchoice
     }
 
     fn get_id(&self) -> usize {
-        self.id
+        self.area.id
     }
 
     fn get_numeric_result(&self) -> Vec<u32> {
         vec![self.r, self.g, self.b, self.a]
     }
-
 }

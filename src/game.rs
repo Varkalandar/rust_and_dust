@@ -161,7 +161,7 @@ impl UiController for Game
         }
 
         if self.show_shop_inventory {
-            self.shop_view.handle_mouse_move_event(event, &ui.context.mouse_state, &mut world.player_inventory);
+            self.shop_view.handle_mouse_move_event(event, &ui.context.mouse_state, world);
         }
 
         false

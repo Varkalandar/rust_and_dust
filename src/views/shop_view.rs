@@ -6,6 +6,7 @@ use glium::Display;
 
 use crate::shop::Shop;
 use crate::item::Item;
+use crate::item::ItemKind;
 use crate::ItemFactory;
 use crate::Inventory;
 use crate::Slot;
@@ -28,6 +29,8 @@ pub struct ShopView
     shop_item_index: Option<usize>,      // the index of the shop item the mouse point is currently pointing at
 
     shop_index: usize,     // the index of the shop in the current map to show
+
+    click_areas: Vec<UiArea>,
 }
 
 
@@ -40,6 +43,7 @@ impl ShopView
             player_items_view: PlayerItemsView::new(70 + 560, 10, texture),
             shop_index: 0,
             shop_item_index: None,
+            click_areas: Vec::new(),
         }
     }
 
@@ -57,7 +61,7 @@ impl ShopView
     }
 
 
-    pub fn draw(&self, ui: &UI, target: &mut Frame, 
+    pub fn draw(&mut self, ui: &UI, target: &mut Frame, 
                 shop: &Shop, player_inventory: &Inventory, item_tiles: &TileSet) 
     {
         let area = calc_view_area(ui.context.window_size);
@@ -83,9 +87,22 @@ impl ShopView
     pub fn handle_button_event(&mut self, ui: &UI, event: &ButtonEvent, world: &mut GameWorld) 
         -> (bool, bool) 
     {
-        // did the player click a shop item?
-        let item_index = find_item_at(event.mx, event.my);
         let shop = &mut world.map.shops[self.shop_index];
+
+        // did the player click a shop inventory tab?
+
+        let mut index = 0;
+        for area in &self.click_areas {
+            if area.contains(event.mx as i32, event.my as i32) {
+                shop.active_tab = index;
+                return (true, false);
+            }
+            index += 1;
+        }
+
+        // no tab -> did the player click a shop item?
+        let current_filter = self.get_current_filter(shop);
+        let item_index = find_item_at(shop, current_filter, event.mx, event.my);
 
         if item_index.is_some() && item_index.unwrap() < shop.items.len() &&
             shop.items[item_index.unwrap()].calc_price() <= world.player_inventory.total_money() {
@@ -99,34 +116,43 @@ impl ShopView
     }
 
 
-    pub fn handle_mouse_move_event(&mut self, event: &MouseMoveEvent, mouse_state: &MouseState, player_inventory: &mut Inventory) -> bool 
+    pub fn handle_mouse_move_event(&mut self, event: &MouseMoveEvent, mouse_state: &MouseState, world: &mut GameWorld) -> bool 
     {
-        self.shop_item_index = find_item_at(event.mx, event.my);
+        let shop = &mut world.map.shops[self.shop_index];
+        let current_filter = self.get_current_filter(shop);
+
+        self.shop_item_index = find_item_at(shop, current_filter, event.mx, event.my);
 
         // forward the event to the player item view
-        self.player_items_view.handle_mouse_move_event(event, mouse_state, player_inventory);
+        self.player_items_view.handle_mouse_move_event(event, mouse_state, &mut world.player_inventory);
 
         false
     }
 
 
-    fn draw_shop_inventory(&self, ui: &UI, target: &mut Frame, 
+    fn draw_shop_inventory(&mut self, ui: &UI, target: &mut Frame, 
                            shop: &Shop, item_tiles: &TileSet, player_money: u32)
     {
         let font = &ui.context.font_small;
         let mut x = SHOP_ITEMS_LEFT;
         let y = SHOP_ITEMS_TOP;
         
-        let mut row = 0;
         let mut col = 0;
+
+        self.click_areas.clear();
 
         for tab in &shop.tabs {
             let w = font.calc_string_width(&tab) as i32 + 8;
             let y_off = if col == shop.active_tab {0} else {2};
 
             ui.draw_box(target, x, y+y_off, w, SHOP_TAB_HEIGHT-y_off, &[0.4, 0.5, 0.6, 1.0]);
+            ui.fill_box(target, x + 1, y+y_off + 1, w - 2, SHOP_TAB_HEIGHT-y_off - 2, 
+                        if col == shop.active_tab {&[0.2, 0.2, 0.2, 1.0]} else {&[0.1, 0.1, 0.1, 1.0]});
+
             font.draw(&ui.display, target, &ui.program,
                       x + 4, y + 6 + y_off/2, &tab, &[1.0, 0.9, 0.5, 1.0]);
+
+            self.click_areas.push(UiArea::new(x, y+y_off, w, SHOP_TAB_HEIGHT-y_off, col));
             x += w;
             col += 1;
         }
@@ -139,12 +165,17 @@ impl ShopView
         let w = 108;
         let h = 96;
 
-        for item in &shop.items {
+        ui.draw_box(target, x, y, w*5, h*4, &[0.4, 0.5, 0.6, 1.0]);
+        ui.fill_box(target, x + 1, y + 1, w*5 - 2, h*4 - 2, &[0.1, 0.1, 0.1, 1.0]);
+
+        let current_filter = self.get_current_filter(shop);
+
+        for item in shop.items.iter().filter(|item| current_filter(*item)) {
 
             let entry_x = x + col * w;
             let entry_y = y + row * h;
 
-            let back_color = if item.base_price <= player_money {[0.0, 0.02, 0.1, 0.7]} else {[0.1, 0.01, 0.0, 0.7]};
+            let back_color = if item.base_price <= player_money {[0.0, 0.02, 0.1, 1.0]} else {[0.1, 0.01, 0.0, 0.7]};
 
             ui.draw_box(target, entry_x, entry_y, w, h, &[0.4, 0.5, 0.6, 1.0]);
             ui.fill_box(target, entry_x + 1, entry_y + 1, w - 2, h - 2, &back_color);
@@ -154,8 +185,12 @@ impl ShopView
                       w as f32, h as f32, 
                       item, item_tiles);
 
-            let limit = 17;
-            let name = item.name().to_string();
+            let limit = 16;
+            let mut name = item.name().to_string();
+
+            if item.show_type {
+                name = name + " " + item.kind.name_str()
+            }
 
             draw_multiline_centered(&ui.display, target, &ui.program, 
                                     &name, entry_x, entry_y, w, limit, font);
@@ -183,6 +218,22 @@ impl ShopView
             let mx = ui.context.mouse_state.position[0] as i32;
             let my = ui.context.mouse_state.position[1] as i32;
             show_item_popup(ui, target, mx, my, item);
+        }
+    }
+
+    fn get_current_filter(&self, shop: &Shop) -> fn(&Item) -> bool
+    {
+        if shop.active_tab == 0 {
+           return wand_staff_filter;
+        }
+        else if shop.active_tab == 1 {
+           return jewelry_filter;
+        }
+        else if shop.active_tab == 2 {
+           return all_items_filter;
+        }
+        else {
+            return all_items_filter;
         }
     }
 }
@@ -265,7 +316,7 @@ fn calculate_price_string(item: &Item) -> String
 }
 
 
-fn find_item_at(mx: f32, my: f32) -> Option<usize>
+fn find_item_at(shop: &Shop, filter: fn(&Item) -> bool, mx: f32, my: f32) -> Option<usize>
 {
     let left = SHOP_ITEMS_LEFT;
     let top = SHOP_ITEMS_TOP + SHOP_TAB_HEIGHT;
@@ -277,7 +328,25 @@ fn find_item_at(mx: f32, my: f32) -> Option<usize>
     let y = my as i32 - top;
 
     if x >= 0 && x < w * 5 && y >= 0 && y < h * 4 {
-        return Some(((y / h) * 5 + x / w) as usize);
+        let location_item_index = ((y / h) * 5 + x / w) as usize;
+
+        // there could be a filter on the ui, so we need to find the actual
+        // index of that item in the shops inventory.
+
+        let mut index = 0;
+        let mut filter_index = 0;
+        for item in &shop.items {
+
+            if filter(item) {
+                if filter_index == location_item_index {
+                    return Some(index);
+                }
+                filter_index += 1;
+            }
+
+            index += 1;
+        }
+
     }
 
     None
@@ -302,5 +371,23 @@ fn calc_view_area(window_size: [u32; 2]) -> UiArea
     let top = 10;
     let height = (window_size[1] as i32) - top * 2;
 
-    UiArea::new(left, top, width, height)
+    UiArea::new(left, top, width, height, 0)
+}
+
+
+fn wand_staff_filter(item: &Item) -> bool
+{
+    return item.kind == ItemKind::Wand || item.kind == ItemKind::Staff;
+}
+
+
+fn jewelry_filter(item: &Item) -> bool
+{
+    return item.kind == ItemKind::Ring || item.kind == ItemKind::Amulet;
+}
+
+
+fn all_items_filter(item: &Item) -> bool
+{
+    return true;
 }
