@@ -77,10 +77,6 @@ impl ShopView
                   area.x + 10, area.y + 20, &shop.name, &WHITE);
 
         self.draw_shop_inventory(ui, target, shop, item_tiles, player_inventory.total_money());
-
-        let text = "Drop items here to sell.";
-        font.draw(&ui.display, target, &ui.program, 
-                  area.x + 130, area.y + 570, text, &ORANGE);
     }
 
 
@@ -162,11 +158,11 @@ impl ShopView
 
         let x = SHOP_ITEMS_LEFT;
         let y = SHOP_ITEMS_TOP + SHOP_TAB_HEIGHT;
-        let w = 108;
-        let h = 96;
+        let w = 109;
+        let h = 95;
 
-        ui.draw_box(target, x, y, w*5, h*4, &[0.4, 0.5, 0.6, 1.0]);
-        ui.fill_box(target, x + 1, y + 1, w*5 - 2, h*4 - 2, &[0.1, 0.1, 0.1, 1.0]);
+        ui.draw_box(target, x, y, w*5, h*7, &[0.4, 0.5, 0.6, 1.0]);
+        ui.fill_box(target, x + 1, y + 1, w*5 - 2, h*7 - 2, &[0.1, 0.1, 0.1, 1.0]);
 
         let current_filter = self.get_current_filter(shop);
 

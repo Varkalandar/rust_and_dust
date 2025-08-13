@@ -38,7 +38,7 @@ impl Shop
 
         let mut rng = rand::rngs::StdRng::seed_from_u64(12345678901);
 
-        for _i in 0 .. 20 {
+        for _i in 0 .. 30 {
             let mut item = item_factory.create_random_item(&mut rng, 1, 6, MAGIC_ITEM_CHANCE, MAGIC_FIND_FACTOR);
 
             // we need a better way to generate shop items ...
