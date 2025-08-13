@@ -32,7 +32,7 @@ pub struct PlayerItemsView
     inventory_view: InventoryView,
 
     pub hover_item: Option<u64>,
-    dragged_item: Option<u64>,
+    pub dragged_item: Option<u64>,
     drag_x: f32,
     drag_y: f32,
 

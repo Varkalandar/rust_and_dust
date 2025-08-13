@@ -69,14 +69,26 @@ impl ShopView
         ui.draw_box(target, area.x, area.y, area.w, area.h, &[0.6, 0.6, 0.6, 1.0]);
         ui.fill_box(target, area.x + 1, area.y + 1, area.w - 2, area.h - 2 , &[0.08, 0.06, 0.03, 1.0]);
 
-        self.player_items_view.draw(ui, target, player_inventory, item_tiles);
-
         let font = &ui.context.font_large;
 
         font.draw(&ui.display, target, &ui.program, 
                   area.x + 10, area.y + 20, &shop.name, &WHITE);
 
         self.draw_shop_inventory(ui, target, shop, item_tiles, player_inventory.total_money());
+        self.player_items_view.draw(ui, target, player_inventory, item_tiles);
+
+        // if the mouse was pointing at something in the shop inventory,
+        // show the item details, too
+
+        if self.shop_item_index.is_some() && 
+           self.shop_item_index.unwrap() < shop.items.len() &&
+           self.player_items_view.dragged_item.is_none() 
+        {
+            let item = &shop.items[self.shop_item_index.unwrap()];
+            let mx = ui.context.mouse_state.position[0] as i32;
+            let my = ui.context.mouse_state.position[1] as i32;
+            show_item_popup(ui, target, mx, my, item);
+        }
     }
 
 
@@ -203,19 +215,8 @@ impl ShopView
                 row += 1;
             }
         }
-
-        // if the mouse was pointing at something in the shop inventory,
-        // show the item details, too
-
-        if self.shop_item_index.is_some() && self.shop_item_index.unwrap() < shop.items.len() {
-            // println!("Shop item index={}", self.shop_item_index);
-
-            let item = &shop.items[self.shop_item_index.unwrap()];
-            let mx = ui.context.mouse_state.position[0] as i32;
-            let my = ui.context.mouse_state.position[1] as i32;
-            show_item_popup(ui, target, mx, my, item);
-        }
     }
+
 
     fn get_current_filter(&self, shop: &Shop) -> fn(&Item) -> bool
     {
@@ -323,7 +324,7 @@ fn find_item_at(shop: &Shop, filter: fn(&Item) -> bool, mx: f32, my: f32) -> Opt
     let x = mx as i32 - left;
     let y = my as i32 - top;
 
-    if x >= 0 && x < w * 5 && y >= 0 && y < h * 4 {
+    if x >= 0 && x < w * 5 && y >= 0 && y < h * 7 {
         let location_item_index = ((y / h) * 5 + x / w) as usize;
 
         // there could be a filter on the ui, so we need to find the actual
