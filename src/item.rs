@@ -51,6 +51,7 @@ pub enum ItemKind
     Amulet,
     Scroll,
     Currency,
+    Mushroom,
     Plugin
 }
 
@@ -68,6 +69,7 @@ impl ItemKind
             ItemKind::Amulet => "Amulet",
             ItemKind::Scroll => "Scroll",
             ItemKind::Currency => "Currency",
+            ItemKind::Mushroom => "Mushroom",
             ItemKind::Plugin => "Plugin",
         }
     }
@@ -336,7 +338,8 @@ impl ItemFactory
             self.proto_mods.iter().filter( |value| -> bool 
                 {
                     if item.kind == ItemKind::Scroll || 
-                       item.kind == ItemKind::Currency {
+                       item.kind == ItemKind::Currency || 
+                       item.kind == ItemKind::Mushroom {
                         return false
                     }
                     else {
@@ -518,6 +521,7 @@ fn parse_attribute(input: &str) -> Attribute
         "res_cold" => Attribute::ResCold,
         "spell_dam" => Attribute::SpellDamage,
         "phys_dam" => Attribute::PhysicalDamage,
+        "heal" => Attribute::Heal,
         _ => panic!("parse_attribute: unknown attribute {}", input),
     }
 }
@@ -587,6 +591,9 @@ fn parse_item_type(input: &str) -> ItemKind
     else if "currency" == input {
         return ItemKind::Currency;
     }
+    else if "mushroom" == input {
+        return ItemKind::Mushroom;
+    }
     else if "plugin" == input {
         return ItemKind::Plugin;
     }
@@ -609,6 +616,7 @@ pub enum Attribute {
     ResFire,
     ResLight,
     ResCold,
+    Heal,
 }
 
 
@@ -625,6 +633,7 @@ impl std::fmt::Display for Attribute
             Attribute::ResFire => "Fire Resistance",
             Attribute::ResLight => "Lightning Resistance",
             Attribute::ResCold => "Cold Resistance",
+            Attribute::Heal => "Healing",
         };
 
         write!(f, "{}", name)
@@ -721,6 +730,16 @@ fn process_proto_mods<R: Rng + ?Sized>(mods: &Vec<ModPrototype>, rng: &mut R) ->
             // from that range to produce a concrete mod for our item
             result.push(random_from_range(modifier, rng, ModKind::Implicit));
         }
+        else if modifier.attribute == Attribute::Heal {
+            result.push(Mod {
+                attribute: modifier.attribute.clone(),
+                min_value: modifier.min_value,
+                max_value: modifier.max_value,
+                unit: modifier.unit.clone(),
+                kind: ModKind::Implicit,
+                ilvl: modifier.ilvl,
+            })
+        } 
         else {
             result.push(random_from_range(modifier, rng, ModKind::Implicit));
         }

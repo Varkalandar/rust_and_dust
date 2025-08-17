@@ -17,6 +17,8 @@ falling_moon_pendant,Falling Moon,,yes,109,108,1,1,0.8,0.2,1 1 1 1,1,amulet,1,15
 ,,,,,,,,,,,,,,,,,,,
 stick_bow,Stick Bow,,no,149,148,2,3,1,0.4,1 1 1 1,1,bow,1,200,,phys_dam_1,,,
 ,,,,,,,,,,,,,,,,,,,
+healing_mushroom,Mushroom of Healing,Mushrooms of Healing,no,360,360,1,1,0.9,0.3,1 1 1 1,1,mushroom,20,100,,heal_1,info,This is a quite healthy sort of mushroom. Right click to eat it.,
+,,,,,,,,,,,,,,,,,,,
 pl_dumbbell,Dumbbell Plugin,,no,24,24,1,1,1,0.2,1 1 1 1,0,plugin,1,300,,,,,
 pl_green_twist,Green Twist Plugin,,no,26,26,1,1,1,0.2,1 1 1 1,0,plugin,1,300,,,,,
 pl_four_leaf,Four Leaf Plugin,,no,28,28,1,1,1,0.2,1 1 1 1,0,plugin,1,300,,,,,

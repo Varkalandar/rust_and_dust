@@ -5759,15 +5759,15 @@ data
 Tile Description
 v.5
 360
-1 1
+41 47
 0 0
-0 0
+20 44
 End Of Header
 Item
 v.1
 data
 2
-
+mushroom_of_healing
 
 1
 0
@@ -5775,9 +5775,9 @@ data
 Tile Description
 v.5
 361
-1 1
+37 43
 0 0
-0 0
+18 40
 End Of Header
 Item
 v.1
@@ -5791,9 +5791,9 @@ data
 Tile Description
 v.5
 362
-1 1
+41 41
 0 0
-0 0
+20 36
 End Of Header
 Item
 v.1
@@ -5807,9 +5807,9 @@ data
 Tile Description
 v.5
 363
-1 1
+37 41
 0 0
-0 0
+19 37
 End Of Header
 Item
 v.1
@@ -5823,9 +5823,9 @@ data
 Tile Description
 v.5
 364
-1 1
+24 45
 0 0
-0 0
+11 42
 End Of Header
 Item
 v.1
@@ -5839,9 +5839,9 @@ data
 Tile Description
 v.5
 365
-1 1
+37 48
 0 0
-0 0
+17 41
 End Of Header
 Item
 v.1
@@ -5855,9 +5855,9 @@ data
 Tile Description
 v.5
 366
-1 1
+25 38
 0 0
-0 0
+12 33
 End Of Header
 Item
 v.1
@@ -5871,9 +5871,9 @@ data
 Tile Description
 v.5
 367
-1 1
+34 53
 0 0
-0 0
+16 48
 End Of Header
 Item
 v.1
@@ -5887,9 +5887,9 @@ data
 Tile Description
 v.5
 368
-1 1
+27 37
 0 0
-0 0
+13 33
 End Of Header
 Item
 v.1
@@ -5903,9 +5903,9 @@ data
 Tile Description
 v.5
 369
-1 1
+29 39
 0 0
-0 0
+15 35
 End Of Header
 Item
 v.1
@@ -5919,9 +5919,9 @@ data
 Tile Description
 v.5
 370
-1 1
+26 44
 0 0
-0 0
+13 36
 End Of Header
 Item
 v.1
@@ -5935,9 +5935,9 @@ data
 Tile Description
 v.5
 371
-1 1
+33 31
 0 0
-0 0
+15 27
 End Of Header
 Item
 v.1
@@ -5951,9 +5951,9 @@ data
 Tile Description
 v.5
 372
-1 1
+39 42
 0 0
-0 0
+19 38
 End Of Header
 Item
 v.1
@@ -5967,9 +5967,9 @@ data
 Tile Description
 v.5
 373
-1 1
+33 31
 0 0
-0 0
+16 27
 End Of Header
 Item
 v.1
@@ -5983,9 +5983,9 @@ data
 Tile Description
 v.5
 374
-1 1
+36 66
 0 0
-0 0
+19 61
 End Of Header
 Item
 v.1
@@ -5999,9 +5999,9 @@ data
 Tile Description
 v.5
 375
-1 1
+39 38
 0 0
-0 0
+18 34
 End Of Header
 Item
 v.1
@@ -6015,9 +6015,9 @@ data
 Tile Description
 v.5
 376
-1 1
+33 43
 0 0
-0 0
+15 39
 End Of Header
 Item
 v.1
@@ -6031,9 +6031,9 @@ data
 Tile Description
 v.5
 377
-1 1
+36 54
 0 0
-0 0
+18 50
 End Of Header
 Item
 v.1
@@ -6047,9 +6047,9 @@ data
 Tile Description
 v.5
 378
-1 1
+37 51
 0 0
-0 0
+19 46
 End Of Header
 Item
 v.1
@@ -6063,9 +6063,9 @@ data
 Tile Description
 v.5
 379
-1 1
+27 47
 0 0
-0 0
+13 41
 End Of Header
 Item
 v.1
@@ -6079,9 +6079,9 @@ data
 Tile Description
 v.5
 380
-1 1
+37 47
 0 0
-0 0
+18 40
 End Of Header
 Item
 v.1
@@ -6095,9 +6095,9 @@ data
 Tile Description
 v.5
 381
-1 1
+39 56
 0 0
-0 0
+19 51
 End Of Header
 Item
 v.1
@@ -6111,9 +6111,9 @@ data
 Tile Description
 v.5
 382
-1 1
+33 39
 0 0
-0 0
+16 34
 End Of Header
 Item
 v.1
@@ -6127,9 +6127,9 @@ data
 Tile Description
 v.5
 383
-1 1
+36 41
 0 0
-0 0
+18 37
 End Of Header
 Item
 v.1
@@ -6143,9 +6143,9 @@ data
 Tile Description
 v.5
 384
-1 1
+27 54
 0 0
-0 0
+14 47
 End Of Header
 Item
 v.1
@@ -6159,9 +6159,9 @@ data
 Tile Description
 v.5
 385
-1 1
+29 37
 0 0
-0 0
+14 33
 End Of Header
 Item
 v.1
@@ -6175,9 +6175,9 @@ data
 Tile Description
 v.5
 386
-1 1
+35 36
 0 0
-0 0
+17 30
 End Of Header
 Item
 v.1
@@ -6191,9 +6191,9 @@ data
 Tile Description
 v.5
 387
-1 1
+32 66
 0 0
-0 0
+17 61
 End Of Header
 Item
 v.1
@@ -6207,9 +6207,9 @@ data
 Tile Description
 v.5
 388
-1 1
+36 37
 0 0
-0 0
+18 32
 End Of Header
 Item
 v.1
@@ -6223,9 +6223,9 @@ data
 Tile Description
 v.5
 389
-1 1
+38 39
 0 0
-0 0
+19 34
 End Of Header
 Item
 v.1
@@ -6239,9 +6239,9 @@ data
 Tile Description
 v.5
 390
-1 1
+30 40
 0 0
-0 0
+14 36
 End Of Header
 Item
 v.1
@@ -6255,9 +6255,9 @@ data
 Tile Description
 v.5
 391
-1 1
+40 56
 0 0
-0 0
+19 50
 End Of Header
 Item
 v.1
@@ -6271,9 +6271,9 @@ data
 Tile Description
 v.5
 392
-1 1
+32 41
 0 0
-0 0
+16 36
 End Of Header
 Item
 v.1
@@ -6287,9 +6287,9 @@ data
 Tile Description
 v.5
 393
-1 1
+41 43
 0 0
-0 0
+21 36
 End Of Header
 Item
 v.1
@@ -6303,9 +6303,9 @@ data
 Tile Description
 v.5
 394
-1 1
+41 42
 0 0
-0 0
+20 36
 End Of Header
 Item
 v.1
@@ -6319,9 +6319,9 @@ data
 Tile Description
 v.5
 395
-1 1
+36 49
 0 0
-0 0
+19 43
 End Of Header
 Item
 v.1
@@ -6335,9 +6335,9 @@ data
 Tile Description
 v.5
 396
-1 1
+32 40
 0 0
-0 0
+18 35
 End Of Header
 Item
 v.1
@@ -6351,9 +6351,9 @@ data
 Tile Description
 v.5
 397
-1 1
+27 48
 0 0
-0 0
+13 45
 End Of Header
 Item
 v.1
@@ -6367,9 +6367,9 @@ data
 Tile Description
 v.5
 398
-1 1
+37 40
 0 0
-0 0
+17 33
 End Of Header
 Item
 v.1
@@ -6383,9 +6383,9 @@ data
 Tile Description
 v.5
 399
-1 1
+36 43
 0 0
-0 0
+17 37
 End Of Header
 Item
 v.1
@@ -6399,9 +6399,9 @@ data
 Tile Description
 v.5
 400
-1 1
+40 37
 0 0
-0 0
+19 34
 End Of Header
 Item
 v.1
