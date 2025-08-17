@@ -9,6 +9,7 @@ use crate::inventory::Slot;
 use crate::inventory::Entry;
 use crate::TileSet;
 use crate::item::Item;
+use crate::item::ItemKind;
 use crate::item::Activation;
 use crate::item::DropEffect;
 
@@ -228,61 +229,77 @@ impl PlayerItemsView
     {
         let area = &self.area;
 
-        if event.args.state == ButtonState::Release &&
-           event.args.button == Button::Mouse(MouseButton::Left) {
+        if event.args.state == ButtonState::Release {
+           if event.args.button == Button::Mouse(MouseButton::Left) {
 
-            // did the player click the close button?
-            if (event.mx as i32) > area.x + area.w - 40 && (event.my as i32) < area.y + 70 {
-                world.speaker.play(Sound::Click, 0.5);
-                return (true, true);
-            }
-
-            match self.dragged_item {
-                None => {
-                    if self.hover_item.is_some() {
-                        self.dragged_item = self.hover_item;
-        
-                        world.speaker.play(Sound::Click, 0.5);
-                        println!("Started to drag item idx={:?} from {}, {}", self.dragged_item, event.mx, event.my);
-                        
-                        let item_id = self.dragged_item.unwrap();
-                        let inventory = &mut world.player_inventory;
-                        let idx = inventory.find_entry_for_id(item_id).unwrap();
-                        let entry: &mut Entry = &mut inventory.entries[idx];
-                        entry.slot = Slot::OnCursor;
-
-                        return (true, false);
-                    }
-                },
-                Some(id) => {
-
+                // did the player click the close button?
+                if (event.mx as i32) > area.x + area.w - 40 && (event.my as i32) < area.y + 70 {
                     world.speaker.play(Sound::Click, 0.5);
+                    return (true, true);
+                }
 
-                    let mx = (mouse.position[0] as i32) - area.x;
-                    let my = (mouse.position[1] as i32) - area.y;
-                    
-                    let slot_opt = self.find_slot_at(mx, my);
-
-                    match slot_opt {
-                        None => {
-                            if mx < 0 { // dropped to the map floor?
-                                self.dragged_item = None;
-                                self.drop_item(world, id);
-        
-                                return (true, false);
-                            }
-                            else {
-                                println!("No suitable drop location {}, {}", mx, my);
-                            }
-                        },
-                        Some(slot) => {
+                match self.dragged_item {
+                    None => {
+                        if self.hover_item.is_some() {
+                            self.dragged_item = self.hover_item;
+            
+                            world.speaker.play(Sound::Click, 0.5);
+                            println!("Started to drag item idx={:?} from {}, {}", self.dragged_item, event.mx, event.my);
+                            
+                            let item_id = self.dragged_item.unwrap();
                             let inventory = &mut world.player_inventory;
-                            self.drop_item_to_slot(inventory, id, slot, mx, my);
-                            self.dragged_item = None;
-        
+                            let idx = inventory.find_entry_for_id(item_id).unwrap();
+                            let entry: &mut Entry = &mut inventory.entries[idx];
+                            entry.slot = Slot::OnCursor;
+
                             return (true, false);
                         }
+                    },
+                    Some(id) => {
+
+                        world.speaker.play(Sound::Click, 0.5);
+
+                        let mx = (mouse.position[0] as i32) - area.x;
+                        let my = (mouse.position[1] as i32) - area.y;
+                        
+                        let slot_opt = self.find_slot_at(mx, my);
+
+                        match slot_opt {
+                            None => {
+                                if mx < 0 { // dropped to the map floor?
+                                    self.dragged_item = None;
+                                    self.drop_item(world, id);
+            
+                                    return (true, false);
+                                }
+                                else {
+                                    println!("No suitable drop location {}, {}", mx, my);
+                                }
+                            },
+                            Some(slot) => {
+                                let inventory = &mut world.player_inventory;
+                                self.drop_item_to_slot(inventory, id, slot, mx, my);
+                                self.dragged_item = None;
+            
+                                return (true, false);
+                            }
+                        }
                     }
+                }
+            }
+            else if event.args.button == Button::Mouse(MouseButton::Right) {
+                if self.hover_item.is_some() {
+                    let inventory = &mut world.player_inventory;
+                    let item = inventory.bag.get(&self.hover_item.unwrap());
+                    println!("Activating {:?}", item);
+
+                    if item.unwrap().kind == ItemKind::Mushroom {
+                        let key = self.hover_item.unwrap();
+                        self.hover_item = None;
+                        inventory.remove_item(key);
+                    }
+
+                    return (true, false);
                 }
             }
         }
